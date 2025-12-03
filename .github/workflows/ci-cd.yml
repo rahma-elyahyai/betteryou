@@ -24,6 +24,8 @@ jobs:
 
       - name: Build & Test backend
         run: ./mvnw clean test
+      - name: Make mvnw executable
+        run: chmod +x mvnw
 
   build-frontend:
     runs-on: ubuntu-latest
