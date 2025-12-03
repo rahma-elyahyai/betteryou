@@ -22,10 +22,11 @@ jobs:
           distribution: temurin
           java-version: "17"
 
-      - name: Build & Test backend
-        run: ./mvnw clean test
       - name: Make mvnw executable
         run: chmod +x mvnw
+
+      - name: Build & Test backend
+        run: ./mvnw clean test
 
   build-frontend:
     runs-on: ubuntu-latest
