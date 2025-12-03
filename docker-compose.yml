@@ -1,0 +1,52 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:16
+    container_name: betteryou-postgres
+    environment:
+      POSTGRES_DB: betteryou_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 1234
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - betteryou-net
+
+  backend:
+    build:
+      context: .              # AU LIEU DE ..
+      dockerfile: devops/Dockerfile.backend
+    container_name: betteryou-backend
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/betteryou_db
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: 1234
+    depends_on:
+      - postgres
+    ports:
+      - "8080:8080"
+    networks:
+      - betteryou-net
+
+
+  frontend:
+    build:
+      context: .              # AU LIEU DE ..
+      dockerfile: devops/Dockerfile.frontend
+    container_name: betteryou-frontend
+    depends_on:
+      - backend
+    ports:
+      - "3000:80"
+    networks:
+      - betteryou-net
+
+
+volumes:
+  pgdata:
+
+networks:
+  betteryou-net:
