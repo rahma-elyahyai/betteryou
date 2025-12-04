@@ -1,12 +1,14 @@
 server:
   port: 8080
+
 spring:
   application:
     name: betteryou-backend
+
   datasource:
-    url: jdbc:postgresql://localhost:5432/betteryou_db
-    username: postgres
-    password: 1234
+    url: jdbc:postgresql://ep-crimson-queen-ab7d5yoc-pooler.eu-west-2.aws.neon.tech:5432/betteryou_db?sslmode=require
+    username: neondb_owner
+    password: npg_yzkwA5gZb7BT
     driver-class-name: org.postgresql.Driver
 
   jpa:
@@ -23,3 +25,5 @@ spring:
       allowed-origins: "http://localhost:3000"
       allowed-methods: "*"
       allowed-headers: "*"
+
+
