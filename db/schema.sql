@@ -2,7 +2,7 @@
 -- 1. TABLE UTILISATEUR
 -- =========================================================
 
-CREATE TABLE "USER" (
+CREATE TABLE USERS (
     id_user            SERIAL PRIMARY KEY,
     first_name         VARCHAR(50)      NOT NULL,
     last_name          VARCHAR(50)      NOT NULL,
@@ -26,7 +26,7 @@ CREATE TABLE "USER" (
 --    (USER 1,n WORKOUT_PROGRAM)
 -- =========================================================
 
-CREATE TABLE "WORKOUT_PROGRAM" (
+CREATE TABLE WORKOUT_PROGRAM (
     id_program        SERIAL PRIMARY KEY,
     program_name      VARCHAR(100)     NOT NULL,
     description       VARCHAR(255),
@@ -39,7 +39,7 @@ CREATE TABLE "WORKOUT_PROGRAM" (
     id_user           INT NOT NULL,
     CONSTRAINT fk_program_user
         FOREIGN KEY (id_user)
-        REFERENCES "USER"(id_user)
+        REFERENCES USER(id_user)
         ON DELETE CASCADE
 );
 
@@ -48,7 +48,7 @@ CREATE TABLE "WORKOUT_PROGRAM" (
 --    (WORKOUT_PROGRAM 1,n WORKOUT_SESSION)
 -- =========================================================
 
-CREATE TABLE "WORKOUT_SESSION" (
+CREATE TABLE WORKOUT_SESSION (
     id_session       SERIAL PRIMARY KEY,
     session_date     DATE,
     duration_minutes INT,
@@ -58,7 +58,7 @@ CREATE TABLE "WORKOUT_SESSION" (
     id_program       INT NOT NULL,
     CONSTRAINT fk_session_program
         FOREIGN KEY (id_program)
-        REFERENCES "WORKOUT_PROGRAM"(id_program)
+        REFERENCES WORKOUT_PROGRAM(id_program)
         ON DELETE CASCADE
 );
 
@@ -66,7 +66,7 @@ CREATE TABLE "WORKOUT_SESSION" (
 -- 4. TABLE EXERCICE
 -- =========================================================
 
-CREATE TABLE "EXERCISE" (
+CREATE TABLE EXERCISE (
     id_exercise        SERIAL PRIMARY KEY,
     exercise_name      VARCHAR(100)    NOT NULL,
     description        VARCHAR(255),
@@ -82,7 +82,7 @@ CREATE TABLE "EXERCISE" (
 --    (N,N entre WORKOUT_SESSION et EXERCISE)
 -- =========================================================
 
-CREATE TABLE "SESSION_EXERCISE" (
+CREATE TABLE SESSION_EXERCISE (
     id_session       INT NOT NULL,
     id_exercise      INT NOT NULL,
     sets             INT,
@@ -95,12 +95,12 @@ CREATE TABLE "SESSION_EXERCISE" (
 
     CONSTRAINT fk_sess_ex_session
         FOREIGN KEY (id_session)
-        REFERENCES "WORKOUT_SESSION"(id_session)
+        REFERENCES WORKOUT_SESSION (id_session)
         ON DELETE CASCADE,
 
     CONSTRAINT fk_sess_ex_exercise
         FOREIGN KEY (id_exercise)
-        REFERENCES "EXERCISE"(id_exercise)
+        REFERENCES EXERCISE(id_exercise)
         ON DELETE CASCADE
 );
 
@@ -109,7 +109,7 @@ CREATE TABLE "SESSION_EXERCISE" (
 --    (USER 1,n NUTRITION_PLAN)
 -- =========================================================
 
-CREATE TABLE "NUTRITION_PLAN" (
+CREATE TABLE NUTRITION_PLAN (
     id_nutrition     SERIAL PRIMARY KEY,
     nutrition_name   VARCHAR(100)    NOT NULL,
     start_date       DATE,
@@ -121,7 +121,7 @@ CREATE TABLE "NUTRITION_PLAN" (
     id_user          INT NOT NULL,
     CONSTRAINT fk_nutrition_user
         FOREIGN KEY (id_user)
-        REFERENCES "USER"(id_user)
+        REFERENCES USER(id_user)
         ON DELETE CASCADE
 );
 
@@ -129,7 +129,7 @@ CREATE TABLE "NUTRITION_PLAN" (
 -- 7. TABLE MEAL (repas)
 -- =========================================================
 
-CREATE TABLE "MEAL" (
+CREATE TABLE MEAL (
     id_meal       SERIAL PRIMARY KEY,
     meal_name     VARCHAR(100)   NOT NULL,
     description   VARCHAR(255),
@@ -141,7 +141,7 @@ CREATE TABLE "MEAL" (
 -- 8. TABLE FOOD_ITEM (catalogue aliments)
 -- =========================================================
 
-CREATE TABLE "FOOD_ITEM" (
+CREATE TABLE FOOD_ITEM (
     id_food           SERIAL PRIMARY KEY,
     food_name         VARCHAR(100)   NOT NULL,
     description       VARCHAR(255),
@@ -156,7 +156,7 @@ CREATE TABLE "FOOD_ITEM" (
 --    correspond à la relation "contains" du MCD/MLD
 -- =========================================================
 
-CREATE TABLE "CONTAINS" (
+CREATE TABLE CONTAINS (
     id_meal        INT NOT NULL,
     id_food        INT NOT NULL,
     quantity_grams DECIMAL(6,2),
@@ -166,12 +166,12 @@ CREATE TABLE "CONTAINS" (
 
     CONSTRAINT fk_contains_meal
         FOREIGN KEY (id_meal)
-        REFERENCES "MEAL"(id_meal)
+        REFERENCES MEAL(id_meal)
         ON DELETE CASCADE,
 
     CONSTRAINT fk_contains_food
         FOREIGN KEY (id_food)
-        REFERENCES "FOOD_ITEM"(id_food)
+        REFERENCES FOOD_ITEM(id_food)
         ON DELETE CASCADE
 );
 
@@ -180,7 +180,7 @@ CREATE TABLE "CONTAINS" (
 --     correspond à l'entité-association "composed_of"
 -- =========================================================
 
-CREATE TABLE "COMPOSED_OF" (
+CREATE TABLE COMPOSED_OF (
     id_nutrition INT NOT NULL,
     id_meal      INT NOT NULL,
 
@@ -189,12 +189,12 @@ CREATE TABLE "COMPOSED_OF" (
 
     CONSTRAINT fk_composed_nutrition
         FOREIGN KEY (id_nutrition)
-        REFERENCES "NUTRITION_PLAN"(id_nutrition)
+        REFERENCES NUTRITION_PLAN(id_nutrition)
         ON DELETE CASCADE,
 
     CONSTRAINT fk_composed_meal
         FOREIGN KEY (id_meal)
-        REFERENCES "MEAL"(id_meal)
+        REFERENCES MEAL(id_meal)
         ON DELETE CASCADE
 );
 
@@ -203,7 +203,7 @@ CREATE TABLE "COMPOSED_OF" (
 --     (USER 1,n CHAT_MESSAGE)
 -- =========================================================
 
-CREATE TABLE "CHAT_MESSAGE" (
+CREATE TABLE CHAT_MESSAGE (
     id_message    SERIAL PRIMARY KEY,
     message_time  TIMESTAMP      NOT NULL,
     message_text  TEXT           NOT NULL,
@@ -212,7 +212,7 @@ CREATE TABLE "CHAT_MESSAGE" (
     id_user       INT NOT NULL,
     CONSTRAINT fk_message_user
         FOREIGN KEY (id_user)
-        REFERENCES "USER"(id_user)
+        REFERENCES USER(id_user)
         ON DELETE CASCADE
 );
 
@@ -221,7 +221,7 @@ CREATE TABLE "CHAT_MESSAGE" (
 --     (CHAT_MESSAGE 1,0..1 AI_CALL_LOG)
 -- =========================================================
 
-CREATE TABLE "AI_CALL_LOG" (
+CREATE TABLE AI_CALL_LOG (
     id_call          SERIAL PRIMARY KEY,
     status           VARCHAR(20),   -- tu peux ajouter un CHECK si tu veux fixer les valeurs
     called_at        TIMESTAMP,
@@ -234,6 +234,6 @@ CREATE TABLE "AI_CALL_LOG" (
 
     CONSTRAINT fk_aicall_message
         FOREIGN KEY (id_message)
-        REFERENCES "CHAT_MESSAGE"(id_message)
+        REFERENCES CHAT_MESSAGE(id_message)
         ON DELETE CASCADE
 );
