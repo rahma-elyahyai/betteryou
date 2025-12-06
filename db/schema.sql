@@ -39,7 +39,7 @@ CREATE TABLE WORKOUT_PROGRAM (
     id_user           INT NOT NULL,
     CONSTRAINT fk_program_user
         FOREIGN KEY (id_user)
-        REFERENCES USER(id_user)
+        REFERENCES USERS(id_user)
         ON DELETE CASCADE
 );
 
@@ -121,7 +121,7 @@ CREATE TABLE NUTRITION_PLAN (
     id_user          INT NOT NULL,
     CONSTRAINT fk_nutrition_user
         FOREIGN KEY (id_user)
-        REFERENCES USER(id_user)
+        REFERENCES USERS(id_user)
         ON DELETE CASCADE
 );
 
@@ -212,7 +212,7 @@ CREATE TABLE CHAT_MESSAGE (
     id_user       INT NOT NULL,
     CONSTRAINT fk_message_user
         FOREIGN KEY (id_user)
-        REFERENCES USER(id_user)
+        REFERENCES USERS(id_user)
         ON DELETE CASCADE
 );
 
