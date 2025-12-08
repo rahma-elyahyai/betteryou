@@ -19,7 +19,7 @@ jobs:
           distribution: temurin
           java-version: "17"
 
-      # 🔹 Donne les droits d'exécution au script mvnw dans backend/
+      # 🔹 Donne les droits d'exécution au script mvnw
       - name: Make mvnw executable
         working-directory: backend
         run: chmod +x mvnw
@@ -27,6 +27,7 @@ jobs:
       - name: Backend tests
         working-directory: backend
         run: ./mvnw clean test
+
       - name: Build backend
         working-directory: backend
         run: ./mvnw -q clean package -DskipTests
@@ -48,6 +49,7 @@ jobs:
           cd frontend
           npm install
           npm run build
+
 
   docker-build-push:
     runs-on: ubuntu-latest
@@ -72,3 +74,6 @@ jobs:
         run: |
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/betteryou-backend:latest
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/betteryou-frontend:latest
+
+      - name: Logout Docker
+        run: docker logout
