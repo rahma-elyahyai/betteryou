@@ -9,5 +9,4 @@ class BetteryouBackendApplicationTests {
     @Test
     void contextLoads() {
     }
-
 }
