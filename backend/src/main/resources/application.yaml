@@ -1,5 +1,5 @@
 server:
-  port: 8080
+  port: 3031
 
 spring:
   application:
@@ -25,5 +25,9 @@ spring:
       allowed-origins: "http://localhost:3000"
       allowed-methods: "*"
       allowed-headers: "*"
+jwt:
+  secret: "g3M3vC64N0YV9qA3ZP1lq7wJzXpimBcKd7lQfo2x8cw="
+  expiration: 86400000
+
 
 
