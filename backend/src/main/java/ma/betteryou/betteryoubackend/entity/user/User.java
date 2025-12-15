@@ -20,7 +20,7 @@ import ma.betteryou.betteryoubackend.entity.enums.Goal;
 @Builder
 public class User {
 
-    @Id
+    @Id    //clé primaire
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_user")
     private Integer idUser;

@@ -13,7 +13,7 @@ import lombok.*;
 @Builder
 public class SessionExercise {
 
-    @EmbeddedId
+    @EmbeddedId   //clé primaire composite   idSession + idExercise
     private SessionExerciseId id;
 
     @ManyToOne(fetch = FetchType.LAZY)

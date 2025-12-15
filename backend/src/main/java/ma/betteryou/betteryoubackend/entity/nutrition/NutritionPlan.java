@@ -3,6 +3,7 @@ package ma.betteryou.betteryoubackend.entity.nutrition;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDate;
+import java.util.Optional;
 import java.util.Set;
 
 import ma.betteryou.betteryoubackend.entity.user.User;
@@ -43,4 +44,6 @@ public class NutritionPlan {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_user", nullable = false)
     private User user;
+
+
 }

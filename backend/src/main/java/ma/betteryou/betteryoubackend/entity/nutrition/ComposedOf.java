@@ -25,4 +25,5 @@ public class ComposedOf {
     @MapsId("idMeal")
     @JoinColumn(name = "id_meal", nullable = false)
     private Meal meal;
+
 }

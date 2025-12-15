@@ -6,8 +6,9 @@ spring:
     name: betteryou-backend
 
   datasource:
-    url: jdbc:postgresql://ep-crimson-queen-ab7d5yoc-pooler.eu-west-2.aws.neon.tech/betteryou_db?user=neondb_owner&password=npg_yzkwA5gZb7BT&sslmode=require&channelBinding=require
-    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://ep-crimson-queen-ab7d5yoc-pooler.eu-west-2.aws.neon.tech/betteryou_db?sslmode=require
+    username: neondb_owner
+    password: npg_yzkwA5gZb7BT
 
   jpa:
     hibernate:
@@ -20,6 +21,6 @@ spring:
 
   mvc:
     cors:
-      allowed-origins: "http://localhost:3000"
+      allowed-origins: "http://localhost:5173"
       allowed-methods: "*"
       allowed-headers: "*"
