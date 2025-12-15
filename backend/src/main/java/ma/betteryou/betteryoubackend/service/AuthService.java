@@ -4,11 +4,9 @@ import lombok.RequiredArgsConstructor;
 import ma.betteryou.betteryoubackend.DTO.AuthResponse;
 import ma.betteryou.betteryoubackend.DTO.LoginRequest;
 import ma.betteryou.betteryoubackend.DTO.RegisterRequest;
-import ma.betteryou.betteryoubackend.enums.*;
-import ma.betteryou.betteryoubackend.entity.User;
-import ma.betteryou.betteryoubackend.enums.Gender;
+import ma.betteryou.betteryoubackend.entity.enums.*;
+import ma.betteryou.betteryoubackend.entity.user.User;
 import ma.betteryou.betteryoubackend.repository.UserRepository;
-import ma.betteryou.betteryoubackend.service.impl.UserDetailsServiceImp;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -50,7 +48,7 @@ public class AuthService {
 
         //j'ai choisi de mettre que userId dans payload du token
         Map<String, Object> extraClaims = new HashMap<>();
-        extraClaims.put("userId", user.getUserId());
+        extraClaims.put("userId", user.getIdUser());
 
         // Générer le token avec userId dans les claims
         //var userDetails = new UserDetailsServiceImp(user);
@@ -58,7 +56,7 @@ public class AuthService {
 
         return AuthResponse.builder()
                 .token(jwtToken)
-                .userId(user.getUserId())
+                .userId(Long.valueOf(user.getIdUser()))
                 .message("Inscription réussie")
                 .build();
     }
@@ -79,7 +77,7 @@ public class AuthService {
 
         // 3) Ajouter l'userId dans les claims comme register()
         Map<String, Object> extraClaims = new HashMap<>();
-        extraClaims.put("userId", user.getUserId());
+        extraClaims.put("userId", user.getIdUser());
 
         // 4) Générer le token (email dans subject, userId dans claims)
         var jwtToken = jwtService.generateToken(extraClaims, user);
@@ -87,7 +85,7 @@ public class AuthService {
         // 5) Retourner la réponse
         return AuthResponse.builder()
                 .token(jwtToken)
-                .userId(user.getUserId())
+                .userId(Long.valueOf(user.getIdUser()))
                 .message("Connexion réussie")
                 .build();
     }

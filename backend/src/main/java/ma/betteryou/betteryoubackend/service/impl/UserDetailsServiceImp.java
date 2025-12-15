@@ -1,6 +1,6 @@
 package ma.betteryou.betteryoubackend.service.impl;
 
-import ma.betteryou.betteryoubackend.entity.User;
+import ma.betteryou.betteryoubackend.entity.user.User;
 import ma.betteryou.betteryoubackend.repository.UserRepository;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;

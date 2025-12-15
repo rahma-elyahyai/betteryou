@@ -1,8 +1,8 @@
 package ma.betteryou.betteryoubackend.service;
-import ma.betteryou.betteryoubackend.entity.User;
 
 import ma.betteryou.betteryoubackend.DTO.RegisterRequest;
 import ma.betteryou.betteryoubackend.DTO.LoginRequest;
+import ma.betteryou.betteryoubackend.entity.user.User;
 
 
 public interface UserService {

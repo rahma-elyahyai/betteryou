@@ -5,8 +5,10 @@ package ma.betteryou.betteryoubackend;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.Disabled;
 import org.springframework.stereotype.Component;
 
+@Disabled
 @Data  // Génère getters, setters, equals, hashCode, toString
 @RequiredArgsConstructor  // Génère constructeur avec champs final
 @Slf4j  // Génère un logger

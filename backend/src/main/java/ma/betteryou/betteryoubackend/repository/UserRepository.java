@@ -1,7 +1,6 @@
 package ma.betteryou.betteryoubackend.repository;
 
-import ma.betteryou.betteryoubackend.entity.User;
-import org.springframework.data.jpa.repository.JpaRepository;
+import ma.betteryou.betteryoubackend.entity.user.User;
 import org.springframework.stereotype.Repository;
 import org.springframework.data.repository.CrudRepository;
 import java.util.Optional;
