@@ -1,42 +1,137 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* ============================================
+   GLOBAL STYLES
+   ============================================ */
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+  'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ============================================
+   ERROR PAGE STYLES (404) - Keep in App.css
+   ============================================ */
+
+.error-container {
+  width: 100vw;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #000000 0%, #1a0033 50%, #000000 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+}
+
+.error-content {
   text-align: center;
+  animation: fadeInUp 0.8s ease-out;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
-}
-
-@keyframes logo-spin {
+@keyframes fadeInUp {
   from {
-    transform: rotate(0deg);
+    opacity: 0;
+    transform: translateY(30px);
   }
   to {
-    transform: rotate(360deg);
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
+.error-title {
+  font-size: 120px;
+  font-weight: 900;
+  color: #D4FF00;
+  margin-bottom: 20px;
+  text-shadow: 0 0 40px rgba(212, 255, 0, 0.4);
+}
+
+.error-subtitle {
+  font-size: 36px;
+  color: #ffffff;
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+
+.error-description {
+  font-size: 18px;
+  color: #cccccc;
+  margin-bottom: 40px;
+  max-width: 500px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* ============================================
+   RESPONSIVE BREAKPOINTS FOR ERROR PAGE
+   ============================================ */
+
+/* Ultra Wide Monitors (2560px+) */
+@media (min-width: 2560px) {
+  .error-title {
+    font-size: 150px;
+  }
+
+  .error-subtitle {
+    font-size: 44px;
   }
 }
 
-.card {
-  padding: 2em;
+/* Laptop (1024px - 1279px) */
+@media (min-width: 1024px) and (max-width: 1279px) {
+  .error-title {
+    font-size: 100px;
+  }
+
+  .error-subtitle {
+    font-size: 32px;
+  }
 }
 
-.read-the-docs {
-  color: #888;
+/* Small Laptop / Tablet Landscape (768px - 1023px) */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .error-title {
+    font-size: 90px;
+  }
+
+  .error-subtitle {
+    font-size: 28px;
+  }
+
+  .error-description {
+    font-size: 16px;
+  }
+}
+
+/* Tablet Portrait / Large Mobile (480px - 767px) */
+@media (min-width: 480px) and (max-width: 767px) {
+  .error-title {
+    font-size: 72px;
+  }
+
+  .error-subtitle {
+    font-size: 24px;
+  }
+}
+
+/* Mobile (up to 479px) */
+@media (max-width: 479px) {
+  .error-title {
+    font-size: 60px;
+  }
+
+  .error-subtitle {
+    font-size: 22px;
+  }
+
+  .error-description {
+    font-size: 14px;
+  }
 }

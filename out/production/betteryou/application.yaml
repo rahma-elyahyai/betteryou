@@ -1,0 +1,33 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: betteryou-backend
+
+  datasource:
+    url: jdbc:postgresql://ep-crimson-queen-ab7d5yoc-pooler.eu-west-2.aws.neon.tech:5432/betteryou_db?sslmode=require
+    username: neondb_owner
+    password: npg_yzkwA5gZb7BT
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+  mvc:
+    cors:
+      allowed-origins: "http://localhost:3000"
+      allowed-methods: "*"
+      allowed-headers: "*"
+  jwt:
+    secret: "votreClefSecreteTresLongueEtComplexePourSignerLesTokensJWT2024"
+    expiration: 86400000
+
+
+
