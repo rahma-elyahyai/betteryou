@@ -1,5 +1,7 @@
 package ma.betteryou.betteryoubackend.entity.nutrition;
 
+import java.util.List;
+
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -29,4 +31,11 @@ public class Meal {
 
     @Column(name = "image_url", length = 255)
     private String imageUrl;
+
+    @Column(name = "meal_status", length = 20)
+    private String mealStatus;
+
+    @OneToMany(mappedBy = "meal", fetch = FetchType.LAZY)
+    private List<Contains> contains;
 }
+
