@@ -1,6 +1,6 @@
 import React from "react";
 import { LayoutDashboard, Utensils, Dumbbell, User, LogOut } from "lucide-react";
-import logo2 from "@/assets/logo.png";
+import logo2 from "@/assets/logo2.png";
 
 const Item = ({ active, id, Icon, label }) => {
   const isActive = active === id;

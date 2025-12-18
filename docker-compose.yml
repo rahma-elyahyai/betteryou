@@ -24,6 +24,9 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/betteryou_db
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: 1234
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      # optionnel si tu veux configurer le modèle depuis compose
+      OPENAI_MODEL: gpt-4o-mini
     depends_on:
       - postgres
     ports:
