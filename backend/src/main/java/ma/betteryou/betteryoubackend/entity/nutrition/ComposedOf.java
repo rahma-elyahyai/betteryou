@@ -1,4 +1,3 @@
-
 package ma.betteryou.betteryoubackend.entity.nutrition;
 
 import jakarta.persistence.*;
@@ -25,4 +24,8 @@ public class ComposedOf {
     @MapsId("idMeal")
     @JoinColumn(name = "id_meal", nullable = false)
     private Meal meal;
+
+    @Column(name="meal_slot")
+    private String mealSlot; // ou enum
+
 }

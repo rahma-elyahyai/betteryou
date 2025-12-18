@@ -10,6 +10,7 @@ import ma.betteryou.betteryoubackend.entity.enums.ActivityLevel;
 import ma.betteryou.betteryoubackend.entity.enums.FitnessLevel;
 import ma.betteryou.betteryoubackend.entity.enums.Gender;
 import ma.betteryou.betteryoubackend.entity.enums.Goal;
+import ma.betteryou.betteryoubackend.entity.enums.FoodPreferences;
 
 @Entity
 @Table(name = "users") 
@@ -23,7 +24,7 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_user")
-    private Integer idUser;
+    private Long idUser;
 
     @Column(name = "first_name", nullable = false, length = 50)
     private String firstName;
@@ -67,4 +68,8 @@ public class User {
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "food_preferences", length = 255)
+    private FoodPreferences foodPreferences;
 }

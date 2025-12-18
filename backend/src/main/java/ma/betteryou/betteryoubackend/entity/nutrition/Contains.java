@@ -4,6 +4,9 @@ import jakarta.persistence.*;
 import lombok.*;
 import java.math.BigDecimal;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Entity
 @Table(name = "contains")
 @Getter
@@ -19,6 +22,7 @@ public class Contains {
     @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("idMeal")
     @JoinColumn(name = "id_meal", nullable = false)
+    @JsonBackReference 
     private Meal meal;
 
     @ManyToOne(fetch = FetchType.LAZY)
