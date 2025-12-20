@@ -1,6 +1,11 @@
-<<<<<<< HEAD
 // src/App.jsx
 import React from "react";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import NutritionPage from "./features/Nutrition/components/NutritionPage";
+import MyPrograms from "./features/Nutrition/components/MyPrograms";
+import CreateNutritionPlan from "./features/Nutrition/components/CreateNutritionPlan";
+import AddMeals from "./features/Nutrition/components/AddMeals";
+import { NutritionProvider } from "./features/Nutrition/store/NutritionContext";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
 import LandingPage from "./pages/LandingPage.jsx";
@@ -14,9 +19,10 @@ import Welcome from "./components/auth/Welcome.jsx";
 // 🔐 Guard
 import ProtectedRoute from "./components/auth/ProtectedRoute.jsx";
 
-export default function App() {
+function App() {
   return (
-    <Router>
+    <BrowserRouter>
+    <NutritionProvider>
       <Routes>
         {/* Page d’accueil marketing */}
         <Route path="/" element={<LandingPage />} />
@@ -35,23 +41,6 @@ export default function App() {
             </ProtectedRoute>
           }
         />
-      </Routes>
-    </Router>
-  );
-}
-=======
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import NutritionPage from "./features/Nutrition/components/NutritionPage";
-import MyPrograms from "./features/Nutrition/components/MyPrograms";
-import CreateNutritionPlan from "./features/Nutrition/components/CreateNutritionPlan";
-import AddMeals from "./features/Nutrition/components/AddMeals";
-import { NutritionProvider } from "./features/Nutrition/store/NutritionContext"
-
-function App() {
-  return (
-    <BrowserRouter>
-    <NutritionProvider>
-      <Routes>
 
         {/* PAGE NUTRITION */}
         <Route path="/nutrition" element={<NutritionPage />} />
@@ -60,8 +49,6 @@ function App() {
 
         <Route path="/myprograms" element={<MyPrograms/>} />
 
-        {/* PAGE ACCUEIL (optionnelle pour le test) */}
-        <Route path="/" element={<div>Home Page</div>} />
 
         <Route path="/create-nutrition-plan" element={<CreateNutritionPlan />} />
         <Route path="/nutrition-plans/:planId/add-meals" element={<AddMeals />} />
@@ -73,4 +60,3 @@ function App() {
 }
 
 export default App;
->>>>>>> origin/Nutrition_feature_by_Sara

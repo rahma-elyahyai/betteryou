@@ -1,16 +1,3 @@
-<<<<<<< HEAD
-/** @type {import('tailwindcss').Config} */
-export default {
-  content: [
-    "./index.html",
-    "./src/**/*.{js,jsx,ts,tsx}",
-  ],
-  theme: {
-    extend: {},
-  },
-  plugins: [],
-};
-=======
 // tailwind.config.js
 const colors = require("tailwindcss/colors");
 
@@ -31,4 +18,3 @@ module.exports = {
   plugins: [],
 };
 
->>>>>>> origin/Nutrition_feature_by_Sara
