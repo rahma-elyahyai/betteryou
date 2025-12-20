@@ -20,6 +20,11 @@ spring:
 
   mvc:
     cors:
-      allowed-origins: "http://localhost:3000"
+      allowed-origins: "http://localhost:5173"
       allowed-methods: "*"
       allowed-headers: "*"
+
+app:
+  jwt:
+    secret: "betteryou_super_secret_key_very_long_64_chars_1234567890_abcdef"
+    expiration-ms: 100000

@@ -1,10 +1,14 @@
 package ma.betteryou.betteryoubackend.controller;
 
 import lombok.RequiredArgsConstructor;
-import ma.betteryou.betteryoubackend.dto.*;
-import ma.betteryou.betteryoubackend.service.UserProfileService;
+import ma.betteryou.betteryoubackend.dto.Profile.UserObjectiveDto;
+import ma.betteryou.betteryoubackend.dto.Profile.UserProfileInfoDto;
+import ma.betteryou.betteryoubackend.dto.Profile.UserProfileResponseDto;
+import ma.betteryou.betteryoubackend.entity.user.User;
+import ma.betteryou.betteryoubackend.repository.UserRepository;
+import ma.betteryou.betteryoubackend.service.profile.UserProfileService;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.bind.annotation.CrossOrigin;
 
 @RestController
 @RequestMapping("/api/profile")
@@ -13,24 +17,32 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 public class UserProfileController {
 
     private final UserProfileService userProfileService;
+    private final UserRepository userRepository;
 
-    // Pour l’instant : user fixe tant qu’on n’a pas l’auth
-    private static final Long DEMO_USER_ID = 1L;
+    private Long getCurrentUserId(Authentication authentication) {
+        String email = authentication.getName(); //  récupéré depuis le token
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found: " + email));
+        return user.getIdUser(); // ⚠️ adapte si ton champ ID a un autre nom
+    }
 
     @GetMapping
-    public UserProfileResponseDto getProfile() {
-        return userProfileService.getProfileByUserId(DEMO_USER_ID);
+    public UserProfileResponseDto getProfile(Authentication authentication) {
+        Long userId = getCurrentUserId(authentication);
+        return userProfileService.getProfileByUserId(userId);
     }
 
     @PutMapping("/info")
-    public UserProfileInfoDto updateInfo(@RequestBody UserProfileInfoDto dto) {
-        Long userId = 1L;
+    public UserProfileInfoDto updateInfo(@RequestBody UserProfileInfoDto dto,
+                                         Authentication authentication) {
+        Long userId = getCurrentUserId(authentication);
         return userProfileService.updateProfileInfo(userId, dto);
     }
 
     @PutMapping("/objective")
-    public UserObjectiveDto updateObjective(@RequestBody UserObjectiveDto dto) {
-        Long userId = 1L;
+    public UserObjectiveDto updateObjective(@RequestBody UserObjectiveDto dto,
+                                            Authentication authentication) {
+        Long userId = getCurrentUserId(authentication);
         return userProfileService.updateObjective(userId, dto);
     }
 }

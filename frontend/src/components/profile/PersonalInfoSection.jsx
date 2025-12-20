@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { User, X, CheckCircle } from "lucide-react";
+import { User, X, CheckCircle, Sparkles } from "lucide-react";
 import ObjectiveSection from "./ObjectiveSection";
-import Sidebar from "../../layout/Sidebar";
+import Sidebar from "@/layout/Sidebar";
+import { profileApi } from "@/api/profileApi";
 
-export default function ProfileHeader() {
-  const [activeTab, setActiveTab] = useState("informations"); // informations | objective
-  const [activePage, setActivePage] = useState("profile"); // dashboard | nutrition | training | profile
+export default function PersonalInfoSection() {
+  const [activeTab, setActiveTab] = useState("informations");
+  const [activePage, setActivePage] = useState("profile");
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(true);
   const [showSuccessNotif, setShowSuccessNotif] = useState(false);
@@ -27,9 +28,8 @@ export default function ProfileHeader() {
 
   const fetchUserData = async () => {
     try {
-      const response = await fetch("http://localhost:8080/api/profile");
-      const data = await response.json();
-
+      setLoading(true);
+      const { data } = await profileApi.getProfile();
       const info = data.info;
 
       setFormData({
@@ -52,10 +52,7 @@ export default function ProfileHeader() {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSaveModifications = async () => {
@@ -70,24 +67,12 @@ export default function ProfileHeader() {
         activityLevel: formData.activity_level ? formData.activity_level.toUpperCase() : null,
       };
 
-      const response = await fetch("http://localhost:8080/api/profile/info", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-
-      if (!response.ok) {
-        console.error("Erreur backend:", await response.text());
-        return;
-      }
-
+      await profileApi.updateInfo(payload);
       await fetchUserData();
       setIsEditing(false);
 
       setShowSuccessNotif(true);
-      setTimeout(() => {
-        setShowSuccessNotif(false);
-      }, 3000);
+      setTimeout(() => setShowSuccessNotif(false), 2500);
     } catch (error) {
       console.error("Error saving user data:", error);
     }
@@ -95,222 +80,265 @@ export default function ProfileHeader() {
 
   const calculateAge = (birthDate) => {
     if (!birthDate) return "";
-
     const today = new Date();
     const birth = new Date(birthDate);
     if (isNaN(birth.getTime())) return "";
-
     let age = today.getFullYear() - birth.getFullYear();
     const monthDiff = today.getMonth() - birth.getMonth();
-    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
-      age--;
-    }
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) age--;
     return age;
   };
 
+  // ✨ UI classes
+  const surface =
+    "relative rounded-2xl border border-white/10 bg-white/5 backdrop-blur-xl shadow-[0_18px_60px_rgba(0,0,0,0.55)]";
+  const glassCard =
+    "rounded-2xl border border-white/10 bg-white/5 backdrop-blur-xl shadow-[0_12px_40px_rgba(0,0,0,0.40)]";
+  const sectionTitle = "text-white text-xl font-semibold tracking-tight";
+  const label = "text-[11px] uppercase tracking-wider text-white/55 mb-2";
+  const inputBase =
+    "w-full rounded-2xl px-4 py-3 bg-white/10 border border-white/15 text-white placeholder:text-white/35 outline-none transition " +
+    "hover:bg-white/12 hover:border-white/25 " +
+    "focus:ring-4 focus:ring-[#D6F93D]/15 focus:border-[#D6F93D]/55";
+  const inputDisabled =
+    "disabled:bg-white/5 disabled:text-white/70 disabled:border-white/10 disabled:cursor-not-allowed";
+
   if (loading) {
     return (
-      <div className="min-h-screen bg-black flex items-center justify-center">
-        <div className="text-white text-xl">Loading...</div>
+      <div className="min-h-screen relative overflow-hidden bg-black text-white flex items-center justify-center">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(214,249,61,0.10),transparent_35%),radial-gradient(circle_at_80%_30%,rgba(139,92,246,0.18),transparent_35%),radial-gradient(circle_at_50%_90%,rgba(214,249,61,0.10),transparent_40%)]" />
+        <div className="absolute inset-0 opacity-20 bg-[url('/src/assets/noise.png')] bg-repeat" />
+        <div className="relative flex items-center gap-3">
+          <div className="h-3 w-3 rounded-full bg-[#D6F93D] animate-pulse" />
+          <div className="text-white/80 font-medium">Loading profile...</div>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-black flex">
-      {/* Sidebar (isolée) */}
+    <div className="min-h-screen relative overflow-hidden bg-black text-white flex">
+      {/* Background like login/loading */}
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(214,249,61,0.10),transparent_35%),radial-gradient(circle_at_80%_30%,rgba(139,92,246,0.18),transparent_35%),radial-gradient(circle_at_50%_90%,rgba(214,249,61,0.10),transparent_40%)]" />
+      <div className="absolute inset-0 opacity-20 bg-[url('/src/assets/noise.png')] bg-repeat" />
+
       <Sidebar
         activePage={activePage}
         onNavigate={setActivePage}
         onLogout={() => {
+          localStorage.removeItem("token");
           console.log("logout");
         }}
       />
 
-      {/* Main Content */}
-      <div className="flex-1 p-8">
+      <div className="relative flex-1 p-8">
         {activePage === "profile" ? (
           <>
             {/* Header */}
-            <div className="bg-gradient-to-r from-yellow-600/20 to-yellow-700/20 rounded-lg p-6 mb-6">
-              <div className="flex items-center gap-3">
-                <h1 className="text-4xl font-bold" style={{ color: "#D6F93D" }}>
-                  My Profile
-                </h1>
-                <User className="w-8 h-8 text-purple-500" />
+            <div className={surface + " p-7 mb-6"}>
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <div className="flex items-center gap-3">
+                    <h1 className="text-4xl font-extrabold tracking-tight text-[#D6F93D]">
+                      My Profile
+                    </h1>
+                    <span className="inline-flex items-center justify-center h-10 w-10 rounded-2xl bg-white/5 border border-white/10">
+                      <User className="w-5 h-5 text-purple-400" />
+                    </span>
+                  </div>
+                  <p className="text-white/65 mt-2">
+                    Personalize your profile and unlock a smarter experience.
+                  </p>
+                </div>
+
+                <div className="hidden md:flex items-center gap-2 text-white/70 text-sm">
+                  <Sparkles className="w-4 h-4 text-[#D6F93D]" />
+                  <span>BetterYou</span>
+                </div>
               </div>
-              <p className="text-gray-300 mt-2">Personalize your profile and unlock a smarter</p>
             </div>
 
             {/* Tabs */}
-            <div className="bg-gray-700 rounded-lg p-1 flex gap-1 mb-6">
-              <button
-                onClick={() => setActiveTab("informations")}
-                className={`flex-1 px-8 py-3 rounded-lg font-bold text-lg transition-colors ${
-                  activeTab === "informations"
-                    ? "text-black"
-                    : "bg-purple-900 text-white hover:bg-purple-800"
-                }`}
-                style={activeTab === "informations" ? { backgroundColor: "#D6F93D" } : {}}
-              >
-                INFORMATIONS
-              </button>
+            <div className={glassCard + " p-2 mb-6"}>
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  onClick={() => setActiveTab("informations")}
+                  className={[
+                    "rounded-xl px-6 py-3 font-semibold tracking-wide transition",
+                    activeTab === "informations"
+                      ? "bg-[#D6F93D] text-black shadow-[0_12px_40px_rgba(214,249,61,0.22)]"
+                      : "bg-white/5 text-white/80 hover:bg-white/10 hover:text-white",
+                  ].join(" ")}
+                >
+                  INFORMATIONS
+                </button>
 
-              <button
-                onClick={() => setActiveTab("objective")}
-                className={`flex-1 px-8 py-3 rounded-lg font-bold text-lg transition-colors ${
-                  activeTab === "objective"
-                    ? "text-black"
-                    : "bg-purple-900 text-white hover:bg-purple-800"
-                }`}
-                style={activeTab === "objective" ? { backgroundColor: "#D6F93D" } : {}}
-              >
-                OBJECTIVE
-              </button>
+                <button
+                  onClick={() => setActiveTab("objective")}
+                  className={[
+                    "rounded-xl px-6 py-3 font-semibold tracking-wide transition",
+                    activeTab === "objective"
+                      ? "bg-[#D6F93D] text-black shadow-[0_12px_40px_rgba(214,249,61,0.22)]"
+                      : "bg-white/5 text-white/80 hover:bg-white/10 hover:text-white",
+                  ].join(" ")}
+                >
+                  OBJECTIVE
+                </button>
+              </div>
             </div>
 
-            {/* Objective tab */}
             {activeTab === "objective" && <ObjectiveSection />}
 
-            {/* Informations tab */}
             {activeTab === "informations" && (
-              <div
-                className="bg-[#2C0E4E] rounded-lg p-8 relative"
-                style={{ border: "1px solid #D6F93D" }}
-              >
+              <div className={glassCard + " p-8 relative"}>
+                {/* top right actions */}
                 {isEditing && (
                   <button
-                    onClick={() => setIsEditing(false)}
-                    className="absolute top-4 right-4 text-white hover:opacity-80"
-                    style={{ color: "#D6F93D" }}
+                    onClick={() => {
+                      setIsEditing(false);
+                      fetchUserData();
+                    }}
+                    className="absolute top-5 right-5 h-10 w-10 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition flex items-center justify-center"
+                    aria-label="Cancel"
                   >
-                    <X className="w-6 h-6" />
+                    <X className="w-5 h-5 text-[#D6F93D]" />
                   </button>
                 )}
 
                 <div className="flex items-center justify-between mb-8">
                   <div className="flex items-center gap-3">
-                    <div className="bg-yellow-700/30 p-2 rounded">
-                      <User className="w-6 h-6" style={{ color: "#D6F93D" }} />
+                    <div className="h-11 w-11 rounded-2xl bg-[#D6F93D]/10 border border-[#D6F93D]/25 flex items-center justify-center">
+                      <User className="w-5 h-5 text-[#D6F93D]" />
                     </div>
-                    <h2 className="text-2xl font-bold text-white">Personal Information</h2>
+                    <div>
+                      <h2 className={sectionTitle}>Personal Information</h2>
+                      <p className="text-white/55 text-sm mt-1">
+                        Update your personal and physical data.
+                      </p>
+                    </div>
                   </div>
 
-                  {!isEditing && (
+                  {!isEditing ? (
                     <button
                       onClick={() => setIsEditing(true)}
-                      className="px-6 py-2 rounded-lg font-bold text-black transition-opacity hover:opacity-90"
-                      style={{ backgroundColor: "#D6F93D" }}
+                      className="px-6 py-2.5 rounded-xl font-semibold text-black bg-[#D6F93D] hover:brightness-95 transition shadow-[0_12px_40px_rgba(214,249,61,0.18)]"
                     >
                       Modify
+                    </button>
+                  ) : (
+                    <button
+                      onClick={handleSaveModifications}
+                      className="px-6 py-2.5 rounded-xl font-semibold text-black bg-[#D6F93D] hover:brightness-95 transition shadow-[0_12px_40px_rgba(214,249,61,0.18)]"
+                    >
+                      Save
                     </button>
                   )}
                 </div>
 
-                <div className="grid grid-cols-2 gap-6">
+                {/* Form */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <label className="block text-white text-sm mb-2">first name</label>
+                    <div className={label}>First name</div>
                     <input
                       type="text"
                       name="first_name"
                       value={formData.first_name}
                       onChange={handleInputChange}
                       disabled={!isEditing}
-                      className="w-full px-4 py-3 rounded-full bg-white text-gray-800 disabled:bg-gray-200 disabled:text-gray-600"
+                      className={inputBase + " " + inputDisabled}
                     />
                   </div>
 
                   <div>
-                    <label className="block text-white text-sm mb-2">last name</label>
+                    <div className={label}>Last name</div>
                     <input
                       type="text"
                       name="last_name"
                       value={formData.last_name}
                       onChange={handleInputChange}
                       disabled={!isEditing}
-                      className="w-full px-4 py-3 rounded-full bg-white text-gray-800 disabled:bg-gray-200 disabled:text-gray-600"
+                      className={inputBase + " " + inputDisabled}
                     />
                   </div>
 
                   <div>
-                    <label className="block text-white text-sm mb-2">age</label>
+                    <div className={label}>Age</div>
                     <input
                       type="text"
-                      value={formData.birth_date ? calculateAge(formData.birth_date) : ""}
+                      value={formData.birth_date ? calculateAge(formData.birth_date) : "-"}
                       disabled
-                      className="w-full px-4 py-3 rounded-full bg-gray-200 text-gray-600"
+                      className={inputBase + " disabled:bg-white/5 disabled:text-white/70 disabled:border-white/10"}
                     />
                   </div>
 
                   <div>
-                    <label className="block text-white text-sm mb-2">gender</label>
+                    <div className={label}>Gender</div>
                     <input
                       type="text"
                       name="gender"
                       value={formData.gender}
                       onChange={handleInputChange}
                       disabled={!isEditing}
-                      className="w-full px-4 py-3 rounded-full bg-white text-gray-800 disabled:bg-gray-200 disabled:text-gray-600"
+                      className={inputBase + " " + inputDisabled + " capitalize"}
                     />
                   </div>
 
                   <div>
-                    <label className="block text-white text-sm mb-2">weight (kg)</label>
+                    <div className={label}>Weight (kg)</div>
                     <input
                       type="number"
                       name="initial_weight_kg"
                       value={formData.initial_weight_kg}
                       onChange={handleInputChange}
                       disabled={!isEditing}
-                      className="w-full px-4 py-3 rounded-full bg-white text-gray-800 disabled:bg-gray-200 disabled:text-gray-600"
+                      className={inputBase + " " + inputDisabled}
                     />
                   </div>
 
                   <div>
-                    <label className="block text-white text-sm mb-2">height (cm)</label>
+                    <div className={label}>Height (cm)</div>
                     <input
                       type="number"
                       name="height_cm"
                       value={formData.height_cm}
                       onChange={handleInputChange}
                       disabled={!isEditing}
-                      className="w-full px-4 py-3 rounded-full bg-white text-gray-800 disabled:bg-gray-200 disabled:text-gray-600"
+                      className={inputBase + " " + inputDisabled}
                     />
                   </div>
 
                   <div>
-                    <label className="block text-white text-sm mb-2">fitness level</label>
+                    <div className={label}>Fitness level</div>
                     <input
                       type="text"
                       name="fitness_level"
                       value={formData.fitness_level}
                       onChange={handleInputChange}
                       disabled={!isEditing}
-                      className="w-full px-4 py-3 rounded-full bg-white text-gray-800 disabled:bg-gray-200 disabled:text-gray-600"
+                      className={inputBase + " " + inputDisabled}
                     />
                   </div>
 
                   <div>
-                    <label className="block text-white text-sm mb-2">activity level</label>
+                    <div className={label}>Activity level</div>
                     <input
                       type="text"
                       name="activity_level"
                       value={formData.activity_level}
                       onChange={handleInputChange}
                       disabled={!isEditing}
-                      className="w-full px-4 py-3 rounded-full bg-white text-gray-800 disabled:bg-gray-200 disabled:text-gray-600"
+                      className={inputBase + " " + inputDisabled}
                     />
                   </div>
                 </div>
 
                 {isEditing && (
-                  <div className="flex justify-center mt-8">
+                  <div className="mt-8 flex justify-end">
                     <button
                       onClick={handleSaveModifications}
-                      className="px-12 py-3 rounded-lg font-bold text-black transition-opacity hover:opacity-90"
-                      style={{ backgroundColor: "#D6F93D" }}
+                      className="px-8 py-3 rounded-xl font-semibold text-black bg-[#D6F93D] hover:brightness-95 transition shadow-[0_12px_40px_rgba(214,249,61,0.18)]"
                     >
-                      save modifications
+                      Save modifications
                     </button>
                   </div>
                 )}
@@ -322,29 +350,20 @@ export default function ProfileHeader() {
         )}
       </div>
 
-      {/* Notification de succès */}
+      {/* Success toast */}
       {showSuccessNotif && (
-        <div className="fixed top-8 right-8 z-50 animate-slide-in">
-          <div
-            className="flex items-center gap-3 px-6 py-4 rounded-lg shadow-lg border"
-            style={{ backgroundColor: "#D6F93D", borderColor: "#b8d631" }}
-          >
-            <CheckCircle className="w-6 h-6 text-green-700" />
+        <div className="fixed top-8 right-8 z-50">
+          <div className="flex items-center gap-3 px-5 py-4 rounded-2xl border border-[#D6F93D]/35 bg-black/60 backdrop-blur-xl shadow-[0_18px_60px_rgba(0,0,0,0.55)]">
+            <div className="h-10 w-10 rounded-2xl bg-[#D6F93D]/15 border border-[#D6F93D]/30 flex items-center justify-center">
+              <CheckCircle className="w-5 h-5 text-[#D6F93D]" />
+            </div>
             <div>
-              <p className="font-bold text-black text-lg">Modification réussie !</p>
-              <p className="text-sm text-gray-800">Vos informations ont été mises à jour</p>
+              <p className="font-semibold text-white">Saved successfully</p>
+              <p className="text-sm text-white/60">Your information has been updated</p>
             </div>
           </div>
         </div>
       )}
-
-      <style>{`
-        @keyframes slide-in {
-          from { transform: translateX(400px); opacity: 0; }
-          to { transform: translateX(0); opacity: 1; }
-        }
-        .animate-slide-in { animation: slide-in 0.3s ease-out; }
-      `}</style>
     </div>
   );
 }
