@@ -24,7 +24,14 @@ spring:
       allowed-methods: "*"
       allowed-headers: "*"
 
+<<<<<<< HEAD
 app:
   jwt:
     secret: "betteryou_super_secret_key_very_long_64_chars_1234567890_abcdef"
     expiration-ms: 100000
+=======
+logging:
+  level:
+    org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping: DEBUG
+    org.springframework.web.servlet.DispatcherServlet: DEBUG
+>>>>>>> origin/Nutrition_feature_by_Sara
