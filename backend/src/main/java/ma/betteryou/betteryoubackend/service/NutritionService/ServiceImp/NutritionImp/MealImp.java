@@ -12,7 +12,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Objects;
 import java.util.ArrayList;
-import ma.betteryou.betteryoubackend.repository.User.UserRepository;
+import ma.betteryou.betteryoubackend.repository.UserRepository;
 import ma.betteryou.betteryoubackend.dto.Nutrition.MealDetailDto;
 import ma.betteryou.betteryoubackend.dto.Nutrition.IngredientDto;
 

@@ -10,7 +10,7 @@ import ma.betteryou.betteryoubackend.entity.nutrition.MealConsumption;
 import ma.betteryou.betteryoubackend.entity.user.User;
 import ma.betteryou.betteryoubackend.repository.Nutrition.MealConsumptionRepository;
 import ma.betteryou.betteryoubackend.repository.Nutrition.MealRepository;
-import ma.betteryou.betteryoubackend.repository.User.UserRepository;
+import ma.betteryou.betteryoubackend.repository.UserRepository;
 import ma.betteryou.betteryoubackend.service.NutritionService.MealConsumptionService;
 
 import java.time.LocalDate;

@@ -3,7 +3,8 @@ import { useEffect, useState } from "react";
 import MealCard from "./MealCard.jsx";
 import MealDetailModal from "./MealDetail.jsx";
 import { useNutrition } from "../store/NutritionContext.jsx";
-import Sidebar from "./Sidebar.jsx";
+import Sidebar from "../../../layout/Sidebar"; // on dois remonté trois fichiers 
+
 
 export default function NutritionCatalog({ userId = 2, limit = 4 }) {
   const { 

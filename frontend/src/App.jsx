@@ -1,12 +1,12 @@
 // src/App.jsx
 import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+
 import NutritionPage from "./features/Nutrition/components/NutritionPage";
 import MyPrograms from "./features/Nutrition/components/MyPrograms";
 import CreateNutritionPlan from "./features/Nutrition/components/CreateNutritionPlan";
 import AddMeals from "./features/Nutrition/components/AddMeals";
 import { NutritionProvider } from "./features/Nutrition/store/NutritionContext";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
 import LandingPage from "./pages/LandingPage.jsx";
 import ProfilePage from "./pages/ProfilePage.jsx";
@@ -22,38 +22,35 @@ import ProtectedRoute from "./components/auth/ProtectedRoute.jsx";
 function App() {
   return (
     <BrowserRouter>
-    <NutritionProvider>
-      <Routes>
-        {/* Page d’accueil marketing */}
-        <Route path="/" element={<LandingPage />} />
+      <NutritionProvider>
+        <Routes>
+          {/* Page d’accueil marketing */}
+          <Route path="/" element={<LandingPage />} />
 
-        {/* Auth */}
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<RegisterWizard />} />
-        <Route path="/welcome" element={<Welcome />} />
+          {/* Auth */}
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<RegisterWizard />} />
+          <Route path="/welcome" element={<Welcome />} />
 
-        {/* Page protégée */}
-        <Route
-          path="/profile"
-          element={
-            <ProtectedRoute>
-              <ProfilePage />
-            </ProtectedRoute>
-          }
-        />
+          {/* Page protégée */}
+          <Route
+            path="/profile"
+            element={
+              <ProtectedRoute>
+                <ProfilePage />
+              </ProtectedRoute>
+            }
+          />
 
-        {/* PAGE NUTRITION */}
-        <Route path="/nutrition" element={<NutritionPage />} />
+          {/* Nutrition */}
+          <Route path="/nutrition" element={<NutritionPage />} />
+          <Route path="/myprograms" element={<MyPrograms />} />
+          <Route path="/create-nutrition-plan" element={<CreateNutritionPlan />} />
+          <Route path="/nutrition-plans/:planId/add-meals" element={<AddMeals />} />
 
-        <Route path="*" element={<div>404 Not Found</div>} />
-
-        <Route path="/myprograms" element={<MyPrograms/>} />
-
-
-        <Route path="/create-nutrition-plan" element={<CreateNutritionPlan />} />
-        <Route path="/nutrition-plans/:planId/add-meals" element={<AddMeals />} />
-
-      </Routes>
+          {/* 404 en dernier */}
+          <Route path="*" element={<div>404 Not Found</div>} />
+        </Routes>
       </NutritionProvider>
     </BrowserRouter>
   );
