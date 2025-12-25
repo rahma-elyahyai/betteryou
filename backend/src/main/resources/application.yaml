@@ -18,8 +18,25 @@ spring:
         format_sql: true
         dialect: org.hibernate.dialect.PostgreSQLDialect
 
-  mvc:
-    cors:
-      allowed-origins: "http://localhost:3000"
-      allowed-methods: "*"
-      allowed-headers: "*"
+# ✅ Actuator (pour /actuator/health)
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "health,info"
+  endpoint:
+    health:
+      show-details: "always"
+
+# ✅ IA (Ollama)
+
+ai:
+  provider: github-models
+  model: gpt-4.1
+  timeout-seconds: 600
+  github:
+    # Use env var GITHUB_MODELS_API_KEY (personal access token) - do NOT commit this
+    api-key: ${GITHUB_MODELS_API_KEY:}
+    base-url: https://models.inference.ai.azure.com
+    model: ${AI_GITHUB_MODEL:${ai.model:gpt-4.1}}
+    api-version: 2024-09-01-preview   # ou la valeur indiquée par la doc GitHub Models

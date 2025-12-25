@@ -7,7 +7,6 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
 
-// imports CORS
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -22,13 +21,13 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         http
-                // ⚠ toujours désactivé pour API
                 .csrf(AbstractHttpConfigurer::disable)
-
-                // ✅ activer CORS avec notre configuration
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
 
-                // ici on dit : toutes les requêtes sont autorisées
+                // ✅ désactiver les pages login / basic auth auto
+                .httpBasic(AbstractHttpConfigurer::disable)
+                .formLogin(AbstractHttpConfigurer::disable)
+
                 .authorizeHttpRequests(auth -> auth
                         .anyRequest().permitAll()
                 );
@@ -36,25 +35,24 @@ public class SecurityConfig {
         return http.build();
     }
 
-    // ✅ Configuration globale CORS
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
+
         CorsConfiguration configuration = new CorsConfiguration();
 
-        // Origine du frontend (Vite)
-        configuration.setAllowedOrigins(List.of("http://localhost:5173"));
+        // ✅ autoriser Vite + React(3000) + Postman
+        configuration.setAllowedOrigins(List.of(
+                "http://localhost:5173",
+                "http://localhost:3000"
+        ));
 
-        // Méthodes HTTP autorisées
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-
-        // Tous les headers
         configuration.setAllowedHeaders(List.of("*"));
-
-        // Si un jour tu utilises des cookies / Authorization header
         configuration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
+
         return source;
     }
 }

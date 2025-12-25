@@ -17,7 +17,7 @@ services:
 
   backend:
     build:
-      context: .              # AU LIEU DE ..
+      context: .
       dockerfile: devops/Dockerfile.backend
     container_name: betteryou-backend
     environment:
@@ -31,10 +31,9 @@ services:
     networks:
       - betteryou-net
 
-
   frontend:
     build:
-      context: .              # AU LIEU DE ..
+      context: .
       dockerfile: devops/Dockerfile.frontend
     container_name: betteryou-frontend
     depends_on:
@@ -43,7 +42,6 @@ services:
       - "3000:80"
     networks:
       - betteryou-net
-
 
 volumes:
   pgdata:

@@ -1,4 +1,3 @@
-
 package ma.betteryou.betteryoubackend.entity.nutrition;
 
 import jakarta.persistence.*;
@@ -18,11 +17,15 @@ public class ComposedOf {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("idNutrition")
-    @JoinColumn(name = "id_nutrition", nullable = false)
+    @JoinColumn(name = "id_nutrition", nullable = false, insertable = false, updatable = false)
     private NutritionPlan nutritionPlan;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("idMeal")
-    @JoinColumn(name = "id_meal", nullable = false)
+    @JoinColumn(name = "id_meal", nullable = false, insertable = false, updatable = false)
     private Meal meal;
+
+    @Column(name="meal_slot")
+    private String mealSlot; // ou enum
+
 }
