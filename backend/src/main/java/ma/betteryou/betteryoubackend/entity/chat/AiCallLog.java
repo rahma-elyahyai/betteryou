@@ -40,4 +40,9 @@ public class AiCallLog {
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_message", nullable = false, unique = true)
     private ChatMessage chatMessage;
+
+    public void error(String string, Exception e) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'error'");
+    }
 }

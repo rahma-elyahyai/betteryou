@@ -25,7 +25,11 @@ public class ComposedOf {
     @JoinColumn(name = "id_meal", nullable = false)
     private Meal meal;
 
+<<<<<<< HEAD
     @Column(name="meal_slot")
     private String mealSlot; // ou enum
 
 }
+=======
+}
+>>>>>>> soukaina

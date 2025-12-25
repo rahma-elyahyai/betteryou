@@ -21,7 +21,7 @@ import ma.betteryou.betteryoubackend.entity.enums.FoodPreferences;
 @Builder
 public class User {
 
-    @Id
+    @Id    //clé primaire
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_user")
     private Long idUser;

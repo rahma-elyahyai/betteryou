@@ -3,8 +3,13 @@ package ma.betteryou.betteryoubackend.entity.nutrition;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDate;
+<<<<<<< HEAD
 import java.util.ArrayList;
 import java.util.List;
+=======
+import java.util.Optional;
+import java.util.Set;
+>>>>>>> soukaina
 
 import ma.betteryou.betteryoubackend.entity.user.User;
 
@@ -44,6 +49,11 @@ public class NutritionPlan {
     @JoinColumn(name = "id_user", nullable = false)
     private User user;
 
+<<<<<<< HEAD
     @OneToMany(mappedBy = "nutritionPlan", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<ComposedOf> composedOf = new ArrayList<>();
 }
+=======
+
+}
+>>>>>>> soukaina

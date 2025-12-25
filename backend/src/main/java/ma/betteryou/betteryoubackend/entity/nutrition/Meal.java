@@ -1,5 +1,7 @@
 package ma.betteryou.betteryoubackend.entity.nutrition;
 
+import java.util.List;
+
 import jakarta.persistence.*;
 import lombok.*;
 import ma.betteryou.betteryoubackend.entity.enums.Goal;
@@ -38,6 +40,7 @@ public class Meal {
     @Column(name = "image_url", length = 255)
     private String imageUrl;
 
+<<<<<<< HEAD
     @Enumerated(EnumType.STRING)
     @Column(name = "goal", length = 20)
     private Goal goal;
@@ -56,4 +59,12 @@ public class Meal {
 
     @Column(columnDefinition = "jsonb")
     private String preparationSteps;
+=======
+    @Column(name = "meal_status", length = 20)
+    private String mealStatus;
+
+    @OneToMany(mappedBy = "meal", fetch = FetchType.LAZY)
+    private List<Contains> contains;
+>>>>>>> soukaina
 }
+

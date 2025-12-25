@@ -35,4 +35,8 @@ public class MealConsumption {
 
     @Column(name = "servings", nullable = false)
     private Integer servings;
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> soukaina
