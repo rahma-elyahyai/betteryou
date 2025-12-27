@@ -8,10 +8,12 @@ import ma.betteryou.betteryoubackend.service.auth.AuthService;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+
+
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "*")
+
 public class AuthController {
 
     private final AuthService authService;

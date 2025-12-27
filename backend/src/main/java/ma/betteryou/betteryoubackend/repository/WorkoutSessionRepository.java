@@ -20,7 +20,7 @@ public interface WorkoutSessionRepository extends JpaRepository<WorkoutSession, 
           AND ws.sessionDate BETWEEN :start AND :end
     """)
     List<WorkoutSession> findSessionsForUserBetween(
-            @Param("userId") Integer userId,
+            @Param("userId") long userId,
             @Param("start") LocalDate start,
             @Param("end") LocalDate end
     );
@@ -36,7 +36,7 @@ public interface WorkoutSessionRepository extends JpaRepository<WorkoutSession, 
         ORDER BY ws.sessionDate ASC
     """)
     List<WorkoutSession> findUpcomingSessions(
-            @Param("userId") Integer userId,
+            @Param("userId") long userId,
             @Param("today") LocalDate today
     );
 

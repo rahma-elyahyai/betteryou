@@ -8,7 +8,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDate;
 import java.util.Optional;
-
+import java.util.List;
 public interface NutritionPlanRepository extends JpaRepository<NutritionPlan, Long> {
 
     @Query("""
@@ -19,9 +19,12 @@ public interface NutritionPlanRepository extends JpaRepository<NutritionPlan, Lo
         ORDER BY np.startDate DESC
     """)
     Optional<NutritionPlan> findFirstByUser_IdUserOrderByStartDateDesc(
-            @Param("userId") Integer userId,
+            @Param("userId") long userId,
             @Param("today") LocalDate today
     );
+
+    // ✅ Retourne une Liste, pas un Optional
+    List<NutritionPlan> findByUser_IdUser(Long idUser);
 
 }
 

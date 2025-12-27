@@ -15,7 +15,7 @@ import ma.betteryou.betteryoubackend.entity.nutrition.NutritionPlan;
 import ma.betteryou.betteryoubackend.entity.user.User;
 import ma.betteryou.betteryoubackend.entity.workout.WorkoutProgram;
 import ma.betteryou.betteryoubackend.entity.workout.WorkoutSession;
-import ma.betteryou.betteryoubackend.repository.MealConsumptionRepository;
+import ma.betteryou.betteryoubackend.repository.Nutrition.MealConsumptionRepository;
 import ma.betteryou.betteryoubackend.repository.NutritionPlanRepository;
 import ma.betteryou.betteryoubackend.repository.UserRepository;
 import ma.betteryou.betteryoubackend.repository.WorkoutProgramRepository;
@@ -38,7 +38,7 @@ public class DashboardServiceImpl implements DashboardService {
     private final MealConsumptionRepository mealConsumptionRepository;
 
     @Override
-    public DashboardResponse getDashboardForUser(Integer userId) {
+    public DashboardResponse getDashboardForUser(long userId) {
 
         // 1) USER
         User user = userRepository.findById(userId)
@@ -178,7 +178,7 @@ public class DashboardServiceImpl implements DashboardService {
      * Burned   : somme par jour (durationMinutes * 7)
      */
     private List<DashboardResponse.DayCaloriesDto> buildWeeklyCalories(
-            Integer userId,
+            long userId,
             NutritionPlan nutritionPlan,
             LocalDate start,
             LocalDate end
@@ -231,7 +231,7 @@ public class DashboardServiceImpl implements DashboardService {
     // 3) MACROS (placeholder)
     // =====================================================================
     private DashboardResponse.MacroDistributionDto buildMacroDistribution(
-        Integer userId,
+        long userId,
         LocalDate today
 ) {
     // On prend uniquement les repas consommés aujourd’hui
@@ -299,7 +299,7 @@ public class DashboardServiceImpl implements DashboardService {
     // 4) TRAINING MINUTES par jour (CARDIO/STRENGTH/MIXED)
     // =====================================================================
     private List<DashboardResponse.DayTrainingDto> buildWeeklyTraining(
-            Integer userId,
+            long userId,
             LocalDate start,
             LocalDate end
     ) {
@@ -344,7 +344,7 @@ public class DashboardServiceImpl implements DashboardService {
     // =====================================================================
     // 5) GOAL TRACKER
     // =====================================================================
-    private DashboardResponse.GoalTrackerDto buildGoalTracker(Integer userId) {
+    private DashboardResponse.GoalTrackerDto buildGoalTracker(long userId) {
         User user = userRepository.findById(userId).orElseThrow();
 
         WorkoutProgram program = workoutProgramRepository
@@ -366,7 +366,7 @@ public class DashboardServiceImpl implements DashboardService {
     // 6) UPCOMING SESSIONS
     // =====================================================================
     private List<DashboardResponse.UpcomingSessionDto> buildUpcomingSessions(
-            Integer userId,
+            long userId,
             LocalDate today
     ) {
         List<WorkoutSession> sessions =

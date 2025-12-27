@@ -12,6 +12,7 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import ma.betteryou.betteryoubackend.entity.enums.SessionStatus;
 
+
 @Entity
 @Table(name = "meal")
 @Getter
@@ -40,7 +41,6 @@ public class Meal {
     @Column(name = "image_url", length = 255)
     private String imageUrl;
 
-<<<<<<< HEAD
     @Enumerated(EnumType.STRING)
     @Column(name = "goal", length = 20)
     private Goal goal;
@@ -59,12 +59,5 @@ public class Meal {
 
     @Column(columnDefinition = "jsonb")
     private String preparationSteps;
-=======
-    @Column(name = "meal_status", length = 20)
-    private String mealStatus;
-
-    @OneToMany(mappedBy = "meal", fetch = FetchType.LAZY)
-    private List<Contains> contains;
->>>>>>> soukaina
 }
 

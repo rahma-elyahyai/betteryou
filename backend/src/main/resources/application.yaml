@@ -20,16 +20,14 @@ spring:
 
   mvc:
     cors:
-      allowed-origins: 
-      =  - "http://localhost:5173"
-        - "http://localhost:5174"
+      allowed-origins: "http://localhost:5174"
       allowed-methods: "*"
       allowed-headers: "*"
 
 app:
   jwt:
     secret: "betteryou_super_secret_key_very_long_64_chars_1234567890_abcdef"
-    expiration-ms: 100000
+    expiration-ms: 10000000
 logging:
   level:
     org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping: DEBUG

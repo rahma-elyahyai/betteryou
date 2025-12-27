@@ -8,6 +8,9 @@ import MacroDonut from "@/components/dashboard/MacroDonut";
 import TrainingChart from "@/components/dashboard/TrainingChart";
 import ProgramProgressGauge from "@/components/dashboard/ProgramProgressGauge";
 import TodaysFocus from "@/components/dashboard/TodaysFocus";
+import {authApi} from "@/api/auth.js";
+import { getCurrentUserId } from "@/utils/authUtils.js";
+
 
 import { Flame, Activity, Clock, Dumbbell } from "lucide-react";
 
@@ -21,7 +24,9 @@ export default function DashboardPage() {
       try {
         setLoading(true);
         setError("");
-        const data = await fetchDashboard(1);
+        const userId = await getCurrentUserId(); // 🔥 depuis /api/auth/me
+        console.log("User ID:", userId);
+        const data = await fetchDashboard(userId);
         setDashboard(data);
       } catch (e) {
         console.error("Erreur API Dashboard", e);

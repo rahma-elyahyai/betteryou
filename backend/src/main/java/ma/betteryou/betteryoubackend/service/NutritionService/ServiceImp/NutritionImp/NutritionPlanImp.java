@@ -2,7 +2,7 @@ package ma.betteryou.betteryoubackend.service.NutritionService.ServiceImp.Nutrit
 
 import ma.betteryou.betteryoubackend.repository.Nutrition.ComposedOfRepository;
 import ma.betteryou.betteryoubackend.repository.Nutrition.MealRepository;
-import ma.betteryou.betteryoubackend.repository.Nutrition.NutritionPlanRepository;
+import ma.betteryou.betteryoubackend.repository.NutritionPlanRepository;
 import ma.betteryou.betteryoubackend.repository.UserRepository;
 import ma.betteryou.betteryoubackend.service.NutritionService.NutritionPlanService;
 import ma.betteryou.betteryoubackend.dto.Nutrition.NutritionPlanDto;

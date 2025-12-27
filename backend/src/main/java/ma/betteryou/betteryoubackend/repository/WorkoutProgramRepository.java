@@ -10,7 +10,7 @@ import java.util.Optional;
 public interface WorkoutProgramRepository extends JpaRepository<WorkoutProgram, Long> {
     // choisit juste le dernier programme parce que user peut avoit plusieurs programmes et on choisit de travailler juste le derniere par notre methode
     Optional<WorkoutProgram> findFirstByUser_IdUserAndProgramStatusOrderByStartDateDesc(
-        Integer idUser,
+        long idUser,
         ProgramStatus status
     );
 }
