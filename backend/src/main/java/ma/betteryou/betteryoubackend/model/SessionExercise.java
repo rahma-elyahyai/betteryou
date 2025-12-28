@@ -1,0 +1,128 @@
+package ma.betteryou.betteryoubackend.model;
+
+import java.math.BigDecimal;
+
+import jakarta.persistence.*;
+
+@Entity
+@Table(name = "session_exercise")
+public class SessionExercise {
+
+    @EmbeddedId
+    private SessionExerciseId id;
+
+    // relation vers WorkoutSession (id_session)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @MapsId("sessionId")                     // lie le champ id.sessionId
+    @JoinColumn(name = "id_session")
+    private WorkoutSession session;
+
+    // relation vers Exercise (id_exercise)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @MapsId("exerciseId")                    // lie le champ id.exerciseId
+    @JoinColumn(name = "id_exercise")
+    private Exercise exercise;
+
+
+    @Column(name = "reps")
+    private Integer reps;
+
+    @Column(name = "rest_seconds")
+    private Integer restSeconds;
+
+    @Column(name="calories_burned")
+    private BigDecimal caloriesBurned; // ✅ BigDecimal si DB BigDecimal
+
+    @Column(name = "sets")
+    private Integer sets;
+
+    @Column(name = "note")
+    private String note;
+
+
+    public SessionExercise() {}
+
+    public SessionExercise(WorkoutSession session,
+                           Exercise exercise,
+                           Integer orderInSession,
+                           Integer reps,
+                           Integer restSeconds,
+                           Integer sets) {
+        this.session = session;
+        this.exercise = exercise;
+        this.reps = reps;
+        this.restSeconds = restSeconds;
+        this.sets = sets;
+        this.id = new SessionExerciseId(
+            session != null ? session.getId() : null,
+            orderInSession,
+            exercise != null ? exercise.getId() : null
+        );
+
+    }
+
+    public SessionExerciseId getId() {
+        return id;
+    }
+
+    public void setId(SessionExerciseId id) {
+        this.id = id;
+    }
+
+    public WorkoutSession getSession() {
+        return session;
+    }
+
+    public void setSession(WorkoutSession session) {
+        this.session = session;
+    }
+
+    public Exercise getExercise() {
+        return exercise;
+    }
+
+    public void setExercise(Exercise exercise) {
+        this.exercise = exercise;
+    }
+
+    public Integer getReps() {
+        return reps;
+    }
+
+    public void setReps(Integer reps) {
+        this.reps = reps;
+    }
+
+    public Integer getRestSeconds() {
+        return restSeconds;
+    }
+
+    public void setRestSeconds(Integer restSeconds) {
+        this.restSeconds = restSeconds;
+    }
+
+    public Integer getSets() {
+        return sets;
+    }
+
+    public void setSets(Integer sets) {
+        this.sets = sets;
+    }
+
+    public BigDecimal getCaloriesBurned() {
+        return caloriesBurned;
+    }
+    public void setCaloriesBurned(BigDecimal caloriesBurned) {
+        this.caloriesBurned = caloriesBurned;
+    }
+
+    public String getNote() {
+        return note;
+    }
+    public void setNote(String note) {
+        this.note = note;
+    }
+}
+
+
+
