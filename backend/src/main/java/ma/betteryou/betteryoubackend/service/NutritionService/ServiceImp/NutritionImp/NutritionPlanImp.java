@@ -43,7 +43,8 @@ public class NutritionPlanImp implements NutritionPlanService {
         List<NutritionPlan> nutritionPlans = nutritionPlanRepository.findByUser_IdUser(idUser);
         
         if (nutritionPlans.isEmpty()) {
-            throw new RuntimeException("No nutrition plans found for user: " + idUser);
+            return plans == null ? List.of() : plans;
+
         }
 
         // ✅ Convertir chaque NutritionPlan en DTO
