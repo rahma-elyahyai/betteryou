@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { X, RefreshCw, Search } from 'lucide-react';
+import { useNutrition } from '../store/NutritionContext.jsx';
 
 const ReplaceMealModal = ({ currentMeal, dayOfWeek, programId, onClose, onReplace }) => {
+  const { loadAllMeals } = useNutrition();
+
   const [meals, setMeals] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -9,18 +12,27 @@ const ReplaceMealModal = ({ currentMeal, dayOfWeek, programId, onClose, onReplac
   const [isReplacing, setIsReplacing] = useState(false);
 
   useEffect(() => {
-    fetch('http://localhost:8080/api/recommendations/meals')
-      .then(res => res.json())
-      .then(data => {
-        const filtered = data.filter(m => m.idMeal !== currentMeal.idMeal && m.mealType === currentMeal.mealType);
+    const fetchMeals = async () => {
+      try {
+        const data = await loadAllMeals();
+
+        const filtered = data.filter(
+          m =>
+            m.idMeal !== currentMeal.idMeal &&
+            m.mealType === currentMeal.mealType
+        );
+
         setMeals(filtered);
+      } catch (err) {
+        console.error('Error loading meals:', err);
+      } finally {
         setLoading(false);
-      })
-      .catch(err => {
-        console.error('Error fetching meals:', err);
-        setLoading(false);
-      });
-  }, [currentMeal]);
+      }
+    };
+
+    fetchMeals();
+  }, [currentMeal, loadAllMeals]);
+
 
   const filteredMeals = meals.filter(meal =>
     meal.mealName?.toLowerCase().includes(searchTerm.toLowerCase()) ||

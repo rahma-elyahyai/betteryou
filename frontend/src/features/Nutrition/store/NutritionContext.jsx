@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useCallback, useRef } from 'react';
-import { api } from "../../../api/auth";
+import { api } from "@/api/auth";
 
 const NutritionContext = createContext();
 
