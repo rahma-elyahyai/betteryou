@@ -43,7 +43,7 @@ public class NutritionPlanImp implements NutritionPlanService {
         List<NutritionPlan> nutritionPlans = nutritionPlanRepository.findByUser_IdUser(idUser);
         
         if (nutritionPlans.isEmpty()) {
-            return plans == null ? List.of() : plans;
+            return nutritionPlans == null ? List.of() : nutritionPlans;
 
         }
 
