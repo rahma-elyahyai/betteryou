@@ -17,6 +17,7 @@ import ma.betteryou.betteryoubackend.entity.nutrition.Contains;
 import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import java.util.Collections;
 
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
@@ -43,7 +44,7 @@ public class NutritionPlanImp implements NutritionPlanService {
         List<NutritionPlan> nutritionPlans = nutritionPlanRepository.findByUser_IdUser(idUser);
         
         if (nutritionPlans.isEmpty()) {
-            return ;
+            return Collections.emptyList();
 
         }
 
