@@ -45,7 +45,7 @@ describe("Login Component", () => {
         ).toBeInTheDocument();
 
         expect(screen.getByLabelText(/Email/i)).toBeInTheDocument();
-        expect(screen.getByLabelText(/Password/i)).toBeInTheDocument();
+        expect(screen.getByLabelText(/Password/i,{ selector: 'input' })).toBeInTheDocument();
 
         expect(
             screen.getByPlaceholderText("you@example.com")
@@ -175,6 +175,6 @@ describe("Login Component", () => {
     it("devrait avoir des labels accessibles", () => {
         renderWithRouter(<Login />);
         expect(screen.getByLabelText(/Email/i)).toBeInTheDocument();
-        expect(screen.getByLabelText(/Password/i)).toBeInTheDocument();
+        expect(screen.getByLabelText(/Password/i, { selector: 'input' })).toBeInTheDocument();
     });
 });

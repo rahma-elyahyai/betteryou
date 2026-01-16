@@ -190,7 +190,7 @@ class UserProfileControllerIntegrationTest {
     @DisplayName("PUT /api/profile/objective avec des données valides doit mettre à jour l'objectif")
     void testUpdateObjectiveSuccess() throws Exception {
         UserObjectiveDto objectiveDto = UserObjectiveDto.builder()
-                .goal("GAIN_MUSCLE")
+                .goal("GAIN_MASS")
                 .targetWeight(90.0)
                 .build();
 
@@ -199,7 +199,7 @@ class UserProfileControllerIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(objectiveDto)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.goal", is("GAIN_MUSCLE")))
+                .andExpect(jsonPath("$.goal", is("GAIN_MASS")))
                 .andExpect(jsonPath("$.targetWeight", is(90.0)));
 
         // Vérifier que les données ont bien été persistées
@@ -211,7 +211,7 @@ class UserProfileControllerIntegrationTest {
     @DisplayName("PUT /api/profile/objective sans targetWeight doit fonctionner")
     void testUpdateObjectiveWithoutTargetWeight() throws Exception {
         UserObjectiveDto objectiveDto = UserObjectiveDto.builder()
-                .goal("MAINTAIN_WEIGHT")
+                .goal("MAINTAIN")
                 .targetWeight(null) // Optionnel
                 .build();
 
@@ -220,7 +220,7 @@ class UserProfileControllerIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(objectiveDto)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.goal", is("MAINTAIN_WEIGHT")));
+                .andExpect(jsonPath("$.goal", is("MAINTAIN")));
     }
 
     @Test
@@ -287,7 +287,7 @@ class UserProfileControllerIntegrationTest {
 
         // 3. Mettre à jour l'objectif
         UserObjectiveDto updateObjective = UserObjectiveDto.builder()
-                .goal("MAINTAIN_WEIGHT")
+                .goal("MAINTAIN")
                 .targetWeight(82.0)
                 .build();
 
@@ -296,7 +296,7 @@ class UserProfileControllerIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(updateObjective)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.goal", is("MAINTAIN_WEIGHT")))
+                .andExpect(jsonPath("$.goal", is("MAINTAIN")))
                 .andExpect(jsonPath("$.targetWeight", is(82.0)));
 
         // 4. Vérifier que tout a été mis à jour
@@ -306,7 +306,7 @@ class UserProfileControllerIntegrationTest {
                 .andExpect(jsonPath("$.info.firstName", is("Johnny")))
                 .andExpect(jsonPath("$.info.weight", is(82.0)))
                 .andExpect(jsonPath("$.info.fitnessLevel", is("ADVANCED")))
-                .andExpect(jsonPath("$.objective.goal", is("MAINTAIN_WEIGHT")))
+                .andExpect(jsonPath("$.objective.goal", is("MAINTAIN")))
                 .andExpect(jsonPath("$.objective.targetWeight", is(82.0)));
     }
 

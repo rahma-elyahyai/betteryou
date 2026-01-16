@@ -12,6 +12,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Optional;
 
@@ -52,16 +53,15 @@ class AuthServiceTest {
 
     @Test
     void register_ShouldThrowException_WhenEmailAlreadyExists() {
-        // Given
         RegisterRequest request = new RegisterRequest();
         request.setEmail("existing@test.com");
         when(userRepository.existsByEmail("existing@test.com")).thenReturn(true);
 
-        // When & Then
         assertThatThrownBy(() -> authService.register(request))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("Email already used");
+                .isInstanceOf(ResponseStatusException.class)
+                .hasMessageContaining("Email already used");
     }
+
 
     @Test
     void login_ShouldReturnToken_WhenCredentialsAreValid() {

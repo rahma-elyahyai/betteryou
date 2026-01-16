@@ -5,9 +5,11 @@ import ma.betteryou.betteryoubackend.dto.auth.*;
 import ma.betteryou.betteryoubackend.entity.user.User;
 import ma.betteryou.betteryoubackend.repository.UserRepository;
 import ma.betteryou.betteryoubackend.service.auth.security.JwtService;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 @Service
 @RequiredArgsConstructor
@@ -29,7 +31,7 @@ public class AuthService {
 
     public AuthResponse register(RegisterRequest req) {
         if (userRepository.existsByEmail(req.getEmail())) {
-            throw new IllegalArgumentException("Email already used");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Email already used");
         }
 
         User user = User.builder()

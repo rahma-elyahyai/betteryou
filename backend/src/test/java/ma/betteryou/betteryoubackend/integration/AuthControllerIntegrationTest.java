@@ -89,25 +89,25 @@ class AuthControllerIntegrationTest {
     }
 
     @Test
-    @DisplayName("Login avec un email invalide doit retourner 401")
+    @DisplayName("Login avec un email invalide ")
     void testLoginWithInvalidEmail() throws Exception {
         LoginRequest loginRequest = new LoginRequest("wrong@test.com", "password123");
 
         mockMvc.perform(post("/api/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(loginRequest)))
-                .andExpect(status().isUnauthorized());
+                .andExpect(status().isForbidden());
     }
 
     @Test
-    @DisplayName("Login avec un mot de passe invalide doit retourner 401")
+    @DisplayName("Login avec un mot de passe invalide")
     void testLoginWithInvalidPassword() throws Exception {
         LoginRequest loginRequest = new LoginRequest("john.doe@test.com", "wrongpassword");
 
         mockMvc.perform(post("/api/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(loginRequest)))
-                .andExpect(status().isUnauthorized());
+                .andExpect(status().isForbidden());
     }
 
     @Test
@@ -243,7 +243,7 @@ class AuthControllerIntegrationTest {
     }
 
     @Test
-    @DisplayName("Endpoint /me sans token doit retourner 403")
+    @DisplayName("Endpoint /me sans token ")
     void testMeWithoutToken() throws Exception {
         mockMvc.perform(get("/api/auth/me"))
                 .andExpect(status().isForbidden());

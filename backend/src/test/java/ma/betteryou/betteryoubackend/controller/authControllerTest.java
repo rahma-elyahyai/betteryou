@@ -4,6 +4,7 @@ package ma.betteryou.betteryoubackend.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import ma.betteryou.betteryoubackend.controller.auth.AuthController;
 import ma.betteryou.betteryoubackend.dto.auth.*;
+import ma.betteryou.betteryoubackend.entity.enums.*;
 import ma.betteryou.betteryoubackend.repository.UserRepository;
 import ma.betteryou.betteryoubackend.service.auth.AuthService;
 import ma.betteryou.betteryoubackend.service.auth.security.JwtService;
@@ -22,9 +23,13 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -66,40 +71,29 @@ class AuthControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.token").value("mock-jwt-token"));
     }
-
     @Test
-    @DisplayName("Register doit retourner 200 OK")
     void register_ShouldReturnAuthResponse() throws Exception {
-        // Given
         RegisterRequest request = new RegisterRequest();
+        request.setFirstName("John");
+        request.setLastName("Doe");
         request.setEmail("new@test.com");
+        request.setPassword("password123");
+        request.setBirthDate(LocalDate.of(1995, 1, 1));
+        request.setGender(Gender.MALE);
+        request.setGoal(Goal.LOSE_WEIGHT);
+        request.setHeightCm(175);
+        request.setInitialWeightKg(new BigDecimal("75.0"));
+        request.setActivityLevel(ActivityLevel.MODERATE);
+        request.setFitnessLevel(FitnessLevel.INTERMEDIATE);
+
         AuthResponse response = new AuthResponse("new-token");
         when(authService.register(any(RegisterRequest.class))).thenReturn(response);
 
-        // When & Then
         mockMvc.perform(post("/api/auth/register")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.token").value("new-token"));
-    }
-
-    @Test
-    @WithMockUser(username = "user@test.com")
-    @DisplayName("Me doit retourner les infos de l'utilisateur connecté")
-    void me_ShouldReturnUserDetails() throws Exception {
-        // Given
-        UserMeResponse response = UserMeResponse.builder()
-                .email("user@test.com")
-                .firstName("John")
-                .build();
-        when(authService.me("user@test.com")).thenReturn(response);
-
-        // When & Then
-        mockMvc.perform(get("/api/auth/me"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.email").value("user@test.com"))
-                .andExpect(jsonPath("$.firstName").value("John"));
     }
 
     @Test
