@@ -61,9 +61,10 @@ export default function Login() {
           <span className="text-xs text-white/50">
             Min 8 chars + numbers/symbols recommended.
           </span>
-          <button type="button" className="text-sm text-[#D6F93D] hover:brightness-110">
+          <Link to="/forgot-password" className="text-sm text-[#D6F93D] hover:brightness-110">
             Forgot Password?
-          </button>
+          </Link>
+
         </div>
 
         {error ? (

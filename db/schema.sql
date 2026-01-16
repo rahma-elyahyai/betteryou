@@ -17,7 +17,7 @@ CREATE TABLE USERS (
     fitness_level      VARCHAR(20) CHECK (fitness_level IN ('BEGINNER','INTERMEDIATE','ADVANCED')),
     activity_level     VARCHAR(20) CHECK (activity_level IN ('SEDENTARY','MODERATE','ACTIVE')),
     created_at         TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-
+    food_preferences  VARCHAR(50) CHECK (food_preferences IN ('VEGAN','VEGETARIAN','KETO','PALEO','NONE')),
     CONSTRAINT uq_user_email UNIQUE (email)
 );
 
@@ -134,7 +134,12 @@ CREATE TABLE MEAL (
     meal_name     VARCHAR(100)   NOT NULL,
     description   VARCHAR(255),
     meal_type     VARCHAR(50),   -- BREAKFAST / LUNCH / DINNER / SNACK...
-    image_url     VARCHAR(255)
+    image_url     VARCHAR(255)?
+    goal          VARCHAR(20) CHECK (goal IN ('LOSE_WEIGHT','MAINTAIN','GAIN_MASS')),
+    food_preferences VARCHAR(50) CHECK (food_preferences IN ('VEGAN','VEGETARIAN','KETO','PALEO','NONE')),
+    meal_status  VARCHAR(20) CHECK (meal_status IN ('PLANNED','CONSUMED','SKIPPED')),
+    preparation_steps TEXT
+
 );
 
 -- =========================================================
@@ -237,3 +242,16 @@ CREATE TABLE AI_CALL_LOG (
         REFERENCES CHAT_MESSAGE(id_message)
         ON DELETE CASCADE
 );
+
+CREATE TABLE password_reset_tokens (
+  id BIGSERIAL PRIMARY KEY,
+  token VARCHAR(120) NOT NULL UNIQUE,
+  user_id BIGINT NOT NULL,
+  expires_at TIMESTAMP NOT NULL,
+  used BOOLEAN NOT NULL DEFAULT FALSE,
+  CONSTRAINT fk_password_reset_user
+    FOREIGN KEY (user_id)
+    REFERENCES users(id_user)
+    ON DELETE CASCADE
+);
+

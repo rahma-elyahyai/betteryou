@@ -3,7 +3,8 @@ package ma.betteryou.betteryoubackend.entity.nutrition;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDate;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 import ma.betteryou.betteryoubackend.entity.user.User;
 
@@ -39,8 +40,10 @@ public class NutritionPlan {
     @Column(name = "calories_per_day")
     private Integer caloriesPerDay;
 
-    // --------- RELATION VERS USER (1,n) ----------
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_user", nullable = false)
     private User user;
+
+    @OneToMany(mappedBy = "nutritionPlan", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<ComposedOf> composedOf = new ArrayList<>();
 }
