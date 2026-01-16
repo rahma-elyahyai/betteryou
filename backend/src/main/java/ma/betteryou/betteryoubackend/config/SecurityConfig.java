@@ -45,7 +45,7 @@ public class SecurityConfig {
 
                 // Routes publiques / protégées
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/api/auth/login", "/api/auth/register", "/api/auth/check-email").permitAll()
                         .anyRequest().authenticated()
                 )
 
