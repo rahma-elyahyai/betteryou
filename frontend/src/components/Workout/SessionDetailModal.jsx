@@ -1,3 +1,5 @@
+// MyProgramsSection.jsx
+
 import React, { useEffect, useMemo, useState } from "react";
 import { fetchSessionDetail, saveExerciseNote, savePerformance, completeSession } from "../../api/Workout/sessionApi";
 import useRestTimer from "../../hooks/Workout/useRestTimer";
@@ -12,10 +14,9 @@ export default function SessionDetailModal({ sessionId, onClose }) {
   const [activeExerciseIndex, setActiveExerciseIndex] = useState(0);
   const [showVideo, setShowVideo] = useState(false);
 
-  // ✅ FIX: remplacer le faux "setSession" par une fonction qui met à jour fetchState.data
   const setSession = (updater) => {
     setFetchState((prev) => {
-      if (prev.id !== sessionId) return prev; // sécurité
+      if (prev.id !== sessionId) return prev;
       const nextData = typeof updater === "function" ? updater(prev.data) : updater;
       return { ...prev, data: nextData };
     });
@@ -27,20 +28,15 @@ export default function SessionDetailModal({ sessionId, onClose }) {
   const [showPerformance, setShowPerformance] = useState(false);
   const [performanceData, setPerformanceData] = useState({ weight: "", reps: "", sets: "" });
 
-  // ✅ loading dérivé
   const loading = !!sessionId && fetchState.id !== sessionId;
 
   const session = fetchState.id === sessionId ? fetchState.data : null;
   const error = fetchState.id === sessionId ? fetchState.error : null;
+
   const handleCompleteSession = async () => {
     try {
       const updated = await completeSession(sessionId);
-
-      // si tu utilises fetchState comme dans ton code:
       setFetchState((prev) => ({ ...prev, data: updated }));
-
-      // ou si tu utilises setSession direct:
-      // setSession(updated);
     } catch (e) {
       console.error(e);
       alert("Failed to complete session");
@@ -106,7 +102,6 @@ export default function SessionDetailModal({ sessionId, onClose }) {
     timer.resetTo(rest);
   };
 
-  // ✅ note text (draft par exercice)
   const activeId = activeExercise ? (activeExercise.idExercise ?? activeExercise.id_exercise) : null;
   const noteText = activeId ? (noteDrafts[activeId] ?? activeExercise?.note ?? "") : "";
 
@@ -154,14 +149,12 @@ export default function SessionDetailModal({ sessionId, onClose }) {
           const exId = ex.idExercise ?? ex.id_exercise;
           if (exId !== exerciseId) return ex;
 
-          // support 2 noms: performanceHistory (camel) ou performance_history (snake)
           const historyCamel = Array.isArray(ex.performanceHistory) ? ex.performanceHistory : null;
           const historySnake = Array.isArray(ex.performance_history) ? ex.performance_history : null;
 
           if (historyCamel) return { ...ex, performanceHistory: [saved, ...historyCamel] };
           if (historySnake) return { ...ex, performance_history: [saved, ...historySnake] };
 
-          // sinon on crée camel par défaut
           return { ...ex, performanceHistory: [saved] };
         }),
       };
@@ -174,155 +167,163 @@ export default function SessionDetailModal({ sessionId, onClose }) {
   if (!sessionId) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/90 flex items-center justify-center z-50 p-4 overflow-y-auto">
-      <div className="relative bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white rounded-2xl w-full max-w-6xl max-h-[95vh] overflow-hidden border-2 border-lime-400 shadow-2xl shadow-lime-400/30">
-        {/* ✅ Header sticky (ajouté) */}
-        <div className="sticky top-0 bg-gradient-to-r from-gray-900 to-gray-800 border-b-2 border-lime-400/30 p-6 z-10">
+    <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm overflow-y-auto">
+      <div className="min-h-screen flex items-center justify-center p-4">
+        <div className="relative w-full max-w-5xl bg-gradient-to-br from-gray-900 to-gray-800 rounded-2xl shadow-2xl my-8">
+          
+          {/* Close Button */}
           <button
-            className="absolute top-6 right-6 text-3xl text-[#D6F93D] hover:border-[#D6F93D] hover:rotate-90 transition-all duration-300 font-bold"
             onClick={onClose}
+            className="sticky top-6 left-full -ml-6 z-10 bg-lime-400 hover:bg-lime-500 text-gray-900 w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300 hover:scale-110 shadow-lg"
           >
-            ✕
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
           </button>
 
-          <div className="flex items-center gap-3 mb-4">
-            <span className="text-[#D6F93D] text-5xl">💪</span>
-            <div>
-              <h2 className="text-3xl font-black text-[#D6F93D] uppercase tracking-wider">
-                Session Workout
-              </h2>
+          <div className="p-8">
+            {/* Header */}
+            <div className="mb-8">
+              <h2 className="text-lime-400 text-4xl font-bold mb-2">SESSION DETAIL</h2>
               <p className="text-gray-400 text-sm">
-                {session?.programName ?? session?.program_name ?? "-"}
+                {session?.programName ?? session?.program_name ?? "Workout Program"}
               </p>
             </div>
-          </div>
 
-          {loading && <p className="text-[#D6F93D] font-bold animate-pulse">Loading session...</p>}
-          {error && <p className="text-red-400">{error}</p>}
+            {loading && (
+              <div className="flex flex-col items-center justify-center py-32">
+                <div className="w-20 h-20 border-4 border-gray-800 border-t-lime-400 rounded-full animate-spin"></div>
+                <p className="text-gray-400 text-base mt-6 font-medium">Loading session...</p>
+              </div>
+            )}
 
-          {!loading && session && (
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-4">
-              <div className="bg-gray-800/50 p-3 rounded-lg border border-gray-700">
-                <div className="text-xs text-gray-400 uppercase">Date</div>
-                <div className="text-[#D6F93D] font-bold">
-                  {session.sessionDate ?? session.session_date ?? "-"}
+            {error && (
+              <div className="bg-red-900/20 border-2 border-red-500/50 rounded-2xl p-8 text-center">
+                <p className="text-red-400 text-lg font-semibold">{error}</p>
+              </div>
+            )}
+
+            {!loading && session && (
+              <>
+                {/* Session Info */}
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                  <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700">
+                    <div className="text-gray-500 text-xs uppercase mb-1">Date</div>
+                    <div className="text-white font-semibold">
+                      {session.sessionDate ?? session.session_date ?? "-"}
+                    </div>
+                  </div>
+                  <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700">
+                    <div className="text-gray-500 text-xs uppercase mb-1">Duration</div>
+                    <div className="text-white font-semibold">
+                      {session.durationMinutes ?? session.duration_minutes ?? "-"} min
+                    </div>
+                  </div>
+                  <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700">
+                    <div className="text-gray-500 text-xs uppercase mb-1">Exercises</div>
+                    <div className="text-lime-400 font-bold text-xl">{exercises.length}</div>
+                  </div>
+                  <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700">
+                    <div className="text-gray-500 text-xs uppercase mb-1">Calories</div>
+                    <div className="text-lime-400 font-bold text-xl">{totalCalories}</div>
+                  </div>
                 </div>
-              </div>
-              <div className="bg-gray-800/50 p-3 rounded-lg border border-gray-700">
-                <div className="text-xs text-gray-400 uppercase">Duration</div>
-                <div className="text-[#D6F93D] font-bold">
-                  {session.durationMinutes ?? session.duration_minutes ?? "-"} min
+
+                {/* Exercise List + Detail */}
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+                  {/* Liste exercices */}
+                  <div className="lg:col-span-1">
+                    <h3 className="text-lime-400 text-xl font-bold mb-4 uppercase">Exercises</h3>
+                    <div className="space-y-2">
+                      {exercises.map((ex, idx) => {
+                        const exId = ex.idExercise ?? ex.id_exercise;
+                        const name = ex.exerciseName ?? ex.exercise_name;
+                        const sets = ex.sets ?? 0;
+                        const reps = ex.reps ?? 0;
+
+                        return (
+                          <button
+                            key={exId ?? idx}
+                            onClick={() => onSelectExercise(idx)}
+                            className={`w-full text-left p-4 rounded-xl transition-all duration-300 ${
+                              activeExerciseIndex === idx
+                                ? "bg-lime-400 text-gray-900 shadow-lg shadow-lime-400/50"
+                                : "bg-gray-800/50 text-white hover:bg-gray-700/50 border border-gray-700"
+                            }`}
+                          >
+                            <div className="flex items-start gap-3">
+                              <span
+                                className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center font-bold ${
+                                  activeExerciseIndex === idx
+                                    ? "bg-gray-900 text-lime-400"
+                                    : "bg-lime-400 text-gray-900"
+                                }`}
+                              >
+                                {idx + 1}
+                              </span>
+                              <div className="flex-1 min-w-0">
+                                <div className="font-bold truncate">{name}</div>
+                                <div className={`text-sm ${activeExerciseIndex === idx ? "text-gray-800" : "text-gray-400"}`}>
+                                  {sets} sets × {reps} reps
+                                </div>
+                              </div>
+                            </div>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Détails exercice */}
+                  <div className="lg:col-span-2">
+                    {activeExercise && (
+                      <ExerciseDetailView
+                        exercise={activeExercise}
+                        showVideo={showVideo}
+                        setShowVideo={setShowVideo}
+                        editingNote={editingNote}
+                        setEditingNote={setEditingNote}
+                        noteText={noteText}
+                        onChangeNote={(val) =>
+                          setNoteDrafts((prev) => ({
+                            ...prev,
+                            [activeId]: val,
+                          }))
+                        }
+                        handleSaveNote={handleSaveNote}
+                        showPerformance={showPerformance}
+                        setShowPerformance={setShowPerformance}
+                        performanceData={performanceData}
+                        setPerformanceData={setPerformanceData}
+                        handleSavePerformance={handleSavePerformance}
+                        timer={timer}
+                      />
+                    )}
+                  </div>
                 </div>
-              </div>
-              <div className="bg-gray-800/50 p-3 rounded-lg border border-gray-700">
-                <div className="text-xs text-gray-400 uppercase">Exercises</div>
-                <div className="text-[#D6F93D] font-bold">{exercises.length}</div>
-              </div>
-              <div className="bg-gray-800/50 p-3 rounded-lg border border-gray-700">
-                <div className="text-xs text-gray-400 uppercase">Calories</div>
-                <div className="text-[#D6F93D] font-bold">{totalCalories} kcal</div>
-              </div>
-            </div>
-          )}
-        </div>
 
-        {/* ✅ Content */}
-        {!loading && session && (
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 p-6 overflow-y-auto max-h-[calc(95vh-220px)]">
-            {/* Liste exercices */}
-            <div className="lg:col-span-1 space-y-3">
-              <h3 className="text-xl font-bold text-[#D6F93D] mb-4 uppercase tracking-wide">
-                Exercise List
-              </h3>
-              <div className="space-y-2">
-                {exercises.map((ex, idx) => {
-                  const exId = ex.idExercise ?? ex.id_exercise;
-                  const name = ex.exerciseName ?? ex.exercise_name;
-                  const sets = ex.sets ?? 0;
-                  const reps = ex.reps ?? 0;
-
-                  return (
-                    <button
-                      key={exId ?? idx}
-                      onClick={() => onSelectExercise(idx)}
-                      className={`w-full text-left p-4 rounded-xl transition-all duration-300 ${
-                        activeExerciseIndex === idx
-                          ? "bg-[#D6F93D] text-gray-900 shadow-lg shadow-lime-400/50 scale-[1.02]"
-                          : "bg-gray-800/50 text-white hover:bg-gray-700/50 border border-gray-700"
-                      }`}
-                    >
-                      <div className="flex items-start gap-3">
-                        <span
-                          className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center font-bold ${
-                            activeExerciseIndex === idx
-                              ? "bg-gray-900 text-[#D6F93D]"
-                              : "bg-[#D6F93D] text-gray-900"
-                          }`}
-                        >
-                          {idx + 1}
-                        </span>
-                        <div className="flex-1 min-w-0">
-                          <div className="font-bold truncate">{name}</div>
-                          <div className={`text-sm ${activeExerciseIndex === idx ? "text-gray-800" : "text-gray-400"}`}>
-                            {sets} sets × {reps} reps
-                          </div>
-                        </div>
-                      </div>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* Détails exercice */}
-            <div className="lg:col-span-2">
-              {activeExercise && (
-                <ExerciseDetailView
-                  exercise={activeExercise}
-                  showVideo={showVideo}
-                  setShowVideo={setShowVideo}
-                  editingNote={editingNote}
-                  setEditingNote={setEditingNote}
-                  noteText={noteText}
-                  onChangeNote={(val) =>
-                    setNoteDrafts((prev) => ({
-                      ...prev,
-                      [activeId]: val,
-                    }))
-                  }
-                  handleSaveNote={handleSaveNote}
-                  showPerformance={showPerformance}
-                  setShowPerformance={setShowPerformance}
-                  performanceData={performanceData}
-                  setPerformanceData={setPerformanceData}
-                  handleSavePerformance={handleSavePerformance}
-                  timer={timer}
-                />
-              )}
-            </div>
+                {/* Action Buttons */}
+                <div className="flex gap-4">
+                  <button className="flex-1 py-3 bg-lime-400 hover:bg-lime-500 text-gray-900 font-bold rounded-xl transition-all uppercase tracking-wide">
+                    Start Session
+                  </button>
+                  <button
+                    onClick={handleCompleteSession}
+                    disabled={!session || (session.sessionStatus ?? session.session_status) === "DONE"}
+                    className="flex-1 py-3 bg-gray-700 hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold rounded-xl transition-all uppercase tracking-wide"
+                  >
+                    Complete Session
+                  </button>
+                </div>
+              </>
+            )}
           </div>
-        )}
-
-        {/* ✅ Footer sticky (ajouté) */}
-        <div className="sticky bottom-0 bg-gradient-to-r from-gray-900 to-gray-800 border-t-2 border-lime-400/30 p-6 flex gap-4">
-          <button className="flex-1 bg-[#D6F93D] hover:bg-lime-500 text-gray-900 font-bold py-3 rounded-lg transition-all duration-200 uppercase tracking-wider">
-            Start Session
-          </button>
-          <button
-            onClick={handleCompleteSession}
-            disabled={!session || (session.sessionStatus ?? session.session_status) === "DONE"}
-            className="flex-1 bg-transparent border-2 border-lime-400 text-[#D6F93D] hover:bg-[#D6F93D] hover:text-gray-900 font-bold py-3 rounded-lg transition-all duration-200 uppercase tracking-wider disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            Complete Session
-          </button>
-
         </div>
       </div>
     </div>
   );
 }
 
-// ✅ composant détails (reprend les features + timer + notes + perf)
 function ExerciseDetailView({
   exercise,
   showVideo,
@@ -351,53 +352,53 @@ function ExerciseDetailView({
   const target = exercise.targetMuscle ?? exercise.target_muscle ?? "";
   const equip = exercise.equipmentsNeeded ?? exercise.equipment_needed ?? exercise.equipments_needed ?? "";
 
-  const history =
-    exercise.performanceHistory ??
-    exercise.performance_history ??
-    [];
+  const history = exercise.performanceHistory ?? exercise.performance_history ?? [];
 
   return (
     <div className="space-y-6">
-      <div className="bg-gradient-to-br from-gray-800 to-gray-900 p-6 rounded-xl border-2 border-lime-400/50">
+      {/* Title + Video Button */}
+      <div className="bg-gray-800/50 p-4 rounded-xl border border-gray-700">
         <div className="flex justify-between items-start mb-2">
-          <h3 className="text-2xl font-black text-white">{name}</h3>
+          <h3 className="text-xl font-bold text-white">{name}</h3>
           {videoUrl && (
             <button
               onClick={() => setShowVideo((v) => !v)}
-              className="px-4 py-2 bg-[#D6F93D] hover:bg-lime-500 text-gray-900 font-bold rounded-lg transition-all"
+              className="px-4 py-2 bg-lime-400 hover:bg-lime-500 text-gray-900 font-bold rounded-lg text-sm transition-all"
             >
-              🎥 {showVideo ? "Hide" : "Watch"} Video
+              🎥 {showVideo ? "Hide" : "Watch"}
             </button>
           )}
         </div>
-        <p className="text-gray-300 text-sm leading-relaxed">{desc}</p>
+        {desc && <p className="text-gray-400 text-sm">{desc}</p>}
       </div>
 
+      {/* Video */}
       {showVideo && videoUrl && (
-        <div className="bg-gray-900 p-4 rounded-xl border-2 border-lime-400">
+        <div className="bg-gray-900 p-4 rounded-xl border border-lime-400">
           <video controls className="w-full rounded-lg" src={videoUrl}>
             Your browser does not support video.
           </video>
         </div>
       )}
 
+      {/* Stats Grid */}
       <div className="grid grid-cols-2 gap-4">
-        <div className="bg-gray-800/50 p-4 rounded-xl border border-lime-400/30">
-          <div className="text-xs text-gray-400 uppercase mb-1">Sets × Reps</div>
-          <div className="text-2xl font-bold text-[#D6F93D]">
+        <div className="bg-gradient-to-br from-purple-900/30 to-purple-800/30 border border-purple-500/30 rounded-xl p-4">
+          <div className="text-gray-500 text-xs uppercase mb-1">Sets × Reps</div>
+          <div className="text-2xl font-bold text-lime-400">
             {sets} × {reps}
           </div>
         </div>
 
-        <div className="bg-gradient-to-br from-lime-400/20 to-lime-400/5 p-4 rounded-xl border-2 border-lime-400/50">
-          <div className="text-xs text-gray-400 uppercase mb-1">Rest Timer</div>
+        <div className="bg-gradient-to-br from-lime-900/30 to-lime-800/30 border border-lime-500/30 rounded-xl p-4">
+          <div className="text-gray-500 text-xs uppercase mb-1">Rest Timer</div>
           <div className="flex items-center justify-between">
-            <div className="text-2xl font-bold text-[#D6F93D]">
+            <div className="text-2xl font-bold text-lime-400">
               {Math.floor(timer.seconds / 60)}:{String(timer.seconds % 60).padStart(2, "0")}
             </div>
             <div className="flex gap-2">
               {!timer.isRunning ? (
-                <button onClick={timer.start} className="px-3 py-1 bg-[#D6F93D] text-gray-900 font-bold rounded text-sm">
+                <button onClick={timer.start} className="px-3 py-1 bg-lime-400 text-gray-900 font-bold rounded text-sm">
                   ▶
                 </button>
               ) : (
@@ -412,52 +413,55 @@ function ExerciseDetailView({
           </div>
         </div>
 
-        <div className="bg-gray-800/50 p-4 rounded-xl border border-lime-400/30">
-          <div className="text-xs text-gray-400 uppercase mb-1">Difficulty</div>
-          <div className="text-lg font-bold text-[#D6F93D]">{difficulty}</div>
+        <div className="bg-gray-800/50 p-4 rounded-lg border border-gray-700">
+          <div className="text-gray-500 text-xs uppercase mb-1">Difficulty</div>
+          <div className="text-lg font-bold text-lime-400">{difficulty}</div>
         </div>
 
-        <div className="bg-gray-800/50 p-4 rounded-xl border border-lime-400/30">
-          <div className="text-xs text-gray-400 uppercase mb-1">Calories</div>
-          <div className="text-2xl font-bold text-[#D6F93D]">{calories} kcal</div>
+        <div className="bg-gray-800/50 p-4 rounded-lg border border-gray-700">
+          <div className="text-gray-500 text-xs uppercase mb-1">Calories</div>
+          <div className="text-2xl font-bold text-lime-400">{calories}</div>
         </div>
       </div>
 
+      {/* Target Muscles */}
       <div className="bg-gray-800/50 p-4 rounded-xl border border-gray-700">
-        <div className="text-sm text-gray-400 uppercase tracking-wider mb-2">Target Muscles</div>
+        <div className="text-gray-500 text-xs uppercase tracking-wide mb-2">Target Muscles</div>
         <div className="flex flex-wrap gap-2">
           {String(target)
             .split(",")
             .filter(Boolean)
             .map((m, i) => (
-              <span key={i} className="px-3 py-1 bg-[#D6F93D] text-gray-900 rounded-full text-sm font-semibold">
+              <span key={i} className="px-3 py-1 bg-lime-400/20 text-lime-400 border border-lime-400/30 rounded-full text-sm font-semibold">
                 {m.trim()}
               </span>
             ))}
         </div>
       </div>
 
+      {/* Equipment */}
       <div className="bg-gray-800/50 p-4 rounded-xl border border-gray-700">
-        <div className="text-sm text-gray-400 uppercase tracking-wider mb-2">Equipment Needed</div>
+        <div className="text-gray-500 text-xs uppercase tracking-wide mb-2">Equipment Needed</div>
         <div className="flex flex-wrap gap-2">
           {String(equip)
             .split(",")
             .filter(Boolean)
             .map((e, i) => (
-              <span key={i} className="px-3 py-1 bg-gray-700 text-gray-200 rounded-lg text-sm border border-lime-400/30">
+              <span key={i} className="px-3 py-1 bg-gray-700 text-gray-200 rounded-lg text-sm border border-gray-600">
                 🏋️ {e.trim()}
               </span>
             ))}
         </div>
       </div>
 
-      <div className="bg-gray-800/50 p-4 rounded-xl border border-lime-400/30">
+      {/* Notes */}
+      <div className="bg-gray-800/50 p-4 rounded-xl border border-gray-700">
         <div className="flex justify-between items-center mb-3">
-          <div className="text-sm text-gray-400 uppercase tracking-wider">📝 Personal Notes</div>
+          <div className="text-gray-500 text-xs uppercase tracking-wide">Personal Notes</div>
           {!editingNote && (
             <button
               onClick={() => setEditingNote(true)}
-              className="px-3 py-1 bg-[#D6F93D] hover:bg-lime-500 text-gray-900 font-bold rounded text-sm"
+              className="px-3 py-1 bg-lime-400 hover:bg-lime-500 text-gray-900 font-bold rounded text-sm"
             >
               Edit
             </button>
@@ -474,10 +478,10 @@ function ExerciseDetailView({
               placeholder="Add your notes here..."
             />
             <div className="flex gap-2 mt-2">
-              <button onClick={handleSaveNote} className="px-4 py-2 bg-[#D6F93D] text-gray-900 font-bold rounded">
+              <button onClick={handleSaveNote} className="px-4 py-2 bg-lime-400 hover:bg-lime-500 text-gray-900 font-bold rounded-lg">
                 Save
               </button>
-              <button onClick={() => setEditingNote(false)} className="px-4 py-2 bg-gray-600 text-white font-bold rounded">
+              <button onClick={() => setEditingNote(false)} className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white font-bold rounded-lg">
                 Cancel
               </button>
             </div>
@@ -487,19 +491,20 @@ function ExerciseDetailView({
         )}
       </div>
 
-      <div className="bg-gradient-to-br from-lime-400/10 to-transparent p-4 rounded-xl border-2 border-lime-400/30">
+      {/* Performance History */}
+      <div className="bg-gray-800/50 p-4 rounded-xl border border-lime-400/30">
         <div className="flex justify-between items-center mb-3">
-          <div className="text-sm  uppercase tracking-wider font-bold">📊 Performance History</div>
+          <div className="text-gray-500 text-xs uppercase tracking-wide font-bold">Performance History</div>
           <button
             onClick={() => setShowPerformance((v) => !v)}
-            className="px-3 py-1 bg-[#D6F93D] hover:bg-lime-500 text-gray-900 font-bold rounded text-sm"
+            className="px-3 py-1 bg-lime-400 hover:bg-lime-500 text-gray-900 font-bold rounded text-sm"
           >
-            {showPerformance ? "Cancel" : "+ Log Performance"}
+            {showPerformance ? "Cancel" : "+ Log"}
           </button>
         </div>
 
         {showPerformance && (
-          <div className="mb-4 p-4 bg-gray-900/50 rounded-lg">
+          <div className="mb-4 p-4 bg-gray-900/50 rounded-lg border border-gray-700">
             <div className="grid grid-cols-3 gap-3 mb-3">
               <input
                 className="w-full bg-gray-800 text-white p-2 rounded border border-gray-700 focus:border-lime-400 outline-none"
@@ -523,7 +528,7 @@ function ExerciseDetailView({
                 onChange={(e) => setPerformanceData((p) => ({ ...p, sets: e.target.value }))}
               />
             </div>
-            <button onClick={handleSavePerformance} className="w-full px-4 py-2 bg-[#D6F93D] text-gray-900 font-bold rounded">
+            <button onClick={handleSavePerformance} className="w-full px-4 py-2 bg-lime-400 hover:bg-lime-500 text-gray-900 font-bold rounded-lg">
               Save Performance
             </button>
           </div>
@@ -532,10 +537,10 @@ function ExerciseDetailView({
         <div className="space-y-2 max-h-48 overflow-y-auto">
           {history && history.length > 0 ? (
             history.map((perf, i) => (
-              <div key={i} className="flex justify-between items-center bg-gray-800/50 p-3 rounded-lg">
-                <span className="text-sm text-gray-400">{perf.date}</span>
+              <div key={i} className="flex justify-between items-center bg-gray-800/50 p-3 rounded-lg border border-gray-700">
+                <span className="text-sm text-gray-500">{perf.date}</span>
                 <div className="flex gap-4 text-sm">
-                  <span className="text-[#D6F93D] font-semibold">{perf.weight ?? "-"} kg</span>
+                  <span className="text-lime-400 font-semibold">{perf.weight ?? "-"} kg</span>
                   <span className="text-gray-300">
                     {perf.sets ?? "-"} × {perf.reps ?? "-"}
                   </span>
@@ -543,10 +548,10 @@ function ExerciseDetailView({
               </div>
             ))
           ) : (
-            <p className="text-sm text-gray-400 text-center py-4">No performance logged yet. Start tracking your progress!</p>
+            <p className="text-sm text-gray-400 text-center py-4">No performance logged yet.</p>
           )}
         </div>
       </div>
     </div>
   );
-}
+} 

@@ -1,3 +1,4 @@
+
 // WorkoutDetailModal.jsx
 import React from "react";
 
@@ -5,77 +6,79 @@ const WorkoutDetailModal = ({ detail, onClose }) => {
   if (!detail) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-[9999] p-4">
-      <div className="relative bg-gradient-to-br from-gray-900 to-black text-white p-8 rounded-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto border-2 border-lime-400 shadow-2xl shadow-lime-400/20">
-        {/* Close Button */}
-        <button
-          className="absolute top-6 right-6 text-3xl text-[#D6F93D] hover:text-lime-300 hover:rotate-90 bg-transparent border-none cursor-pointer transition-all duration-300 font-bold"
-          onClick={onClose}
-        >
-          ✕
-        </button>
+    <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm overflow-y-auto">
+      {/* Container avec padding pour l'espace */}
+      <div className="min-h-screen flex items-center justify-center p-4">
+        
+        <div className="relative w-full max-w-5xl bg-gradient-to-br from-gray-900 to-gray-800 rounded-2xl shadow-2xl my-8">
+          
+          {/* Close Button */}
+          <button
+            onClick={onClose}
+            className="sticky top-6 left-full -ml-6 z-10 bg-lime-400 hover:bg-lime-500 text-gray-900 w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300 hover:scale-110 shadow-lg"
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
 
-        {/* Title with W icon */}
-        <div className="flex items-center gap-3 mb-6">
-          <span className="text-[#D6F93D] text-4xl font-black">W</span>
-          <h2 className="text-[#D6F93D] text-3xl font-black uppercase tracking-wider">
-            DETAIL
-          </h2>
-        </div>
+          <div className="p-8">
+            {/* Header */}
+            <div className="mb-8">
+              <h2 className="text-lime-400 text-4xl font-bold mb-2">DETAIL</h2>
+            </div>
 
-        {/* Image */}
-        <img
-          src={detail.imageUrl}
-          alt={detail.title}
-          className="w-full rounded-xl mb-6 object-cover max-h-80 border-2 border-gray-700"
-        />
+            {/* Image */}
+            <div className="relative h-80 rounded-xl overflow-hidden mb-8">
+              <img
+                src={detail.imageUrl}
+                alt={detail.title}
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-transparent to-transparent" />
+            </div>
 
-        {/* Exercise Overview Section */}
-        <div className="mb-8">
-          <h4 className="text-[#D6F93D] text-2xl font-bold mb-3 uppercase tracking-wide">
-            Exercise Overview
-          </h4>
-          <p className="text-gray-300 leading-relaxed text-base">
-            {detail.overview}
-          </p>
-        </div>
+            {/* Exercise Overview */}
+            <div className="mb-8">
+              <h3 className="text-lime-400 text-2xl font-bold mb-4">Exercise Overview</h3>
+              <h4 className="text-white text-xl font-semibold mb-3">{detail.title}</h4>
+              <p className="text-gray-400 leading-relaxed">
+                {detail.overview}
+              </p>
+            </div>
 
-        {/* Key Benefits Section */}
-        <div className="mb-8">
-          <h4 className="text-[#D6F93D] text-2xl font-bold mb-4 uppercase tracking-wide">
-            Key Benefits
-          </h4>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {detail.benefits?.map((b, i) => (
-              <div
-                key={i}
-                className="bg-gray-800/50 p-4 rounded-lg border border-gray-700 hover:border-lime-400/50 transition-colors"
-              >
-                <p className="text-gray-200 text-sm leading-relaxed">{b}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Step-by-Step Instructions Section */}
-        <div>
-          <h4 className="text-[#D6F93D] text-2xl font-bold mb-4 uppercase tracking-wide">
-            Step-by-Step Instructions
-          </h4>
-          <div className="space-y-4">
-            {detail.steps?.map((s, i) => (
-              <div
-                key={i}
-                className="flex gap-4 bg-gray-800/50 p-4 rounded-lg border border-gray-700 hover:border-lime-400/50 transition-colors"
-              >
-                <div className="flex-shrink-0 w-8 h-8 bg-[#D6F93D] text-gray-900 rounded-full flex items-center justify-center font-bold text-sm">
-                  {i + 1}
+            {/* Key Benefits */}
+            {detail.benefits && detail.benefits.length > 0 && (
+              <div className="mb-8">
+                <h3 className="text-lime-400 text-2xl font-bold mb-4">Key Benefits</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {detail.benefits.map((benefit, index) => (
+                    <div key={index} className="bg-gradient-to-br from-purple-900/30 to-purple-800/30 border border-purple-500/30 rounded-xl p-4">
+                      <p className="text-gray-300 leading-relaxed">{benefit}</p>
+                    </div>
+                  ))}
                 </div>
-                <p className="text-gray-200 text-sm leading-relaxed flex-1">
-                  {s}
-                </p>
               </div>
-            ))}
+            )}
+
+            {/* Step-by-Step Instructions */}
+            {detail.steps && detail.steps.length > 0 && (
+              <div className="mb-8">
+                <h3 className="text-lime-400 text-2xl font-bold mb-4">Step-by-Step Instructions</h3>
+                <div className="space-y-4">
+                  {detail.steps.map((step, index) => (
+                    <div key={index} className="flex gap-4">
+                      <div className="flex-shrink-0 w-10 h-10 bg-lime-400 text-gray-900 rounded-full flex items-center justify-center font-bold">
+                        {index + 1}
+                      </div>
+                      <div className="flex-1 bg-gray-800/30 rounded-lg p-4">
+                        <p className="text-gray-300 leading-relaxed">{step}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
