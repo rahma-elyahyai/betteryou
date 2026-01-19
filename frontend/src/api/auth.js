@@ -1,19 +1,10 @@
 import axios from "axios";
 
-/**
- * Vite: variables injectées au build via import.meta.env
- * Fallback:
- * - en local: localhost:8080
- * - en prod: même hostname que le site + port 8080 (ex: http://92.5.238.53:8080)
- */
-const baseURL =
-  import.meta.env.VITE_API_URL ||
-  (window.location.hostname === "localhost"
-    ? "http://localhost:8080"
-    : `${window.location.protocol}//${window.location.hostname}:8080`);
 
-export const api = axios.create({ baseURL });
-
+export const api = axios.create({
+  baseURL: "", // même origine => http://92.5.238.53:3000
+  timeout: 15000,
+});
 
 // ✅ Interceptor → ajoute le token automatiquement
 api.interceptors.request.use(

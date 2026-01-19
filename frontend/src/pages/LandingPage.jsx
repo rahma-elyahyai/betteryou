@@ -1,6 +1,10 @@
 import React from 'react';
 import { Dumbbell, Apple, Heart, MessageSquare } from 'lucide-react';
 import { useNavigate } from "react-router-dom";
+import habitsImg from "../assets/habits-image.png";
+import iaImg from "../assets/ia-image.png";
+import nutritionImg from "../assets/nutrition-image.png";
+import workoutImg from "../assets/workout-image.png";
 
 export default function LandingPage() {
   const nav = useNavigate();
@@ -243,7 +247,7 @@ export default function LandingPage() {
           <div className="relative">
             <div className="absolute inset-0 bg-pink-500/20 rounded-lg blur-2xl"></div>
             <img 
-              src="/src/assets/workout-image.png"
+              src={workoutImg}
               alt="Person working out"
               className="relative rounded-lg shadow-2xl hover:scale-105 transition-transform duration-500"
             />
@@ -257,7 +261,7 @@ export default function LandingPage() {
           <div className="relative order-2 md:order-1">
             <div className="absolute inset-0 bg-cyan-500/20 rounded-lg blur-2xl"></div>
             <img 
-              src="/src/assets/nutrition-image.png" 
+              src={nutritionImg} 
               alt="Healthy food"
               className="relative rounded-lg shadow-2xl hover:scale-105 transition-transform duration-500"
             />
@@ -341,7 +345,7 @@ export default function LandingPage() {
           <div className="relative">
             <div className="absolute inset-0 bg-purple-500/20 rounded-lg blur-2xl"></div>
             <img 
-              src="/src/assets/habits-image.png" 
+              src={habitsImg}
               alt="Person exercising"
               className="relative rounded-lg shadow-2xl hover:scale-105 transition-transform duration-500"
             />
@@ -355,7 +359,7 @@ export default function LandingPage() {
           <div className="relative order-2 md:order-1">
             <div className="absolute inset-0 bg-green-500/20 rounded-lg blur-2xl"></div>
             <img 
-              src="/src/assets/ia-image.png" 
+              src={iaImg} 
               alt="AI Assistant"
               className="relative rounded-lg shadow-2xl hover:scale-105 transition-transform duration-500"
             />
