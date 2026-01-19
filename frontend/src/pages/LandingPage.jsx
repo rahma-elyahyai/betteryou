@@ -6,13 +6,14 @@ import iaImg from "../assets/ia-image.png";
 import nutritionImg from "../assets/nutrition-image.png";
 import workoutImg from "../assets/workout-image.png";
 
+
 export default function LandingPage() {
   const nav = useNavigate();
   
   return (
     <div className="min-h-screen relative overflow-hidden bg-black text-white">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(214,249,61,0.10),transparent_35%),radial-gradient(circle_at_80%_30%,rgba(139,92,246,0.18),transparent_35%),radial-gradient(circle_at_50%_90%,rgba(214,249,61,0.10),transparent_40%)]" />
-      <div className="absolute inset-0 opacity-20 bg-[url('/src/assets/noise.png')] bg-repeat" />
+      <div className="absolute inset-0 opacity-20" />
       <style>{`
         @keyframes slideIn {
           from { opacity: 0; transform: translateY(30px); }

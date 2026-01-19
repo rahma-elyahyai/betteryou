@@ -23,6 +23,8 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.List;
+import org.springframework.http.HttpMethod;
+
 
 // adapte ce package si ton filtre est ailleurs
 import ma.betteryou.betteryoubackend.service.auth.security.JwtAuthFilter;
@@ -44,10 +46,12 @@ public class SecurityConfig {
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
                 // Routes publiques / protégées
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**").permitAll()
-                        .anyRequest().authenticated()
-                )
+.authorizeHttpRequests(auth -> auth
+    .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()   // ✅ AJOUTE ÇA
+    .requestMatchers("/api/auth/**").permitAll()
+    .anyRequest().authenticated()
+)
+
 
                 //  JWT filter avant UsernamePasswordAuthenticationFilter
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
