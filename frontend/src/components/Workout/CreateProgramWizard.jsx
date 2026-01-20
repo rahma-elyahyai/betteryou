@@ -1,19 +1,22 @@
+// MyProgramsSection.jsx - VERSION AVEC TON CODE + NOUVEAU STYLE
+import React, { useEffect, useState }
+
+// ========================================
+// CreateProgramWizard.jsx - VERSION REDESIGNÉE
+// ========================================
+
 import React, { useEffect, useMemo, useState } from "react";
+import { ArrowRight, ArrowLeft, CheckCircle2, Dumbbell } from 'lucide-react';
 import {
   fetchSessionTypes,
   fetchEquipmentOptions,
   fetchMuscles,
   searchExercises,
 } from "../../api/Workout/programWizardApi";
-
 import { createProgram } from "../../api/Workout/programApi";
+import Sidebar from "../../../layout/Sidebar";
 
-  //muscles: selectedMuscles,
-
-
-/* =========================
-   STEP 1
-========================= */
+/* Step 1 - Configuration */
 function Step1_Configuration({ programData, setProgramData, setCurrentStep, days }) {
   const toggleDay = (day) => {
     setProgramData((p) => {
@@ -22,8 +25,6 @@ function Step1_Configuration({ programData, setProgramData, setCurrentStep, days
       else selected.add(day);
 
       const trainingDays = Array.from(selected);
-
-      // keep sessions map synced with selected days
       const nextSessions = { ...(p.sessions || {}) };
 
       trainingDays.forEach((d) => {
@@ -39,36 +40,36 @@ function Step1_Configuration({ programData, setProgramData, setCurrentStep, days
 
   return (
     <div className="space-y-6">
-      <h2 className="text-2xl font-bold text-white mb-6">Program Configuration</h2>
+      <h2 className="text-2xl font-bold text-lime-400 mb-6">Program Configuration</h2>
 
       <div>
-        <label className="text-white text-sm font-medium block mb-2">
+        <label className="text-gray-300 text-sm font-medium block mb-2">
           Program Name *
         </label>
         <input
           type="text"
           value={programData.programName}
           onChange={(e) => setProgramData((p) => ({ ...p, programName: e.target.value }))}
-          className="w-full bg-gray-700 text-white px-4 py-3 rounded-lg border-2 border-gray-600 focus:border-lime-400 outline-none"
+          className="w-full bg-gray-800 text-white px-4 py-3 rounded-xl border-2 border-gray-700 focus:border-lime-400 outline-none transition-all"
           placeholder="Full Body Builder"
         />
       </div>
 
       <div>
-        <label className="text-white text-sm font-medium block mb-2">
+        <label className="text-gray-300 text-sm font-medium block mb-2">
           Description
         </label>
         <textarea
           value={programData.description}
           onChange={(e) => setProgramData((p) => ({ ...p, description: e.target.value }))}
-          className="w-full bg-gray-700 text-white px-4 py-3 rounded-lg border-2 border-gray-600 focus:border-lime-400 outline-none"
+          className="w-full bg-gray-800 text-white px-4 py-3 rounded-xl border-2 border-gray-700 focus:border-lime-400 outline-none transition-all resize-none"
           placeholder="Describe your program goals..."
           rows={3}
         />
       </div>
 
       <div>
-        <label className="text-white text-sm font-medium block mb-2">
+        <label className="text-gray-300 text-sm font-medium block mb-2">
           Program Goal *
         </label>
         <div className="grid grid-cols-3 gap-3">
@@ -81,13 +82,13 @@ function Step1_Configuration({ programData, setProgramData, setCurrentStep, days
               key={goal.id}
               type="button"
               onClick={() => setProgramData((p) => ({ ...p, goal: goal.id }))}
-              className={`py-3 rounded-lg font-bold transition-all ${
+              className={`py-4 rounded-xl font-bold transition-all border-2 ${
                 programData.goal === goal.id
-                  ? "bg-yellow-400 text-gray-900"
-                  : "bg-gray-700 text-gray-400 hover:bg-gray-600"
+                  ? "bg-lime-400 text-gray-900 border-lime-400 shadow-lg shadow-lime-400/50"
+                  : "bg-gray-800 text-gray-400 border-gray-700 hover:border-gray-600"
               }`}
             >
-              <div className="text-2xl mb-1">{goal.icon}</div>
+              <div className="text-3xl mb-2">{goal.icon}</div>
               <div className="text-sm">{goal.label}</div>
             </button>
           ))}
@@ -95,7 +96,7 @@ function Step1_Configuration({ programData, setProgramData, setCurrentStep, days
       </div>
 
       <div>
-        <label className="text-white text-sm font-medium block mb-2">
+        <label className="text-gray-300 text-sm font-medium block mb-2">
           Session Duration
         </label>
         <input
@@ -109,17 +110,17 @@ function Step1_Configuration({ programData, setProgramData, setCurrentStep, days
               sessionDuration: Number(e.target.value),
             }))
           }
-          className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-lime-400 select-none"
+          className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-lime-400"
         />
         <div className="flex justify-between text-sm mt-2">
-          <span className="text-gray-400">30 min</span>
-          <span className="text-lime-400 font-bold">{programData.sessionDuration} min</span>
-          <span className="text-gray-400">120 min</span>
+          <span className="text-gray-500">30 min</span>
+          <span className="text-lime-400 font-bold text-lg">{programData.sessionDuration} min</span>
+          <span className="text-gray-500">120 min</span>
         </div>
       </div>
 
       <div>
-        <label className="text-white text-sm font-medium block mb-3">
+        <label className="text-gray-300 text-sm font-medium block mb-3">
           Training Days *
         </label>
 
@@ -129,10 +130,10 @@ function Step1_Configuration({ programData, setProgramData, setCurrentStep, days
               key={day}
               type="button"
               onClick={() => toggleDay(day)}
-              className={`py-3 rounded-lg font-bold transition-all ${
+              className={`py-3 rounded-xl font-bold transition-all ${
                 programData.trainingDays.includes(day)
-                  ? "bg-yellow-400 text-gray-900"
-                  : "bg-gray-700 text-gray-400 hover:bg-gray-600"
+                  ? "bg-lime-400 text-gray-900 shadow-lg shadow-lime-400/50"
+                  : "bg-gray-800 text-gray-400 hover:bg-gray-700 border-2 border-gray-700"
               }`}
             >
               {day}
@@ -146,10 +147,10 @@ function Step1_Configuration({ programData, setProgramData, setCurrentStep, days
               key={day}
               type="button"
               onClick={() => toggleDay(day)}
-              className={`py-3 rounded-lg font-bold transition-all ${
+              className={`py-3 rounded-xl font-bold transition-all ${
                 programData.trainingDays.includes(day)
-                  ? "bg-yellow-400 text-gray-900"
-                  : "bg-gray-700 text-gray-400 hover:bg-gray-600"
+                  ? "bg-lime-400 text-gray-900 shadow-lg shadow-lime-400/50"
+                  : "bg-gray-800 text-gray-400 hover:bg-gray-700 border-2 border-gray-700"
               }`}
             >
               {day}
@@ -157,7 +158,7 @@ function Step1_Configuration({ programData, setProgramData, setCurrentStep, days
           ))}
         </div>
 
-        <p className="text-gray-400 text-sm mt-2">
+        <p className="text-gray-500 text-sm mt-3">
           {programData.trainingDays.length} day(s) selected
         </p>
       </div>
@@ -166,17 +167,15 @@ function Step1_Configuration({ programData, setProgramData, setCurrentStep, days
         type="button"
         onClick={() => setCurrentStep(2)}
         disabled={!programData.programName || programData.trainingDays.length === 0 || !programData.goal}
-        className="w-full bg-yellow-400 hover:bg-yellow-500 disabled:bg-gray-600 disabled:cursor-not-allowed text-gray-900 font-bold py-4 rounded-lg transition-all"
+        className="w-full bg-lime-400 hover:bg-lime-500 disabled:bg-gray-700 disabled:cursor-not-allowed disabled:text-gray-500 text-gray-900 font-bold py-4 rounded-xl transition-all flex items-center justify-center gap-2"
       >
-        Continue →
+        Continue <ArrowRight className="w-5 h-5" />
       </button>
     </div>
   );
 }
 
-/* =========================
-   STEP 2
-========================= */
+/* Step 2 - Preferences */
 function Step2_Preferences({
   sessionTypes,
   equipmentOptions,
@@ -188,72 +187,79 @@ function Step2_Preferences({
 }) {
   return (
     <div className="space-y-6">
-      <h2 className="text-xl font-bold text-white mb-4">Session Type</h2>
+      <h2 className="text-2xl font-bold text-lime-400 mb-4">Session Preferences</h2>
 
-      {loadingMeta && <p className="text-lime-400">Loading...</p>}
-      {error && <p className="text-red-400">{error}</p>}
+      {loadingMeta && (
+        <div className="flex items-center justify-center py-8">
+          <div className="w-12 h-12 border-4 border-gray-700 border-t-lime-400 rounded-full animate-spin"></div>
+        </div>
+      )}
+      {error && <p className="text-red-400 bg-red-900/20 border border-red-500/50 rounded-lg p-3">{error}</p>}
 
-      <div className="grid grid-cols-3 gap-4">
-        {sessionTypes.map((type) => (
-          <button
-            key={type.id}
-            type="button"
-            onClick={() => setProgramData((p) => ({ ...p, sessionType: type.id }))}
-            className={`p-6 rounded-xl transition-all border-2 ${
-              programData.sessionType === type.id
-                ? "bg-yellow-400/20 border-yellow-400"
-                : "bg-gray-800 border-gray-700 hover:border-gray-600"
-            }`}
-          >
-            <div className="text-4xl mb-2">{type.icon}</div>
-            <div className="text-white font-bold">{type.label}</div>
-          </button>
-        ))}
+      <div>
+        <h3 className="text-white text-lg font-semibold mb-3">Session Type</h3>
+        <div className="grid grid-cols-3 gap-4">
+          {sessionTypes.map((type) => (
+            <button
+              key={type.id}
+              type="button"
+              onClick={() => setProgramData((p) => ({ ...p, sessionType: type.id }))}
+              className={`p-6 rounded-xl transition-all border-2 ${
+                programData.sessionType === type.id
+                  ? "bg-lime-400/10 border-lime-400 shadow-lg shadow-lime-400/20"
+                  : "bg-gray-800 border-gray-700 hover:border-gray-600"
+              }`}
+            >
+              <div className="text-4xl mb-2">{type.icon}</div>
+              <div className="text-white font-bold text-sm">{type.label}</div>
+            </button>
+          ))}
+        </div>
       </div>
 
-      <h2 className="text-xl font-bold text-white mb-4 mt-8">Equipment Available</h2>
-
-      <div className="grid grid-cols-3 gap-4">
-        {equipmentOptions.map((equip) => (
-          <button
-            key={equip.id}
-            type="button"
-            onClick={() => setProgramData((p) => ({ ...p, equipment: equip.id }))}
-            className={`p-6 rounded-xl transition-all border-2 ${
-              programData.equipment === equip.id
-                ? "bg-yellow-400/20 border-yellow-400"
-                : "bg-gray-800 border-gray-700 hover:border-gray-600"
-            }`}
-          >
-            <div className="text-4xl mb-2">{equip.icon}</div>
-            <div className="text-white font-bold">{equip.label}</div>
-          </button>
-        ))}
+      <div>
+        <h3 className="text-white text-lg font-semibold mb-3">Equipment Available</h3>
+        <div className="grid grid-cols-3 gap-4">
+          {equipmentOptions.map((equip) => (
+            <button
+              key={equip.id}
+              type="button"
+              onClick={() => setProgramData((p) => ({ ...p, equipment: equip.id }))}
+              className={`p-6 rounded-xl transition-all border-2 ${
+                programData.equipment === equip.id
+                  ? "bg-lime-400/10 border-lime-400 shadow-lg shadow-lime-400/20"
+                  : "bg-gray-800 border-gray-700 hover:border-gray-600"
+              }`}
+            >
+              <div className="text-4xl mb-2">{equip.icon}</div>
+              <div className="text-white font-bold text-sm">{equip.label}</div>
+            </button>
+          ))}
+        </div>
       </div>
 
-      <button
-        type="button"
-        onClick={() => setCurrentStep(3)}
-        disabled={!programData.sessionType || !programData.equipment}
-        className="w-full bg-yellow-400 hover:bg-yellow-500 disabled:bg-gray-600 disabled:cursor-not-allowed text-gray-900 font-bold py-4 rounded-lg transition-all"
-      >
-        Continue →
-      </button>
-
-      <button
-        type="button"
-        onClick={() => setCurrentStep(1)}
-        className="w-full bg-gray-700 hover:bg-gray-600 text-white font-bold py-4 rounded-lg transition-all"
-      >
-        ← Back
-      </button>
+      <div className="flex gap-3">
+        <button
+          type="button"
+          onClick={() => setCurrentStep(1)}
+          className="flex-1 bg-gray-700 hover:bg-gray-600 text-white font-bold py-4 rounded-xl transition-all flex items-center justify-center gap-2"
+        >
+          <ArrowLeft className="w-5 h-5" /> Back
+        </button>
+        <button
+          type="button"
+          onClick={() => setCurrentStep(3)}
+          disabled={!programData.sessionType || !programData.equipment}
+          className="flex-1 bg-lime-400 hover:bg-lime-500 disabled:bg-gray-700 disabled:cursor-not-allowed text-gray-900 font-bold py-4 rounded-xl transition-all flex items-center justify-center gap-2"
+        >
+          Continue <ArrowRight className="w-5 h-5" />
+        </button>
+      </div>
     </div>
   );
 }
 
-/* =========================
-   STEP 3
-========================= */
+/* Step 3 - Target Muscles */
 function Step3_TargetMuscles({
   muscles,
   loadingMeta,
@@ -285,19 +291,21 @@ function Step3_TargetMuscles({
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold text-white">{activeDay}</h2>
-        <p className="text-gray-400 text-sm">Select target muscles</p>
+        <h2 className="text-2xl font-bold text-lime-400">{activeDay}</h2>
+        <p className="text-gray-400 text-sm">Select target muscles for this day</p>
       </div>
 
-      {/* ✅ day switcher */}
+      {/* Day Switcher */}
       <div className="flex gap-2 flex-wrap">
         {programData.trainingDays.map((d) => (
           <button
             key={d}
             type="button"
             onClick={() => setActiveDay(d)}
-            className={`px-3 py-2 rounded-lg font-bold ${
-              activeDay === d ? "bg-yellow-400 text-gray-900" : "bg-gray-700 text-gray-300"
+            className={`px-4 py-2 rounded-lg font-bold transition-all ${
+              activeDay === d 
+                ? "bg-lime-400 text-gray-900 shadow-lg shadow-lime-400/50" 
+                : "bg-gray-800 text-gray-400 hover:bg-gray-700"
             }`}
           >
             {d}
@@ -305,18 +313,22 @@ function Step3_TargetMuscles({
         ))}
       </div>
 
-      {loadingMeta && <p className="text-lime-400">Loading muscles...</p>}
+      {loadingMeta && (
+        <div className="flex items-center justify-center py-8">
+          <div className="w-12 h-12 border-4 border-gray-700 border-t-lime-400 rounded-full animate-spin"></div>
+        </div>
+      )}
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-2 gap-3">
         {muscles.map((m) => (
           <button
             key={m}
             type="button"
             onClick={() => toggleMuscle(m)}
-            className={`py-4 rounded-lg font-bold transition-all ${
+            className={`py-4 rounded-xl font-semibold transition-all ${
               selectedMuscles.includes(m)
-                ? "bg-yellow-400 text-gray-900"
-                : "bg-gray-700 text-gray-300 hover:bg-gray-600"
+                ? "bg-lime-400 text-gray-900 shadow-lg shadow-lime-400/50"
+                : "bg-gray-800 text-gray-300 hover:bg-gray-700 border-2 border-gray-700"
             }`}
           >
             {m}
@@ -324,29 +336,28 @@ function Step3_TargetMuscles({
         ))}
       </div>
 
-      <button
-        type="button"
-        onClick={() => setCurrentStep(4)}
-        disabled={selectedMuscles.length === 0}
-        className="w-full bg-yellow-400 hover:bg-yellow-500 disabled:bg-gray-600 disabled:cursor-not-allowed text-gray-900 font-bold py-4 rounded-lg transition-all"
-      >
-        Choose Exercises →
-      </button>
-
-      <button
-        type="button"
-        onClick={() => setCurrentStep(2)}
-        className="w-full bg-gray-700 hover:bg-gray-600 text-white font-bold py-4 rounded-lg transition-all"
-      >
-        ← Back
-      </button>
+      <div className="flex gap-3">
+        <button
+          type="button"
+          onClick={() => setCurrentStep(2)}
+          className="flex-1 bg-gray-700 hover:bg-gray-600 text-white font-bold py-4 rounded-xl transition-all flex items-center justify-center gap-2"
+        >
+          <ArrowLeft className="w-5 h-5" /> Back
+        </button>
+        <button
+          type="button"
+          onClick={() => setCurrentStep(4)}
+          disabled={selectedMuscles.length === 0}
+          className="flex-1 bg-lime-400 hover:bg-lime-500 disabled:bg-gray-700 disabled:cursor-not-allowed text-gray-900 font-bold py-4 rounded-xl transition-all flex items-center justify-center gap-2"
+        >
+          Choose Exercises <ArrowRight className="w-5 h-5" />
+        </button>
+      </div>
     </div>
   );
 }
 
-/* =========================
-   STEP 4
-========================= */
+/* Step 4 - Select Exercises */
 function Step4_SelectExercises({
   programData,
   setProgramData,
@@ -420,21 +431,23 @@ function Step4_SelectExercises({
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold text-white">Exercises</h2>
+        <h2 className="text-2xl font-bold text-lime-400">Select Exercises</h2>
         <p className="text-gray-400 text-sm">
           {selectedMuscles.join(", ")} • {programData.sessionType} • {programData.equipment} • {activeDay}
         </p>
       </div>
 
-      {/* ✅ day switcher */}
+      {/* Day Switcher */}
       <div className="flex gap-2 flex-wrap">
         {programData.trainingDays.map((d) => (
           <button
             key={d}
             type="button"
             onClick={() => setActiveDay(d)}
-            className={`px-3 py-2 rounded-lg font-bold ${
-              activeDay === d ? "bg-yellow-400 text-gray-900" : "bg-gray-700 text-gray-300"
+            className={`px-4 py-2 rounded-lg font-bold transition-all ${
+              activeDay === d 
+                ? "bg-lime-400 text-gray-900 shadow-lg shadow-lime-400/50" 
+                : "bg-gray-800 text-gray-400 hover:bg-gray-700"
             }`}
           >
             {d}
@@ -442,14 +455,23 @@ function Step4_SelectExercises({
         ))}
       </div>
 
-      {loadingExercises && <p className="text-lime-400">Loading exercises...</p>}
-      {error && <p className="text-red-400">{error}</p>}
+      {loadingExercises && (
+        <div className="flex items-center justify-center py-8">
+          <div className="w-12 h-12 border-4 border-gray-700 border-t-lime-400 rounded-full animate-spin"></div>
+        </div>
+      )}
+      {error && <p className="text-red-400 bg-red-900/20 border border-red-500/50 rounded-lg p-3">{error}</p>}
 
+      {/* Edit Panel */}
       {editingExercise && (
-        <div className="bg-gray-800 p-4 rounded-lg border-2 border-lime-400 space-y-3">
+        <div className="bg-gray-800 p-4 rounded-xl border-2 border-lime-400 space-y-3">
           <div className="flex justify-between items-center">
             <h3 className="text-white font-bold">{editingExercise.exerciseName}</h3>
-            <button type="button" onClick={() => setEditingId(null)} className="text-gray-400 hover:text-white">
+            <button 
+              type="button" 
+              onClick={() => setEditingId(null)} 
+              className="text-gray-400 hover:text-white w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-700 transition-all"
+            >
               ✕
             </button>
           </div>
@@ -461,7 +483,7 @@ function Step4_SelectExercises({
                 type="number"
                 value={editingExercise.sets}
                 onChange={(e) => updateEditing({ sets: Number(e.target.value) })}
-                className="w-full bg-gray-700 text-white px-3 py-2 rounded border border-gray-600"
+                className="w-full bg-gray-700 text-white px-3 py-2 rounded-lg border border-gray-600 focus:border-lime-400 outline-none"
               />
             </div>
             <div>
@@ -470,7 +492,7 @@ function Step4_SelectExercises({
                 type="number"
                 value={editingExercise.reps}
                 onChange={(e) => updateEditing({ reps: Number(e.target.value) })}
-                className="w-full bg-gray-700 text-white px-3 py-2 rounded border border-gray-600"
+                className="w-full bg-gray-700 text-white px-3 py-2 rounded-lg border border-gray-600 focus:border-lime-400 outline-none"
               />
             </div>
             <div>
@@ -479,16 +501,16 @@ function Step4_SelectExercises({
                 type="number"
                 value={editingExercise.restSeconds}
                 onChange={(e) => updateEditing({ restSeconds: Number(e.target.value) })}
-                className="w-full bg-gray-700 text-white px-3 py-2 rounded border border-gray-600"
+                className="w-full bg-gray-700 text-white px-3 py-2 rounded-lg border border-gray-600 focus:border-lime-400 outline-none"
               />
             </div>
           </div>
         </div>
       )}
 
+      {/* Exercise List */}
       <div>
-        <h3 className="text-white font-semibold mb-3">Add Exercises</h3>
-
+        <h3 className="text-white font-semibold mb-3">Available Exercises</h3>
         <div className="grid grid-cols-2 gap-3">
           {exerciseCatalog.map((ex) => {
             const selected = isSelected(ex.id);
@@ -501,10 +523,10 @@ function Step4_SelectExercises({
                   if (selected) setEditingId(ex.id);
                   else toggleExercise(ex);
                 }}
-                className={`text-left px-4 py-3 rounded-lg transition-all ${
+                className={`text-left px-4 py-3 rounded-xl transition-all ${
                   selected
-                    ? "bg-gray-700 text-white border-2 border-lime-400"
-                    : "bg-gray-800 text-gray-400 hover:bg-gray-700"
+                    ? "bg-lime-400/10 text-white border-2 border-lime-400"
+                    : "bg-gray-800 text-gray-400 hover:bg-gray-700 border-2 border-gray-700"
                 }`}
               >
                 {selected ? "✓ " : "+ "}
@@ -515,80 +537,99 @@ function Step4_SelectExercises({
         </div>
       </div>
 
-      <button
-        type="button"
-        onClick={() => setCurrentStep(5)}
-        disabled={selectedExercises.length === 0}
-        className="w-full bg-green-500 hover:bg-green-600 disabled:bg-gray-600 disabled:cursor-not-allowed text-white font-bold py-4 rounded-lg transition-all"
-      >
-        ✓ Save Session
-      </button>
-
-      <button
-        type="button"
-        onClick={() => setCurrentStep(3)}
-        className="w-full bg-gray-700 hover:bg-gray-600 text-white font-bold py-4 rounded-lg transition-all"
-      >
-        ← Back
-      </button>
+      <div className="flex gap-3">
+        <button
+          type="button"
+          onClick={() => setCurrentStep(3)}
+          className="flex-1 bg-gray-700 hover:bg-gray-600 text-white font-bold py-4 rounded-xl transition-all flex items-center justify-center gap-2"
+        >
+          <ArrowLeft className="w-5 h-5" /> Back
+        </button>
+        <button
+          type="button"
+          onClick={() => setCurrentStep(5)}
+          disabled={selectedExercises.length === 0}
+          className="flex-1 bg-lime-400 hover:bg-lime-500 disabled:bg-gray-700 disabled:cursor-not-allowed text-gray-900 font-bold py-4 rounded-xl transition-all flex items-center justify-center gap-2"
+        >
+          Save Session <CheckCircle2 className="w-5 h-5" />
+        </button>
+      </div>
     </div>
   );
 }
 
-/* =========================
-   STEP 5
-========================= */
+/* Step 5 - Summary */
 function Step5_Summary({ programData, setCurrentStep, saving, onSave }) {
   return (
     <div className="space-y-6">
-      <h2 className="text-2xl font-bold text-white mb-6">Summary</h2>
+      <h2 className="text-2xl font-bold text-lime-400 mb-6">Program Summary</h2>
 
-      <div className="bg-gray-800 p-5 rounded-lg">
-        <h3 className="text-white font-bold text-lg mb-2">{programData.programName}</h3>
-        <p className="text-gray-400 text-sm mb-1">{programData.description}</p>
-        <p className="text-gray-400 text-sm">
-          Goal: {programData.goal} • {programData.sessionDuration} min/session
-        </p>
-        <p className="text-gray-400 text-sm mt-2">
-          Days: {programData.trainingDays.join(", ")}
-        </p>
+      <div className="bg-gray-800 p-6 rounded-xl border border-gray-700">
+        <h3 className="text-white font-bold text-xl mb-2">{programData.programName}</h3>
+        <p className="text-gray-400 text-sm mb-3">{programData.description}</p>
+        <div className="grid grid-cols-2 gap-3 text-sm">
+          <div className="bg-gray-900/50 p-3 rounded-lg">
+            <div className="text-gray-500 text-xs uppercase mb-1">Goal</div>
+            <div className="text-white font-semibold">{programData.goal}</div>
+          </div>
+          <div className="bg-gray-900/50 p-3 rounded-lg">
+            <div className="text-gray-500 text-xs uppercase mb-1">Duration</div>
+            <div className="text-white font-semibold">{programData.sessionDuration} min/session</div>
+          </div>
+        </div>
+        <div className="mt-3">
+          <div className="text-gray-500 text-xs uppercase mb-1">Training Days</div>
+          <div className="flex gap-2 flex-wrap">
+            {programData.trainingDays.map(day => (
+              <span key={day} className="px-3 py-1 bg-lime-400/20 text-lime-400 rounded-full text-sm font-semibold">
+                {day}
+              </span>
+            ))}
+          </div>
+        </div>
       </div>
 
-      <button
-        type="button"
-        onClick={onSave}
-        disabled={saving}
-        className="w-full bg-yellow-400 hover:bg-yellow-500 disabled:bg-gray-600 disabled:cursor-not-allowed text-gray-900 font-bold py-4 rounded-lg transition-all"
-      >
-        {saving ? "Saving..." : "🏋️ SAVE PROGRAM"}
-      </button>
-
-      <button
-        type="button"
-        onClick={() => setCurrentStep(4)}
-        className="w-full bg-gray-700 hover:bg-gray-600 text-white font-bold py-4 rounded-lg transition-all"
-      >
-        ← Edit
-      </button>
+      <div className="flex gap-3">
+        <button
+          type="button"
+          onClick={() => setCurrentStep(4)}
+          className="flex-1 bg-gray-700 hover:bg-gray-600 text-white font-bold py-4 rounded-xl transition-all flex items-center justify-center gap-2"
+        >
+          <ArrowLeft className="w-5 h-5" /> Edit
+        </button>
+        <button
+          type="button"
+          onClick={onSave}
+          disabled={saving}
+          className="flex-1 bg-lime-400 hover:bg-lime-500 disabled:bg-gray-700 disabled:cursor-not-allowed text-gray-900 font-bold py-4 rounded-xl transition-all flex items-center justify-center gap-2"
+        >
+          {saving ? (
+            <>
+              <div className="w-5 h-5 border-2 border-gray-900 border-t-transparent rounded-full animate-spin"></div>
+              Saving...
+            </>
+          ) : (
+            <>
+              <Dumbbell className="w-5 h-5" />
+              Save Program
+            </>
+          )}
+        </button>
+      </div>
     </div>
   );
 }
 
-/* =========================
-   MAIN
-========================= */
+/* Main Wizard */
 const CreateProgramWizard = () => {
   const [currentStep, setCurrentStep] = useState(1);
-
   const [sessionTypes, setSessionTypes] = useState([]);
   const [equipmentOptions, setEquipmentOptions] = useState([]);
   const [muscles, setMuscles] = useState([]);
   const [exerciseCatalog, setExerciseCatalog] = useState([]);
-
   const [loadingMeta, setLoadingMeta] = useState(false);
   const [loadingExercises, setLoadingExercises] = useState(false);
   const [error, setError] = useState(null);
-
   const [saving, setSaving] = useState(false);
 
   const [programData, setProgramData] = useState({
@@ -600,12 +641,10 @@ const CreateProgramWizard = () => {
     trainingDays: [],
     sessionType: "",
     equipment: "",
-    sessions: {}, // { Mon: { muscles:[], exercises:[] }, Tue: ... }
+    sessions: {},
   });
 
   const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
-
-  // ✅ active day (fixes "only first day edited" issue)
   const [activeDay, setActiveDay] = useState("Mon");
 
   useEffect(() => {
@@ -614,7 +653,6 @@ const CreateProgramWizard = () => {
     }
   }, [programData.trainingDays]);
 
-  // ✅ load metadata once
   useEffect(() => {
     let ignore = false;
 
@@ -651,7 +689,6 @@ const CreateProgramWizard = () => {
     return mus.slice().sort().join("|");
   }, [programData.sessions, activeDay]);
 
-  // ✅ load exercises when step 4 + filters
   useEffect(() => {
     if (currentStep !== 4) return;
     if (!programData.sessionType) return;
@@ -685,14 +722,12 @@ const CreateProgramWizard = () => {
     };
   }, [currentStep, programData.sessionType, programData.equipment, activeDay, selectedMusclesKey]);
 
-  // ✅ Save program -> POST /api/programs?userId=1
   const handleSaveProgram = async () => {
-    const userId = 1; // TODO: replace with real logged user id
+    const userId = 1;
 
     try {
       setSaving(true);
 
-      // ✅ payload matches ExercisePickDto expected by backend
       const payload = {
         programName: programData.programName,
         description: programData.description,
@@ -723,103 +758,261 @@ const CreateProgramWizard = () => {
       console.log("✅ Created:", res);
 
       alert(`✅ Program created! id=${res?.programId}`);
-      // optional reset:
-      // setCurrentStep(1);
-      // setProgramData({ ...initialState });
     } catch (err) {
       console.error("❌ Save failed:", err);
       alert("❌ Save failed: " + err.message);
-    } finally {
-      setSaving(false);
-    }
-  };
+     from "react";
+import { Calendar, Dumbbell, Plus } from 'lucide-react';
+import { fetchUserPrograms } from "../../api/Workout/programApi";
+import SessionDetailModal from "./SessionDetailModal";
+import Sidebar from "../../../layout/Sidebar";
 
-  const totalSteps = 5;
+export default function MyProgramsSection({ userId = 1 }) {
+  const [programs, setPrograms] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black py-12 px-4">
-      <div className="max-w-2xl mx-auto">
-        <div className="text-center mb-8">
-          <div className="flex items-center justify-center gap-2 mb-4">
-            <span className="text-4xl">🏆</span>
-            <h1 className="text-3xl font-black text-white">Create a Program</h1>
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const data = await fetchUserPrograms(userId);
+        console.log("API programs data =", data);
+        setPrograms(Array.isArray(data) ? data : []);
+      } catch (e) {
+        console.error("Erreur chargement programmes", e);
+        setPrograms([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+    load();
+  }, [userId]);
+
+  const list = Array.isArray(programs) ? programs : [];
+
+  const activePrograms = list.filter((p) => p.status === "ONGOING").length;
+  const completedSessions = list.reduce(
+    (sum, p) => sum + (p.completedSessions || 0),
+    0
+  );
+  const totalHours = list.reduce((sum, p) => sum + (p.totalHours || 0), 0);
+  const avgProgress =
+    list.length === 0
+      ? 0
+      : Math.round(
+          list.reduce((s, p) => s + (p.progressPercent || 0), 0) / list.length
+        );
+
+  // ✅ Empty State (nouveau)
+  const EmptyState = () => (
+    <div className="flex min-h-screen bg-gradient-to-br from-[#0B0B12] via-[#1a1625] to-[#0f0f1a]">
+      <Sidebar active="workout" />
+      <div className="flex-1 flex items-center justify-center p-4">
+        <div className="text-center">
+          <div className="w-32 h-32 mx-auto mb-6 bg-lime-400/10 rounded-full flex items-center justify-center">
+            <Dumbbell className="w-16 h-16 text-lime-400" />
           </div>
-
-          <div className="flex justify-center gap-2 mb-2">
-            {[1, 2, 3, 4, 5].map((step) => (
-              <div
-                key={step}
-                className={`h-1 w-12 rounded-full transition-all ${
-                  step < currentStep ? "bg-green-500" : step === currentStep ? "bg-yellow-400" : "bg-gray-700"
-                }`}
-              />
-            ))}
-          </div>
-
-          <p className="text-gray-400 text-sm">
-            Step {currentStep} of {totalSteps}
+          <h2 className="text-3xl font-bold text-white mb-4">No Programs Yet</h2>
+          <p className="text-gray-400 mb-8 max-w-md">
+            Start your fitness journey by creating your first personalized workout program
           </p>
-        </div>
-
-        <div className="bg-gray-800/50 backdrop-blur-sm p-8 rounded-2xl border border-gray-700">
-          {currentStep === 1 && (
-            <Step1_Configuration
-              programData={programData}
-              setProgramData={setProgramData}
-              setCurrentStep={setCurrentStep}
-              days={days}
-            />
-          )}
-
-          {currentStep === 2 && (
-            <Step2_Preferences
-              sessionTypes={sessionTypes}
-              equipmentOptions={equipmentOptions}
-              loadingMeta={loadingMeta}
-              error={error}
-              programData={programData}
-              setProgramData={setProgramData}
-              setCurrentStep={setCurrentStep}
-            />
-          )}
-
-          {currentStep === 3 && (
-            <Step3_TargetMuscles
-              muscles={muscles}
-              loadingMeta={loadingMeta}
-              programData={programData}
-              setProgramData={setProgramData}
-              setCurrentStep={setCurrentStep}
-              activeDay={activeDay}
-              setActiveDay={setActiveDay}
-            />
-          )}
-
-          {currentStep === 4 && (
-            <Step4_SelectExercises
-              programData={programData}
-              setProgramData={setProgramData}
-              setCurrentStep={setCurrentStep}
-              activeDay={activeDay}
-              setActiveDay={setActiveDay}
-              exerciseCatalog={exerciseCatalog}
-              loadingExercises={loadingExercises}
-              error={error}
-            />
-          )}
-
-          {currentStep === 5 && (
-            <Step5_Summary
-              programData={programData}
-              setCurrentStep={setCurrentStep}
-              saving={saving}
-              onSave={handleSaveProgram}
-            />
-          )}
+          <button 
+            className="px-8 py-3 bg-lime-400 hover:bg-lime-500 text-gray-900 font-semibold rounded-full transition-all duration-300 transform hover:scale-105 flex items-center gap-2 mx-auto"
+            onClick={() => window.location.href = '/create-workout'}
+          >
+            <Plus className="w-5 h-5" />
+            Create New Program
+          </button>
         </div>
       </div>
     </div>
   );
-};
 
-export default CreateProgramWizard;
+  // ✅ Loading State (nouveau)
+  if (loading) {
+    return (
+      <div className="flex min-h-screen bg-gradient-to-br from-[#0B0B12] via-[#1a1625] to-[#0f0f1a]">
+        <Sidebar active="workout" />
+        <div className="flex-1 flex items-center justify-center">
+          <div className="flex flex-col items-center">
+            <div className="w-20 h-20 border-4 border-gray-800 border-t-lime-400 rounded-full animate-spin"></div>
+            <p className="text-gray-400 text-base mt-6 font-medium">Loading your programs...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ✅ Empty check (nouveau)
+  if (list.length === 0) {
+    return <EmptyState />;
+  }
+
+  // ✅ CHANGEMENT ICI : Nouveau layout avec Sidebar
+  return (
+    <div className="flex min-h-screen bg-gradient-to-br from-[#0B0B12] via-[#1a1625] to-[#0f0f1a]">
+      <Sidebar active="workout" />
+      
+      <div className="flex-1 p-4 overflow-y-auto">
+        <div className="max-w-4xl mx-auto">
+          {/* ✅ CHANGEMENT : Nouveau Header */}
+          <div className="mb-6">
+            <div className="flex items-center justify-between mb-4">
+              <h1 className="text-4xl font-bold text-lime-400">My Workout Programs</h1>
+              <button
+                onClick={() => window.location.href = '/workout'}
+                className="px-6 py-3 bg-gray-800 hover:bg-lime-400 text-lime-400 hover:text-gray-900 font-semibold rounded-xl border-2 border-gray-700 hover:border-lime-400 transition-all flex items-center gap-2"
+              >
+                <Dumbbell className="w-5 h-5" />
+                Workout Catalog
+              </button>
+            </div>
+          </div>
+
+          {/* ✅ CHANGEMENT : Stats Grid avec nouveau style */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+            <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl p-4 border border-gray-700">
+              <div className="text-xs text-gray-500 uppercase mb-1">Active Programs</div>
+              <div className="text-3xl font-bold text-lime-400">{activePrograms}</div>
+            </div>
+            <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl p-4 border border-gray-700">
+              <div className="text-xs text-gray-500 uppercase mb-1">Completed Sessions</div>
+              <div className="text-3xl font-bold text-lime-400">{completedSessions}</div>
+            </div>
+            <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl p-4 border border-gray-700">
+              <div className="text-xs text-gray-500 uppercase mb-1">Total Hours</div>
+              <div className="text-3xl font-bold text-lime-400">{totalHours.toFixed(1)}</div>
+            </div>
+            <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl p-4 border border-gray-700">
+              <div className="text-xs text-gray-500 uppercase mb-1">Avg Progress</div>
+              <div className="text-3xl font-bold text-lime-400">{avgProgress}%</div>
+            </div>
+          </div>
+
+          {/* ✅ CHANGEMENT : Programs List avec espace réduit */}
+          <div className="space-y-4">
+            {list.map((p) => (
+              <ProgramCard key={p.id} program={p} />
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ProgramCard({ program }) {
+  const [selectedSessionId, setSelectedSessionId] = useState(null);
+
+  return (
+    <>
+      {/* ✅ CHANGEMENT : Nouveau style de card */}
+      <div className="bg-gray-800 rounded-2xl p-6 shadow-lg border-2 border-gray-700 hover:border-lime-400/50 transition-all">
+        {/* Header */}
+        <div className="flex justify-between items-start mb-4">
+          <div>
+            <h2 className="text-2xl font-bold text-white mb-1">{program.name}</h2>
+            <p className="text-sm text-gray-400">
+              {program.goal} · {program.generationType}
+            </p>
+          </div>
+          {/* ✅ CHANGEMENT : Badge status avec lime-400 */}
+          <span className={`px-4 py-1 rounded-full text-sm font-semibold ${
+            program.status === 'ONGOING' 
+              ? 'bg-lime-400 text-gray-900' 
+              : 'bg-gray-700 text-gray-300'
+          }`}>
+            {program.status}
+          </span>
+        </div>
+
+        {program.description && (
+          <p className="text-gray-400 text-sm mb-4">{program.description}</p>
+        )}
+
+        {/* Progress Bar */}
+        <div className="mb-6">
+          <div className="flex justify-between text-sm mb-2">
+            <span className="text-gray-400">Overall Progress</span>
+            {/* ✅ CHANGEMENT : lime-400 au lieu de [#D6F93D] */}
+            <span className="text-lime-400 font-semibold">
+              {Math.round(program.progressPercent || 0)}%
+            </span>
+          </div>
+          <div className="w-full bg-gray-700 rounded-full h-3">
+            {/* ✅ CHANGEMENT : lime-400 + shadow */}
+            <div
+              className="bg-lime-400 h-3 rounded-full transition-all duration-300 shadow-lg shadow-lime-400/50"
+              style={{ width: `${program.progressPercent || 0}%` }}
+            />
+          </div>
+        </div>
+
+        {/* ✅ CHANGEMENT : Info Grid avec nouveau style */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+          <div className="bg-gray-800/50 p-3 rounded-lg border border-gray-700">
+            <div className="text-xs text-gray-500 uppercase mb-1">Goal</div>
+            <div className="text-sm text-gray-200">{program.goal}</div>
+          </div>
+          <div className="bg-gray-800/50 p-3 rounded-lg border border-gray-700">
+            <div className="text-xs text-gray-500 uppercase mb-1">Sessions Completed</div>
+            <div className="text-sm text-gray-200">
+              {program.completedSessions} / {program.totalSessions}
+            </div>
+          </div>
+          <div className="bg-gray-800/50 p-3 rounded-lg border border-gray-700">
+            <div className="text-xs text-gray-500 uppercase mb-1">Next Session</div>
+            <div className="text-sm text-gray-200">
+              {program.nextSessionDate || "—"}
+            </div>
+          </div>
+        </div>
+
+        {/* Recent Sessions */}
+        <div className="mb-4">
+          <h3 className="text-lg font-semibold text-white mb-3">Recent Sessions</h3>
+          {/* ✅ CHANGEMENT : ul → div avec space-y-2 */}
+          <div className="space-y-2">
+            {program.recentSessions?.length ? (
+              program.recentSessions.map((s) => {
+                const sid = s.id ?? s.sessionId ?? s.id_session ?? s.workoutSessionId;
+
+                return (
+                  <div
+                    key={sid ?? `${s.date}-${s.title}`}
+                    onClick={() => {
+                      console.log("clicked session =", s);
+                      console.log("sid =", sid);
+                      if (!sid) return;
+                      setSelectedSessionId(sid);
+                    }}
+                    {/* ✅ CHANGEMENT : Nouveau style hover avec lime-400 */}
+                    className="flex justify-between items-center bg-gray-800/50 p-4 rounded-lg cursor-pointer hover:bg-gray-700/50 border border-transparent hover:border-lime-400/40 transition-all group"
+                  >
+                    <span className="text-sm text-gray-500">{s.date}</span>
+                    <span className="text-sm text-gray-200 flex-1 mx-4 font-medium">{s.title}</span>
+                    {/* ✅ CHANGEMENT : Badge avec hover lime */}
+                    <span className="px-3 py-1 rounded-full text-xs font-semibold bg-gray-700 group-hover:bg-lime-400 text-gray-300 group-hover:text-gray-900 transition-all">
+                      View →
+                    </span>
+                  </div>
+                );
+              })
+            ) : (
+              <div className="text-sm text-gray-400 p-4 text-center bg-gray-800/30 rounded-lg">
+                No sessions yet.
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Modal de détails de session */}
+      {selectedSessionId && (
+        <SessionDetailModal
+          sessionId={selectedSessionId}
+          onClose={() => setSelectedSessionId(null)}
+        />
+      )}
+    </>
+  );
+}
