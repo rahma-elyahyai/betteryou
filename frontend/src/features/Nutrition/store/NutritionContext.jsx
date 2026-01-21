@@ -11,7 +11,7 @@ export const useNutrition = () => {
   return context;
 };
 
-const API_BASE_URL = '/api'; // ✅ Pas besoin de localhost car api.baseURL le gère
+const API_BASE_URL = ''; // ✅ Pas besoin de localhost car api.baseURL le gère
 
 export const NutritionProvider = ({ children }) => {
   const cacheRef = useRef({

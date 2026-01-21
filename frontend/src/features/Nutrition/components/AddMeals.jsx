@@ -71,7 +71,6 @@ const loadAllData = async () => {
     setPlanMeals(weekMeals || {});
   } catch (e) {
     console.error(e);
-    setError("Failed to load data. Please refresh the page.");
   } finally {
     setLoading(false);
   }
