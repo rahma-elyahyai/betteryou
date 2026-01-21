@@ -21,6 +21,12 @@ public class JwtAuthFilter extends GenericFilter {
             throws IOException, ServletException {
 
         HttpServletRequest req = (HttpServletRequest) request;
+            // ✅ 1) Laisser passer les requêtes OPTIONS (CORS preflight)
+    if ("OPTIONS".equalsIgnoreCase(req.getMethod())) {
+        chain.doFilter(request, response);
+        return;
+    }
+
         String auth = req.getHeader("Authorization");
 
         if (auth != null && auth.startsWith("Bearer ")) {

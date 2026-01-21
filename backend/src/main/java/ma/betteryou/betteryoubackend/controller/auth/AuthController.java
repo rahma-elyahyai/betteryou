@@ -11,6 +11,8 @@ import ma.betteryou.betteryoubackend.dto.auth.ForgotPasswordRequest;
 import ma.betteryou.betteryoubackend.dto.auth.ResetPasswordRequest;
 import ma.betteryou.betteryoubackend.dto.auth.MessageResponse;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 
 
 
@@ -34,8 +36,11 @@ public class AuthController {
     }
 
     @GetMapping("/me")
-    public UserMeResponse me(Authentication auth) {
-        return authService.me(auth.getName()); // auth.getName() = email (subject)
+    public ResponseEntity<UserMeResponse> me(Authentication auth) {
+        if (auth == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        return ResponseEntity.ok(authService.me(auth.getName()));
     }
 
     @GetMapping("/check-email")

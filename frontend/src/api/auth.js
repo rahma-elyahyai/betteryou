@@ -1,9 +1,15 @@
 import axios from "axios";
 
-// ✅ Axios instance EXPORTÉE
+
+// Solution PRO : Une ligne, zéro changement manuel
 export const api = axios.create({
-  baseURL: "http://localhost:8080",
+  baseURL: import.meta.env.VITE_API_URL || "http://localhost:8080",
+  timeout: 15000,
 });
+
+// Vérification (optionnel, pour debug)
+console.log("✅ Mode:", import.meta.env.MODE);
+console.log("🌐 API URL:", import.meta.env.VITE_API_URL);
 
 // ✅ Interceptor → ajoute le token automatiquement
 api.interceptors.request.use(

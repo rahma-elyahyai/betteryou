@@ -65,7 +65,7 @@ export default function NutritionCatalog({ userId , limit = 4 }) {
               <div className="flex items-center gap-4">
   
                 <div>
-                  <h1 className="text-2xl font-bold text-white">Nutrition</h1>
+                  <h1 className="text-4xl font-bold text-white">NUTRITION CATALOG</h1>
                   <p className="text-gray-500 text-sm">Personalized Meal Recommendations</p>
                 </div>
               </div>
@@ -86,16 +86,6 @@ export default function NutritionCatalog({ userId , limit = 4 }) {
         {/* Content Area */}
         <div className="flex-1 overflow-auto">
           <div className="max-w-7xl mx-auto px-8 py-12">
-            
-            {/* Title Section */}
-            <div className="mb-12">
-              <h2 className="text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-lime-400 via-lime-300 to-lime-500 mb-4 tracking-tight">
-                NUTRITION CATALOG
-              </h2>
-              <p className="text-gray-400 text-lg max-w-3xl">
-                Discover personalized meal plans designed to accelerate your fitness journey and help you achieve your goals faster
-              </p>
-            </div>
 
             {/* Loading State */}
             {isLoadingRecommendations && (

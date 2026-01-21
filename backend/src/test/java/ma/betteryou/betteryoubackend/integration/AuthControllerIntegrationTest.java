@@ -243,19 +243,20 @@ class AuthControllerIntegrationTest {
     }
 
     @Test
-    @DisplayName("Endpoint /me sans token ")
-    void testMeWithoutToken() throws Exception {
-        mockMvc.perform(get("/api/auth/me"))
-                .andExpect(status().isForbidden());
-    }
+@DisplayName("Endpoint /me sans token ")
+void testMeWithoutToken() throws Exception {
+    mockMvc.perform(get("/api/auth/me"))
+            .andExpect(status().isUnauthorized()); // ✅ au lieu de isForbidden()
+}
 
-    @Test
-    @DisplayName("Endpoint /me avec un token invalide doit retourner 403")
-    void testMeWithInvalidToken() throws Exception {
-        mockMvc.perform(get("/api/auth/me")
-                        .header("Authorization", "Bearer invalid-token"))
-                .andExpect(status().isForbidden());
-    }
+@Test
+@DisplayName("Endpoint /me avec un token invalide doit retourner 401")
+void testMeWithInvalidToken() throws Exception {
+    mockMvc.perform(get("/api/auth/me")
+                    .header("Authorization", "Bearer invalid-token"))
+            .andExpect(status().isUnauthorized()); // ✅ au lieu de isForbidden()
+}
+
 
     // ========== TESTS DE /check-email ==========
 

@@ -1,52 +1,51 @@
 version: "3.9"
 
 services:
-  postgres:
-    image: postgres:16
-    container_name: betteryou-postgres
-    environment:
-      POSTGRES_DB: betteryou_db
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: 1234
-    ports:
-      - "5432:5432"
-    volumes:
-      - pgdata:/var/lib/postgresql/data
-    networks:
-      - betteryou-net
+  # postgres:
+  #   image: postgres:16
+  #   container_name: betteryou-postgres
+  #   environment:
+  #     POSTGRES_DB: ${POSTGRES_DB}
+  #     POSTGRES_USER: ${POSTGRES_USER}
+  #     POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+  #   ports:
+  #     - "5432:5432"
+  #   volumes:
+  #     - pgdata:/var/lib/postgresql/data
+  #   networks:
+  #     - betteryou-net
 
   backend:
-    build:
-      context: .              # AU LIEU DE ..
-      dockerfile: devops/Dockerfile.backend
+  #on fait pas le build ici, on utilise l'image qu'on a poussée sur Docker Hub pour que le deployememnt utilise l'image et non pas reconstruise l'image et le code inexistant !!
+    image: ${DOCKERHUB_USERNAME}/betteryou-backend:latest
     container_name: betteryou-backend
+    env_file:
+      - ./backend/.env
+    restart: always
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/betteryou_db
-      SPRING_DATASOURCE_USERNAME: postgres
-      SPRING_DATASOURCE_PASSWORD: 1234
+      SPRING_DATASOURCE_URL: ${DATA_SOURCE_URL}
+      # SPRING_DATASOURCE_USERNAME: ${DATA_SOURCE_USERNAME}
+      # SPRING_DATASOURCE_PASSWORD: ${DATA_SOURCE_PASSWORD}
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
       OPENAI_API_KEY: ${OPENAI_API_KEY}
-      # optionnel si tu veux configurer le modèle depuis compose
-      OPENAI_MODEL: gpt-4o-mini
-    depends_on:
-      - postgres
+      OPENAI_MODEL: ${OPENAI_MODEL}
     ports:
       - "8080:8080"
     networks:
       - betteryou-net
 
-
   frontend:
-    build:
-      context: .              # AU LIEU DE ..
-      dockerfile: devops/Dockerfile.frontend
+    image: ${DOCKERHUB_USERNAME}/betteryou-frontend:latest
     container_name: betteryou-frontend
+    env_file:
+      - ./frontend/.env.production
+    restart: always
     depends_on:
       - backend
     ports:
       - "3000:80"
     networks:
       - betteryou-net
-
 
 volumes:
   pgdata:
