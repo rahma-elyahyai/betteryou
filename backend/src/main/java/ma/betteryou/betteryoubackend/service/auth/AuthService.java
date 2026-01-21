@@ -37,7 +37,7 @@ public class AuthService {
     private final PasswordResetTokenRepository passwordResetTokenRepository;
     private final EmailService emailService;
 
-    @Value("${app.frontend.reset-url}")
+    @Value("${app.frontend.reset-url}") //depuis application.yaml
     private String resetUrl;
 
 
