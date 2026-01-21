@@ -3,7 +3,7 @@ import axios from "axios";
 
 // Solution PRO : Une ligne, zéro changement manuel
 export const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || "http://localhost:8080/api",
+  baseURL: import.meta.env.VITE_API_URL || "http://localhost:8080",
   timeout: 15000,
 });
 
@@ -25,9 +25,9 @@ api.interceptors.request.use(
 
 // ✅ Auth API
 export const authApi = {
-  login: (data) => api.post("/auth/login", data),
-  register: (data) => api.post("/auth/register", data),
-  me: () => api.get("/auth/me"),
-  forgotPassword: (data) => api.post("/auth/forgot-password", data),
-  resetPassword: (data) => api.post("/auth/reset-password", data),
+  login: (data) => api.post("/api/auth/login", data),
+  register: (data) => api.post("/api/auth/register", data),
+  me: () => api.get("/api/auth/me"),
+  forgotPassword: (data) => api.post("/api/auth/forgot-password", data),
+  resetPassword: (data) => api.post("/api/auth/reset-password", data),
 };
