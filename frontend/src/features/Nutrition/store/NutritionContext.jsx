@@ -39,6 +39,48 @@ export const NutritionProvider = ({ children }) => {
     return Date.now() - lastFetch < CACHE_DURATION;
   }, [CACHE_DURATION]);
 
+    const isPlanActive = useCallback((plan) => {
+    if (!plan || !plan.startDate || !plan.endDate) return false;
+    const today = new Date().toISOString().split('T')[0];
+    return today <= plan.endDate;
+  }, []);
+
+  // 🆕 Détecte si une erreur est due à un plan inactif
+  const isInactivePlanError = useCallback((error) => {
+    const errorMessage = error?.response?.data?.error || error?.message || '';
+    return errorMessage.includes('ended on') || 
+           errorMessage.includes('completed') ||
+           errorMessage.includes('cannot modify');
+  }, []);
+
+  // 🆕 Récupère le plan actif d'un utilisateur
+  const getActivePlan = useCallback(async (userId, forceRefresh = false) => {
+    const cacheKey = `activePlan_${userId}`;
+    
+    if (!forceRefresh && cacheRef.current[cacheKey] && isCacheValid(cacheKey)) {
+      return cacheRef.current[cacheKey];
+    }
+
+    try {
+      // Récupère tous les plans pour lundi (peu importe le jour)
+      const { data: plans } = await api.get(
+        `${API_BASE_URL}/myprograms/user/${userId}?dayOfWeek=Monday`
+      );
+      
+      // Trouve le plan actif
+      const activePlan = plans.find(plan => isPlanActive(plan));
+      
+      cacheRef.current[cacheKey] = activePlan || null;
+      cacheRef.current.lastFetch[cacheKey] = Date.now();
+      
+      return activePlan || null;
+    } catch (error) {
+      console.error('Error getting active plan:', error);
+      return null;
+    }
+  }, [isCacheValid, isPlanActive]);
+  
+
   // ==================== MEALS CATALOG ====================
   
   const loadAllMeals = useCallback(async (forceRefresh = false) => {
@@ -143,7 +185,7 @@ export const NutritionProvider = ({ children }) => {
       
       // Invalider le cache des plans
       Object.keys(cacheRef.current.lastFetch).forEach(key => {
-        if (key.startsWith('plansByUser_')) {
+        if (key.startsWith('plansByUser_') || key.startsWith('activePlan_')) {
           delete cacheRef.current.lastFetch[key];
         }
       });
@@ -235,10 +277,15 @@ export const NutritionProvider = ({ children }) => {
       
       return true;
     } catch (error) {
+      // 🆕 Gestion spécifique des plans inactifs
+      if (isInactivePlanError(error)) {
+        const errorMsg = error?.response?.data?.error || 'This nutrition plan has ended and cannot be modified.';
+        alert(`⚠️ ${errorMsg}`);
+      }
       console.error('Error updating plan:', error);
       throw error;
     }
-  }, []);
+  }, [isInactivePlanError]);
 
   const deleteNutritionPlan = useCallback(async (planId) => {
     try {
@@ -252,7 +299,7 @@ export const NutritionProvider = ({ children }) => {
       delete cacheRef.current.planMeals[planId];
       
       Object.keys(cacheRef.current.lastFetch).forEach(key => {
-        if (key.includes(planId) || key.startsWith('plansByUser_')) {
+        if (key.includes(planId) || key.startsWith('plansByUser_') || key.startsWith('activePlan_')) {
           delete cacheRef.current.lastFetch[key];
         }
       });
@@ -260,6 +307,26 @@ export const NutritionProvider = ({ children }) => {
       return true;
     } catch (error) {
       console.error('Error deleting plan:', error);
+      throw error;
+    }
+  }, []);
+
+  const endNutritionPlan = useCallback(async (planId) => {
+    try {
+      const { data } = await api.put(
+        `${API_BASE_URL}/myprograms/nutritionplans/${planId}/end`
+      );
+      
+      // Invalider tous les caches liés
+      Object.keys(cacheRef.current.lastFetch).forEach(key => {
+        if (key.includes(planId) || key.startsWith('plansByUser_') || key.startsWith('activePlan_')) {
+          delete cacheRef.current.lastFetch[key];
+        }
+      });
+      
+      return data;
+    } catch (error) {
+      console.error('Error ending plan:', error);
       throw error;
     }
   }, []);
@@ -329,10 +396,15 @@ export const NutritionProvider = ({ children }) => {
 
       return true;
     } catch (error) {
+      // 🆕 Gestion spécifique des plans inactifs
+      if (isInactivePlanError(error)) {
+        const errorMsg = error?.response?.data?.error || 'This nutrition plan has ended and cannot be modified.';
+        alert(`⚠️ ${errorMsg}`);
+      }
       console.error('Error adding meal:', error);
       throw error;
     }
-  }, []);
+  }, [isInactivePlanError]);
 
   const removeMealFromPlan = useCallback(async (planId, mealId, dayOfWeek, mealSlot) => {
     try {
@@ -350,10 +422,15 @@ export const NutritionProvider = ({ children }) => {
 
       return true;
     } catch (error) {
+       // 🆕 Gestion spécifique des plans inactifs
+      if (isInactivePlanError(error)) {
+        const errorMsg = error?.response?.data?.error || 'This nutrition plan has ended and cannot be modified.';
+        alert(`⚠️ ${errorMsg}`);
+      }
       console.error('Error removing meal:', error);
       throw error;
     }
-  }, []);
+  }, [isInactivePlanError]);
 
   const replaceMealInPlan = useCallback(async (planId, oldMealId, newMealId, dayOfWeek, mealSlot) => {
     try {
@@ -381,10 +458,15 @@ export const NutritionProvider = ({ children }) => {
 
       return true;
     } catch (error) {
-      console.error('💥 Error replacing meal:', error);
+       // 🆕 Gestion spécifique des plans inactifs
+      if (isInactivePlanError(error)) {
+        const errorMsg = error?.response?.data?.error || 'This nutrition plan has ended and cannot be modified.';
+        alert(`⚠️ ${errorMsg}`);
+      }
+      console.error(' Error replacing meal:', error);
       throw error;
     }
-  }, []);
+  }, [isInactivePlanError]);
 
   // ==================== MEAL CONSUMPTION ====================
 
@@ -408,7 +490,10 @@ export const NutritionProvider = ({ children }) => {
     }
   }, []);
 
+
+
   // ==================== UTILITY FUNCTIONS ====================
+
 
   const getMealsByGoal = useCallback((goal) => {
     if (!cacheRef.current.allMeals) return [];
@@ -423,6 +508,10 @@ export const NutritionProvider = ({ children }) => {
       keys.forEach(key => delete cacheRef.current.lastFetch[key]);
     }
   }, []);
+
+
+
+  
 
   const getCache = useCallback(() => cacheRef.current, []);
 
@@ -443,6 +532,7 @@ export const NutritionProvider = ({ children }) => {
     loadPlanDetails,
     updateNutritionPlan,
     deleteNutritionPlan,
+    endNutritionPlan,
     
     // Meals in Plans
     loadPlanMealsForWeek,
@@ -454,7 +544,10 @@ export const NutritionProvider = ({ children }) => {
     recordMealConsumption,
     
     // Utilities
-    invalidateCache
+    invalidateCache,
+    isPlanActive,
+    isInactivePlanError,
+    getActivePlan,
   };
 
   return (

@@ -52,9 +52,13 @@ export default function NutritionCatalog({ userId , limit = 4 }) {
 
   return (
     <div className="flex min-h-screen bg-gradient-to-br from-[#0B0B12] via-[#1a1625] to-[#0f0f1a]">
-      {/* 🎨 Sidebar */}
-      <Sidebar active="nutrition"/>
-
+      <Sidebar 
+        active="nutrition"
+        onLogout={() => {
+          localStorage.removeItem("token");
+          console.log("logout");
+        }}
+      />
       {/* 🎨 Main Content */}
       <div className="flex-1 flex flex-col">
         
@@ -134,20 +138,32 @@ export default function NutritionCatalog({ userId , limit = 4 }) {
                 </div>
 
                 {/* 🎯 Action Button - CENTRÉ */}
-                <div className="flex justify-center items-center py-12 border-t border-gray-800">
-                  <button 
-                    onClick={() => window.location.href = '/create-nutrition-plan'}
-                    className="group relative px-12 py-5 bg-gradient-to-r from-lime-400 to-lime-500 hover:from-lime-500 hover:to-lime-600 text-gray-900 font-black text-xl uppercase tracking-wider rounded-2xl transition-all duration-300 hover:shadow-2xl hover:shadow-lime-500/40 transform hover:scale-105 hover:-translate-y-1"
-                  >
-                    <span className="relative z-10 flex items-center gap-3">
-                      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M12 4v16m8-8H4" />
-                      </svg>
-                      Create Custom Plan
-                      <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M9 5l7 7-7 7" />
-                      </svg>
-                    </span>
+<div className="flex justify-center items-center py-12 border-t border-gray-800">
+  <button 
+    onClick={() => {
+      // Message d'information générale
+      const hasConfirmed = window.confirm(
+        "⚠️ IMPORTANT\n\n" +
+        "If you already have an active nutrition plan, creating a new one will automatically end it.\n\n" +
+        "Do you want to continue?"
+      );
+      
+      if (hasConfirmed) {
+        window.location.href = '/create-nutrition-plan';
+      }
+    }}
+    className="group relative px-12 py-5 bg-gradient-to-r from-lime-400 to-lime-500 hover:from-lime-500 hover:to-lime-600 text-gray-900 font-black text-xl uppercase tracking-wider rounded-2xl transition-all duration-300 hover:shadow-2xl hover:shadow-lime-500/40 transform hover:scale-105 hover:-translate-y-1"
+  >
+    <span className="relative z-10 flex items-center gap-3">
+      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M12 4v16m8-8H4" />
+      </svg>
+      Create Custom Plan
+      <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M9 5l7 7-7 7" />
+      </svg>
+    </span>
+  
                     
                     {/* Effet de brillance */}
                     <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-transparent via-white/20 to-transparent transform translate-x-[-200%] group-hover:translate-x-[200%] transition-transform duration-700"></div>

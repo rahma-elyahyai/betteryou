@@ -107,7 +107,6 @@ const handleSubmit = async (e) => {
       
     } catch (error) {
       console.error('Error creating plan:', error);
-      setErrors({ submit: 'Failed to create program. Please try again.' });
     } finally {
       setIsSubmitting(false);
     }

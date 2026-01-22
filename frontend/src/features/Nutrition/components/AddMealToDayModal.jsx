@@ -43,6 +43,7 @@ const AddMealToDayModal = ({ dayOfWeek, programId, existingMealTypes, onClose, o
       await onAdd(programId, selectedMeal.idMeal, dayOfWeek, selectedSlot);
       onClose();
     } catch (error) {
+      
       console.error('Add error:', error);
     } finally {
       setIsAdding(false);

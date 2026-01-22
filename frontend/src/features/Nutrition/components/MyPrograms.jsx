@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Calendar, Edit2, Trash2, Plus, ChevronLeft, ChevronRight, Target, RefreshCw } from 'lucide-react';
+import { Calendar, Edit2, Trash2, Plus, ChevronLeft, ChevronRight, Target, RefreshCw, StopCircle, CheckCircle2, XCircle } from 'lucide-react';
 import MealDetailModal from './MealDetail.jsx';
 import EditPlanModal from './EditModal.jsx';
 import DeleteConfirmModal from './DeleteConfirmModal.jsx';
@@ -22,6 +22,8 @@ const MyPrograms = () => {
     replaceMealInPlan,
     addMealToPlan,
     recordMealConsumption,
+    endNutritionPlan, // 🆕 Fonction pour terminer un plan
+    isPlanActive, 
     loading
   } = useNutrition();
 
@@ -40,7 +42,7 @@ const MyPrograms = () => {
   const [removingMealId, setRemovingMealId] = useState(null);
   const [savingMealId, setSavingMealId] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false);
-
+  const  [isEndingPlan, setIsEndingPlan] = useState(false); 
   const { user, loadingUser } = useAuth();
 const userId = user?.idUser;
 
@@ -75,8 +77,51 @@ useEffect(() => {
 }, [loadingUser, userId, currentDay, loadUserPlansForDay, selectedProgram]);
 
 
+  //fonction pur terminer un plan 
+  const handleEndPlan = async () => {
+    if (!selectedProgram) return;
+    
+    const confirmEnd = window.confirm(
+      `Are you sure you want to end "${selectedProgram.nutritionName}"?\n\nThis action will mark the plan as completed and you won't be able to modify it anymore.`
+    );
+    
+    if (!confirmEnd) return;
+
+    setIsEndingPlan(true);
+    try {
+      await endNutritionPlan(selectedProgram.idNutrition);
+      
+      setSaveMsg('✅ Plan ended successfully!');
+      setTimeout(() => setSaveMsg(""), 3000);
+      
+      // Recharger les programmes
+      const data = await loadUserPlansForDay(userId, currentDay, true);
+      setPrograms(data || []);
+      
+      // Mettre à jour le plan sélectionné
+      const updatedPlan = data.find(p => p.idNutrition === selectedProgram.idNutrition);
+      setSelectedProgram(updatedPlan || data[0] || null);
+    } catch (e) {
+      console.error('End plan error:', e);
+      const errorMsg = e?.response?.data?.error || e.message;
+      setSaveErr(`❌ Failed to end plan: ${errorMsg}`);
+      setTimeout(() => setSaveErr(""), 5000);
+    } finally {
+      setIsEndingPlan(false);
+    }
+  };
+
+  // 🔥 Vérifier si le plan sélectionné est actif
+  const isCurrentPlanActive = selectedProgram ? isPlanActive(selectedProgram) : false;
+
+
   // 🔥 Mettre à jour un plan
   const handleUpdatePlan = async (formData) => {
+    // Vérifier si le plan est actif
+    if (!isCurrentPlanActive) {
+      alert('⚠️ This nutrition plan has ended and cannot be modified.');
+      return;
+    }
     try {
       await updateNutritionPlan(selectedProgram.idNutrition, formData);
       
@@ -119,6 +164,11 @@ useEffect(() => {
 
   // 🔥 Supprimer un meal
   const handleRemoveMeal = async (meal) => {
+    // 🆕 Vérifier si le plan est actif
+    if (!isCurrentPlanActive) {
+      alert('⚠️ This nutrition plan has ended and cannot be modified.');
+      return;
+    }
     setRemovingMealId(meal.idMeal);
     try {
       await removeMealFromPlan(
@@ -145,6 +195,11 @@ useEffect(() => {
 
   // 🔥 Remplacer un meal
   const handleReplaceMeal = async (oldMealId, newMealId, dayOfWeek, mealSlot) => {
+    // 🆕 Vérifier si le plan est actif
+    if (!isCurrentPlanActive) {
+      alert('⚠️ This nutrition plan has ended and cannot be modified.');
+      throw new Error('Plan is inactive');
+    }
     try {
       await replaceMealInPlan(
         selectedProgram.idNutrition,
@@ -171,6 +226,11 @@ useEffect(() => {
 
   // 🔥 Ajouter un meal
   const handleAddMeal = async (programId, mealId, dayOfWeek, mealSlot) => {
+    // 🆕 Vérifier si le plan est actif
+    if (!isCurrentPlanActive) {
+      alert('⚠️ This nutrition plan has ended and cannot be modified.');
+      throw new Error('Plan is inactive');
+    }
     try {
       await addMealToPlan(programId, mealId, dayOfWeek, mealSlot);
       
@@ -297,20 +357,37 @@ useEffect(() => {
                   }}
                   className="flex-1 p-3 rounded-xl bg-gray-800 text-white border-2 border-gray-700 hover:border-lime-400 focus:outline-none focus:border-lime-400 transition-all"
                 >
-                  {programs.map(program => (
-                    <option key={program.idNutrition} value={program.idNutrition}>
-                      {program.nutritionName}
-                    </option>
-                  ))}
+                   {programs.map(program => {
+                    const active = isPlanActive(program);
+                    return (
+                      <option key={program.idNutrition} value={program.idNutrition}>
+                        {active ? '🟢' : ''} {program.nutritionName}
+                      </option>
+                    );
+                  })}
                 </select>
               )}
               
-              {selectedProgram && (
+             {selectedProgram && (
                 <div className="flex gap-2">
+                  {/* 🆕 Bouton "End Plan" visible uniquement pour les plans actifs */}
+                  {isCurrentPlanActive && (
+                    <button
+                      onClick={handleEndPlan}
+                      disabled={isEndingPlan}
+                      className="p-3 bg-gray-800 hover:bg-orange-500 text-orange-400 hover:text-white rounded-xl border-2 border-gray-700 hover:border-orange-500 transition-all disabled:opacity-50"
+                      title="End Plan"
+                    >
+                      <StopCircle className="w-5 h-5" />
+                    </button>
+                  )}
+                  
+                  {/* 🆕 Boutons Edit/Delete grisés si le plan est inactif */}
                   <button
-                    onClick={() => setEditingPlan(selectedProgram)}
-                    className="p-3 bg-gray-800 hover:bg-lime-400 text-lime-400 hover:text-gray-900 rounded-xl border-2 border-gray-700 hover:border-lime-400 transition-all"
-                    title="Edit Plan"
+                    onClick={() => isCurrentPlanActive ? setEditingPlan(selectedProgram) : alert('⚠️ This plan has ended and cannot be modified.')}
+                    disabled={!isCurrentPlanActive}
+                    className="p-3 bg-gray-800 hover:bg-lime-400 text-lime-400 hover:text-gray-900 rounded-xl border-2 border-gray-700 hover:border-lime-400 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+                    title={isCurrentPlanActive ? "Edit Plan" : "Plan ended - cannot edit"}
                   >
                     <Edit2 className="w-5 h-5" />
                   </button>
@@ -341,9 +418,23 @@ useEffect(() => {
 
           {selectedProgram && (
             <>
+              {/* 🆕 Warning Banner pour plans inactifs */}
+              {!isCurrentPlanActive && (
+                <div className="mb-6 p-4 rounded-xl bg-gray-900/30 border-2 border-gray-500/50 flex items-start gap-3">
+                  <XCircle className="w-6 h-6 text-red-400 flex-shrink-0 mt-0.5" />
+                  <div>
+                    <h3 className="text-red-400 font-bold text-lg mb-1">Plan Ended</h3>
+                    <p className="text-red-300 text-sm">
+                      This nutrition plan ended on <strong>{selectedProgram.endDate}</strong>. 
+                      You cannot modify it anymore, but you can still view the meals and save them to your diary.
+                    </p>
+                  </div>
+                </div>
+              )}
               {/* Info Card */}
               <div className="bg-gray-800/50 backdrop-blur-md rounded-2xl p-6 mb-6 border border-gray-700">
                 <h2 className="text-2xl font-bold text-lime-400 mb-4">{selectedProgram.nutritionName}</h2>
+
                 <div className="grid grid-cols-2 gap-4 text-gray-300">
                   <div className="flex items-center gap-2">
                     <Target className="w-5 h-5 text-lime-400" />
@@ -421,19 +512,21 @@ useEffect(() => {
                             )}
                           </div>
                         </div>
+                        {/* 🆕 Boutons grisés si le plan est inactif */}
                         <div className="flex gap-2">
                           <button
-                            onClick={() => setReplacingMeal({ meal, dayOfWeek: currentDay })}
-                            className="p-2 text-lime-400 hover:bg-lime-400/20 rounded-lg transition-all"
-                            title="Replace meal"
+                            onClick={() => isCurrentPlanActive ? setReplacingMeal({ meal, dayOfWeek: currentDay }) : alert('⚠️ This plan has ended and cannot be modified.')}
+                            disabled={!isCurrentPlanActive}
+                            className="p-2 text-lime-400 hover:bg-lime-400/20 rounded-lg transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+                            title={isCurrentPlanActive ? "Replace meal" : "Plan ended - cannot replace"}
                           >
                             <RefreshCw className="w-5 h-5" />
                           </button>
                           <button
-                            onClick={() => handleRemoveMeal(meal)}
-                            disabled={removingMealId === meal.idMeal}
-                            className="p-2 text-red-400 hover:bg-red-900/30 rounded-lg transition-all disabled:opacity-50"
-                            title="Remove meal"
+                            onClick={() => isCurrentPlanActive && handleRemoveMeal(meal)}
+                            disabled={removingMealId === meal.idMeal || !isCurrentPlanActive}
+                            className="p-2 text-red-400 hover:bg-red-900/30 rounded-lg transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+                            title={isCurrentPlanActive ? "Remove meal" : "Plan ended - cannot remove"}
                           >
                             <Trash2 className="w-5 h-5" />
                           </button>
@@ -491,36 +584,72 @@ useEffect(() => {
                     </div>
                   ))}
                   
-                  {selectedProgram.meals.length < 4 && (
-                    <button
-                      onClick={() => setAddingMealToDay({
-                        dayOfWeek: currentDay,
-                        existingMealTypes: selectedProgram.meals.map(m => m.mealType.toUpperCase())
-                      })}
-                      className="w-full py-4 bg-gray-800/50 hover:bg-lime-400/10 border-2 border-dashed border-gray-600 hover:border-lime-400 rounded-2xl transition-all flex items-center justify-center gap-2 text-gray-400 hover:text-lime-400 group"
-                    >
-                      <Plus className="w-5 h-5 group-hover:scale-110 transition-transform" />
-                      <span className="font-semibold">Add Another Meal ({selectedProgram.meals.length}/4)</span>
-                    </button>
-                  )}
+{selectedProgram.meals.length < 4 && (
+  <button
+    onClick={() => {
+      // 🔴 VÉRIFIER SI LE PLAN EST ACTIF AVANT D'AUTORISER L'AJOUT
+      if (!isCurrentPlanActive) {
+        alert('⚠️ This plan has ended. You cannot add new meals.');
+        return;
+      }
+      
+      // Si actif, continuer avec votre logique normale
+      setAddingMealToDay({
+        dayOfWeek: currentDay,
+        existingMealTypes: selectedProgram.meals.map(m => m.mealType.toUpperCase())
+      });
+    }}
+    disabled={!isCurrentPlanActive}
+    className={`w-full py-4 rounded-2xl transition-all flex items-center justify-center gap-2 ${
+      isCurrentPlanActive 
+        ? "bg-gray-800/50 hover:bg-lime-400/10 border-2 border-dashed border-gray-600 hover:border-lime-400 text-gray-400 hover:text-lime-400"
+        : "bg-gray-800/30 border-2 border-dashed border-gray-700 text-gray-500 cursor-not-allowed"
+    } group`}
+  >
+    <Plus className={`w-5 h-5 ${isCurrentPlanActive ? 'group-hover:scale-110 transition-transform' : ''}`} />
+    <span className="font-semibold">
+      {isCurrentPlanActive 
+        ? `Add Another Meal (${selectedProgram.meals.length}/4)`
+        : 'Plan Ended - Cannot Add Meals'
+      }
+    </span>
+  </button>
+)}
                 </div>
               ) : (
                 <div className="bg-gray-800/50 backdrop-blur-md rounded-2xl p-12 text-center border border-gray-700 mb-6">
-                  <div className="text-6xl mb-4">🍽️</div>
-                  <h3 className="text-2xl font-bold text-white mb-2">No Meals for {currentDay}</h3>
-                  <p className="text-gray-400 mb-6">Add your first meal to this day</p>
-                  <button 
-                    onClick={() => setAddingMealToDay({
-                      dayOfWeek: currentDay,
-                      existingMealTypes: []
-                    })}
-                    className="px-6 py-3 bg-lime-400 hover:bg-lime-500 text-gray-900 font-semibold rounded-full transition-all flex items-center gap-2 mx-auto"
-                  >
-                    <Plus className="w-5 h-5" />
-                    Add First Meal
-                  </button>
-                </div>
-              )}
+    <div className="text-6xl mb-4">🍽️</div>
+    <h3 className="text-2xl font-bold text-white mb-2">No Meals for {currentDay}</h3>
+    <p className="text-gray-400 mb-6">
+      {isCurrentPlanActive 
+        ? "Add your first meal to this day"
+        : "This plan has ended. View meals only"
+      }
+    </p>
+    
+    <button 
+      onClick={() => {
+        if (!isCurrentPlanActive) {
+          alert('⚠️ This plan has ended. You cannot add new meals.');
+          return;
+        }
+        setAddingMealToDay({
+          dayOfWeek: currentDay,
+          existingMealTypes: []
+        });
+      }}
+      disabled={!isCurrentPlanActive}
+      className={`px-6 py-3 font-semibold rounded-full transition-all flex items-center gap-2 mx-auto ${
+        isCurrentPlanActive
+          ? "bg-lime-400 hover:bg-lime-500 text-gray-900"
+          : "bg-gray-700 text-gray-400 cursor-not-allowed"
+      }`}
+    >
+      <Plus className="w-5 h-5" />
+      {isCurrentPlanActive ? "Add First Meal" : "Plan Ended"}
+    </button>
+  </div>
+)}
 
               {/* Daily Summary */}
               <div className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl p-6 shadow-xl border-2 border-lime-400/30">

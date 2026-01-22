@@ -134,20 +134,35 @@ public class NutritionPlanImp implements NutritionPlanService {
 
 @Override
 public NutritionPlanDto saveNutritionPlanDto(NutritionPlanDto nutritionPlanDto) {
-
-    System.out.println("DTO userId = " + nutritionPlanDto.getIdUser());
-
     User user = userRepository.findById(nutritionPlanDto.getIdUser())
-        .orElseThrow(() -> new RuntimeException("User not found: " + nutritionPlanDto.getIdUser()));
+        .orElseThrow(() -> new RuntimeException("User not found"));
 
+    LocalDate startDate = LocalDate.parse(nutritionPlanDto.getStartDate());
+    LocalDate endDate = startDate.plusDays(6);
+
+    // 🔥 SIMPLE : Trouver et terminer l'ancien plan automatiquement
+    List<NutritionPlan> activePlans = nutritionPlanRepository.findByUser_IdUser(user.getIdUser())
+        .stream()
+        .filter(plan ->!plan.getEndDate().isBefore(LocalDate.now()))
+        .collect(Collectors.toList());
+    
+    // Si un plan est encore actif, on le termine (endDate = hier)
+    for (NutritionPlan oldPlan : activePlans) {
+        oldPlan.setEndDate(LocalDate.now().minusDays(1)); // Termine hier
+        nutritionPlanRepository.save(oldPlan);
+        System.out.println("⚠️ Auto-terminated old plan: " + oldPlan.getIdNutrition());
+    }
+    // 🔥 FIN
+
+    // Créer le nouveau plan (votre code existant)
     NutritionPlan nutritionPlan = NutritionPlan.builder()
         .nutritionName(nutritionPlanDto.getNutritionName())
-        .startDate(LocalDate.parse(nutritionPlanDto.getStartDate()))
-        .endDate(LocalDate.parse(nutritionPlanDto.getStartDate()).plusDays(6)) // ✅ Fixe la durée à 7 jours
+        .startDate(startDate)
+        .endDate(endDate)
         .objective(nutritionPlanDto.getObjective())
         .description(nutritionPlanDto.getDescription())
         .caloriesPerDay(nutritionPlanDto.getCaloriesPerDay())
-        .user(user) // ✅ IMPORTANT -> va remplir id_user
+        .user(user)
         .build();
 
     NutritionPlan savedPlan = nutritionPlanRepository.save(nutritionPlan);
@@ -156,7 +171,7 @@ public NutritionPlanDto saveNutritionPlanDto(NutritionPlanDto nutritionPlanDto) 
         .idNutrition(savedPlan.getIdNutrition())
         .nutritionName(savedPlan.getNutritionName())
         .startDate(savedPlan.getStartDate().toString())
-        .endDate(savedPlan.getStartDate().plusDays(6).toString())
+        .endDate(savedPlan.getEndDate().toString())
         .objective(savedPlan.getObjective())
         .description(savedPlan.getDescription())
         .caloriesPerDay(savedPlan.getCaloriesPerDay())
@@ -168,7 +183,7 @@ public NutritionPlanDto saveNutritionPlanDto(NutritionPlanDto nutritionPlanDto) 
     public NutritionPlanDto addMealToNutritionPlan(Long idNutritionPlan, Long idMeal, String dayOfWeek, String mealSlot) {
     NutritionPlan plan = nutritionPlanRepository.findById(idNutritionPlan)
             .orElseThrow(() -> new RuntimeException("Nutrition plan not found with id: " + idNutritionPlan));
-
+    checkPlanIsActive(plan);
     Meal meal = mealRepository.findById(idMeal)
             .orElseThrow(() -> new RuntimeException("Meal not found with id: " + idMeal));
 
@@ -201,7 +216,9 @@ public void removeMealFromPlan(Long idNutrition, Long idMeal, String dayOfWeek, 
     System.out.println("idMeal: " + idMeal);
     System.out.println("dayOfWeek: " + dayOfWeek);
     System.out.println("mealSlot: " + mealSlot);
-    
+        NutritionPlan plan = nutritionPlanRepository.findById(idNutrition)
+            .orElseThrow(() -> new RuntimeException("Nutrition plan not found with id: " + idNutrition));
+    checkPlanIsActive(plan);
     composedOfRepository.deleteMealFromPlan(idNutrition, idMeal, dayOfWeek, mealSlot);
     
     System.out.println("=== APRÈS SUPPRESSION ===");
@@ -212,15 +229,22 @@ public void removeMealFromPlan(Long idNutrition, Long idMeal, String dayOfWeek, 
     public void updateNutritionPlan(Long idNutrition, NutritionPlanDto nutritionPlanDto){
         NutritionPlan plan = nutritionPlanRepository.findById(idNutrition)
             .orElseThrow(() -> new RuntimeException("Plan not found"));
-        
+
+        LocalDate newStartDate = LocalDate.parse(nutritionPlanDto.getStartDate());
+        LocalDate newEndDate = newStartDate.plusDays(6); // ✅ Toujours 7 jours
+        LocalDate today = LocalDate.now();
+    
+        if (plan.getEndDate() != null && plan.getEndDate().isBefore(today)) {
+            throw new RuntimeException("Cannot update a completed nutrition plan");
+        }
         //  Modifie l'entité existante (builder crée une nouvelle)
         plan.setNutritionName(nutritionPlanDto.getNutritionName());
         plan.setObjective(nutritionPlanDto.getObjective());
         plan.setDescription(nutritionPlanDto.getDescription());
         plan.setCaloriesPerDay(nutritionPlanDto.getCaloriesPerDay());
-        plan.setStartDate(LocalDate.parse(nutritionPlanDto.getStartDate()));
-        plan.setEndDate(LocalDate.parse(nutritionPlanDto.getEndDate()));
-        
+        plan.setStartDate(newStartDate);
+        plan.setEndDate(newEndDate);
+
         //  Sauvegarde l'entité modifiée
         nutritionPlanRepository.save(plan);
     }
@@ -240,6 +264,8 @@ public void removeMealFromPlan(Long idNutrition, Long idMeal, String dayOfWeek, 
         NutritionPlan plan = nutritionPlanRepository.findById(idNutritionPlan)
                 .orElseThrow(() -> new RuntimeException("Nutrition plan not found with id: " + idNutritionPlan));
 
+        checkPlanIsActive(plan);
+        
         Meal newMeal = mealRepository.findById(newMealId)
                 .orElseThrow(() -> new RuntimeException("Meal not found with id: " + newMealId));
 
@@ -272,5 +298,53 @@ public void removeMealFromPlan(Long idNutrition, Long idMeal, String dayOfWeek, 
                 idNutritionPlan, oldMealId, dayOfWeek, mealSlot));
         }
         return convertToNutritionPlanDto(plan, dayOfWeek);
+    }
+
+
+
+    private void checkPlanIsActive(NutritionPlan plan) {
+    if (plan == null) {
+        throw new RuntimeException("Nutrition plan not found");
+    }
+    
+    LocalDate today = LocalDate.now();
+    
+    // Plan terminé ?
+    if (plan.getEndDate() != null && plan.getEndDate().isBefore(today)) {
+        throw new RuntimeException(
+            String.format(
+                "Nutrition plan '%s' (ID: %d) ended on %s. " +
+                "You cannot modify a completed plan.",
+                plan.getNutritionName(),
+                plan.getIdNutrition(),
+                plan.getEndDate()
+            )
+        );
+    }}
+
+
+    @Override
+    @Transactional
+    public void endNutritionPlan(Long idNutrition) {
+        NutritionPlan plan = nutritionPlanRepository.findById(idNutrition)
+            .orElseThrow(() -> new RuntimeException("Nutrition plan not found"));
+        
+        LocalDate today = LocalDate.now();
+        
+        // Ne peut pas terminer un plan déjà terminé
+        if (plan.getEndDate().isBefore(today)) {
+            throw new RuntimeException("Nutrition plan already ended on " + plan.getEndDate());
+        }
+        
+        // Ne peut pas terminer un plan pas encore commencé
+        if (plan.getStartDate().isAfter(today)) {
+            throw new RuntimeException("Cannot end a plan that hasn't started yet");
+        }
+        
+        // Termine le plan (hier pour être sûr)
+        plan.setEndDate(today.minusDays(1));
+        nutritionPlanRepository.save(plan);
+        
+        System.out.println("✅ Plan " + idNutrition + " ended on " + plan.getEndDate());
     }
 }

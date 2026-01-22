@@ -97,6 +97,11 @@ const handleAddMeal = async (meal) => {
     setShowMealLibrary(false);
   } catch (e) {
     setError("Failed to add meal.");
+if (error.response?.data?.message?.includes("cannot modify a completed plan")) {
+  alert("⚠️ This plan has ended. You can no longer modify it.");
+} else {
+  alert("Error: " + error.message);
+}
     // reload
     const weekMeals = await loadPlanMealsForWeek(userId, planId, true);
     setPlanMeals(weekMeals || {});

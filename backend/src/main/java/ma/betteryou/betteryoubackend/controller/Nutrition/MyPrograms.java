@@ -12,7 +12,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.method.P;
 import org.springframework.web.bind.annotation.*;
 
-
+import java.util.Map;
+import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
 
 @RestController
@@ -105,5 +107,19 @@ public class MyPrograms {
         mealSlot
     );
     return ResponseEntity.ok(updatedPlan);
+}
+
+@PutMapping("/nutritionplans/{idNutrition}/end")
+public ResponseEntity<?> endNutritionPlan(@PathVariable Long idNutrition) {
+    try {
+        nutritionPlanService.endNutritionPlan(idNutrition);
+        return ResponseEntity.ok(Map.of(
+            "message", "Nutrition plan ended successfully",
+            "nutritionPlanId", idNutrition
+        ));
+    } catch (RuntimeException e) {
+        return ResponseEntity.badRequest()
+            .body(Map.of("error", e.getMessage()));
+    }
 }
 }

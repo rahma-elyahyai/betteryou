@@ -17,6 +17,7 @@ public interface NutritionPlanRepository extends JpaRepository<NutritionPlan, Lo
           AND np.startDate <= :today
           AND (np.endDate IS NULL OR np.endDate >= :today)
         ORDER BY np.startDate DESC
+        LIMIT 1
     """)
     Optional<NutritionPlan> findFirstByUser_IdUserOrderByStartDateDesc(
             @Param("userId") long userId,

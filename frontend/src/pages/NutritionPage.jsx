@@ -13,4 +13,5 @@ export default function NutritionPage() {
       <NutritionCatalog userId={user.idUser} limit={4} />
     </div>
   );
+  
 }
