@@ -2,7 +2,7 @@ package ma.betteryou.betteryoubackend.service.NutritionService.ServiceImp.Nutrit
 
 import ma.betteryou.betteryoubackend.repository.Nutrition.ComposedOfRepository;
 import ma.betteryou.betteryoubackend.repository.Nutrition.MealRepository;
-import ma.betteryou.betteryoubackend.repository.Nutrition.NutritionPlanRepository;
+import ma.betteryou.betteryoubackend.repository.NutritionPlanRepository;
 import ma.betteryou.betteryoubackend.repository.UserRepository;
 import ma.betteryou.betteryoubackend.service.NutritionService.NutritionPlanService;
 import ma.betteryou.betteryoubackend.dto.Nutrition.NutritionPlanDto;
@@ -17,6 +17,7 @@ import ma.betteryou.betteryoubackend.entity.nutrition.Contains;
 import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import java.util.Collections;
 
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
@@ -43,7 +44,8 @@ public class NutritionPlanImp implements NutritionPlanService {
         List<NutritionPlan> nutritionPlans = nutritionPlanRepository.findByUser_IdUser(idUser);
         
         if (nutritionPlans.isEmpty()) {
-            throw new RuntimeException("No nutrition plans found for user: " + idUser);
+            return Collections.emptyList();
+
         }
 
         // ✅ Convertir chaque NutritionPlan en DTO

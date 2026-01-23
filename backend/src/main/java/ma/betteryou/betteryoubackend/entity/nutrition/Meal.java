@@ -1,5 +1,7 @@
 package ma.betteryou.betteryoubackend.entity.nutrition;
 
+import java.util.List;
+
 import jakarta.persistence.*;
 import lombok.*;
 import ma.betteryou.betteryoubackend.entity.enums.Goal;
@@ -9,6 +11,7 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import ma.betteryou.betteryoubackend.entity.enums.SessionStatus;
+
 
 @Entity
 @Table(name = "meal")
@@ -57,3 +60,4 @@ public class Meal {
     @Column(columnDefinition = "jsonb")
     private String preparationSteps;
 }
+

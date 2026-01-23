@@ -242,3 +242,16 @@ CREATE TABLE AI_CALL_LOG (
         REFERENCES CHAT_MESSAGE(id_message)
         ON DELETE CASCADE
 );
+
+CREATE TABLE password_reset_tokens (
+  id BIGSERIAL PRIMARY KEY,
+  token VARCHAR(120) NOT NULL UNIQUE,
+  user_id BIGINT NOT NULL,
+  expires_at TIMESTAMP NOT NULL,
+  used BOOLEAN NOT NULL DEFAULT FALSE,
+  CONSTRAINT fk_password_reset_user
+    FOREIGN KEY (user_id)
+    REFERENCES users(id_user)
+    ON DELETE CASCADE
+);
+

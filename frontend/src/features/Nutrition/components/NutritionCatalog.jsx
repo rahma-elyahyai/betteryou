@@ -6,7 +6,8 @@ import { useNutrition } from "../store/NutritionContext.jsx";
 import Sidebar from "../../../layout/Sidebar"; // on dois remonté trois fichiers 
 
 
-export default function NutritionCatalog({ userId = 2, limit = 4 }) {
+export default function NutritionCatalog({ userId , limit = 4 }) {
+  if (!userId) return null; 
   const { 
     loadRecommendations, 
     loadMealDetails, 
@@ -50,9 +51,9 @@ export default function NutritionCatalog({ userId = 2, limit = 4 }) {
   const isLoadingRecommendations = loading[`recommendations_${userId}_${limit}`];
 
   return (
-    <div className="flex min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-gray-950">
+    <div className="flex min-h-screen bg-gradient-to-br from-[#0B0B12] via-[#1a1625] to-[#0f0f1a]">
       {/* 🎨 Sidebar */}
-      <Sidebar />
+      <Sidebar active="nutrition"/>
 
       {/* 🎨 Main Content */}
       <div className="flex-1 flex flex-col">
@@ -62,13 +63,9 @@ export default function NutritionCatalog({ userId = 2, limit = 4 }) {
           <div className="max-w-7xl mx-auto px-8 py-6">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
-                <div className="bg-gradient-to-br from-lime-400 to-lime-500 p-3 rounded-xl shadow-lg shadow-lime-400/20">
-                  <svg className="w-7 h-7 text-gray-900" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M3 1a1 1 0 000 2h1.22l.305 1.222a.997.997 0 00.01.042l1.358 5.43-.893.892C3.74 11.846 4.632 14 6.414 14H15a1 1 0 000-2H6.414l1-1H14a1 1 0 00.894-.553l3-6A1 1 0 0017 3H6.28l-.31-1.243A1 1 0 005 1H3zM16 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM6.5 18a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" />
-                  </svg>
-                </div>
+  
                 <div>
-                  <h1 className="text-2xl font-bold text-white">Nutrition</h1>
+                  <h1 className="text-4xl font-bold text-white">NUTRITION CATALOG</h1>
                   <p className="text-gray-500 text-sm">Personalized Meal Recommendations</p>
                 </div>
               </div>
@@ -89,16 +86,6 @@ export default function NutritionCatalog({ userId = 2, limit = 4 }) {
         {/* Content Area */}
         <div className="flex-1 overflow-auto">
           <div className="max-w-7xl mx-auto px-8 py-12">
-            
-            {/* Title Section */}
-            <div className="mb-12">
-              <h2 className="text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-lime-400 via-lime-300 to-lime-500 mb-4 tracking-tight">
-                NUTRITION CATALOG
-              </h2>
-              <p className="text-gray-400 text-lg max-w-3xl">
-                Discover personalized meal plans designed to accelerate your fitness journey and help you achieve your goals faster
-              </p>
-            </div>
 
             {/* Loading State */}
             {isLoadingRecommendations && (
