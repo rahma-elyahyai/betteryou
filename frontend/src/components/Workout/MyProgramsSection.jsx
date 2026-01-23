@@ -4,8 +4,9 @@ import { Calendar, Dumbbell, Plus } from 'lucide-react';
 import { fetchUserPrograms } from "../../api/Workout/programApi";
 import SessionDetailModal from "./SessionDetailModal";
 import Sidebar from "../../Layout/Sidebar";
+import WorkoutCatalog from "./WorkoutCatalog";
 
-export default function MyProgramsSection({ userId = 1 }) {
+export default function MyProgramsSection({ userId = 1, onGoCatalog  }) {
   const [programs, setPrograms] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -97,7 +98,7 @@ export default function MyProgramsSection({ userId = 1 }) {
             <div className="flex items-center justify-between mb-4">
               <h1 className="text-4xl font-bold text-lime-400">My Workout Programs</h1>
               <button
-                onClick={() => window.location.href = '/workout'}
+                onClick={() => onGoCatalog?.()}
                 className="px-6 py-3 bg-gray-800 hover:bg-lime-400 text-lime-400 hover:text-gray-900 font-semibold rounded-xl border-2 border-gray-700 hover:border-lime-400 transition-all flex items-center gap-2"
               >
                 <Dumbbell className="w-5 h-5" />
@@ -105,6 +106,9 @@ export default function MyProgramsSection({ userId = 1 }) {
               </button>
             </div>
           </div>
+
+
+          
 
           {/* ✅ CHANGEMENT : Stats Grid avec nouveau style */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">

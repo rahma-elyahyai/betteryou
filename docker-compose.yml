@@ -1,22 +1,25 @@
 version: "3.9"
 
 services:
-  
-
   backend:
     build:
-      context: .              # AU LIEU DE ..
+      context: .
       dockerfile: devops/Dockerfile.backend
     container_name: betteryou-backend
     ports:
       - "8080:8080"
     networks:
       - betteryou-net
-
+    env_file:
+      - .env
+    environment:
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      OPENAI_MODEL: ${OPENAI_MODEL:-gpt-4o-mini}
+      OPENAI_TIMEOUT_MS: ${OPENAI_TIMEOUT_MS:-15000}
 
   frontend:
     build:
-      context: .              # AU LIEU DE ..
+      context: .
       dockerfile: devops/Dockerfile.frontend
     container_name: betteryou-frontend
     depends_on:
@@ -25,10 +28,6 @@ services:
       - "3000:80"
     networks:
       - betteryou-net
-
-
-volumes:
-  pgdata:
 
 networks:
   betteryou-net:

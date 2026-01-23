@@ -23,4 +23,7 @@ public interface ExerciseRepository extends JpaRepository<Exercise, Long> {
             @Param("equipment") String equipment,
             @Param("muscle") String muscle
     );
+
+    @Query("select e.id from Exercise e")
+    java.util.List<Long> findAllIds();
 }

@@ -5,7 +5,7 @@ import ma.betteryou.betteryoubackend.dto.exercise.*;
 import ma.betteryou.betteryoubackend.dto.program.ProgramWizardResponse;
 import ma.betteryou.betteryoubackend.model.*;
 import ma.betteryou.betteryoubackend.repository.Workout.*;
-import ma.betteryou.betteryoubackend.repository.Workout.ExerciseRepository;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -46,8 +46,11 @@ public class ProgramWizardProgramService {
         program.setGoal(payload.getGoal());
         program.setGenerationType(payload.getGenerationType());
         program.setProgramStatus("ONGOING");
-        program.setStartDate(LocalDate.now());
+        LocalDate start = LocalDate.now();
+        program.setStartDate(start);
+        program.setExpectedEndDate(start.plusDays(6)); // ✅ 1 semaine (7 jours)
         program.setUser(user);
+
 
         program = programRepository.save(program); // ✅ get id_program
 
@@ -61,7 +64,9 @@ public class ProgramWizardProgramService {
             session.setSessionType(sreq.getSessionType());
             session.setDurationMinutes(sreq.getDurationMinutes() != null ? sreq.getDurationMinutes() : 60);
             session.setSessionStatus("PLANNED");
-            session.setSessionDate(null); // ou LocalDate.now() + logique jours
+            session.setSessionDate(
+                sreq.getSessionDate() != null ? sreq.getSessionDate() : start
+            );
 
             session = sessionRepository.save(session); // ✅ get id_session
             createdSessionIds.add(session.getId());
