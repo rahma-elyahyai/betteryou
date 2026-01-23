@@ -26,6 +26,6 @@ spring:
   
 
   openai:
-    api-key: ${OPENAI_API_KEY}
-    model: gpt-4o-mini
-    timeout-ms: ${OPENAI_TIMEOUT_MS:15000}
+  api-key: ${OPENAI_API_KEY}
+  model: ${OPENAI_MODEL:gpt-4o-mini}
+  timeout-ms: ${OPENAI_TIMEOUT_MS:15000}
