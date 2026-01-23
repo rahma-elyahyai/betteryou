@@ -3,10 +3,22 @@ import { useEffect, useState } from "react";
 import MealCard from "./MealCard.jsx";
 import MealDetailModal from "./MealDetail.jsx";
 import { useNutrition } from "../store/NutritionContext.jsx";
-import Sidebar from "../../../layout/Sidebar"; // on dois remonté trois fichiers 
+import Sidebar from "@/layout/Sidebar";  
 
 
 export default function NutritionCatalog({ userId , limit = 4 }) {
+  console.log("🔍 NutritionCatalog - userId:", userId);
+  
+  if (!userId || userId <= 0) {
+    console.error("❌ Invalid userId in NutritionCatalog:", userId);
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-[#0B0B12] via-[#1a1625] to-[#0f0f1a] flex items-center justify-center">
+        <div className="text-red-400 text-xl">
+          Error: Invalid user ID. Please log in again.
+        </div>
+      </div>
+    );
+  }
   if (!userId) return null; 
   const { 
     loadRecommendations, 
@@ -18,6 +30,10 @@ export default function NutritionCatalog({ userId , limit = 4 }) {
   const [selectedMeal, setSelectedMeal] = useState(null);
   const [loadingDetail, setLoadingDetail] = useState(false);
 
+   useEffect(() => {
+    console.log("🔄 NutritionCatalog mounted with userId:", userId);
+  }, [userId]);
+  
   useEffect(() => {
     const fetchRecommendations = async () => {
       try {

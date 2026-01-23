@@ -7,7 +7,7 @@ import ReplaceMealModal from './ReplaceMealModal.jsx';
 import AddMealToDayModal from './AddMealToDayModal.jsx';
 import { useNutrition } from '../store/NutritionContext.jsx';
 import { useAuth } from "../store/AuthContext";
-import Sidebar from "../../../layout/Sidebar"; // on dois remonté trois fichiers 
+import Sidebar from "@/layout/Sidebar"; 
 
 
 const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];

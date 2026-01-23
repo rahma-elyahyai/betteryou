@@ -66,7 +66,7 @@ public class SecurityConfig {
         config.setAllowedOrigins(List.of("http://localhost:5173", "http://localhost:3000","http://localhost:5174","http://92.5.238.53:3000","https://betteryou-app.onrender.com"));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
-        config.setAllowCredentials(false);
+        config.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
