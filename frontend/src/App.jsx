@@ -23,6 +23,9 @@ import AddMeals from "./features/Nutrition/components/AddMeals";
 // Guard
 import ProtectedRoute from "./components/auth/ProtectedRoute.jsx";
 
+import NotFound from "./pages/NotFound.jsx";
+import Unauthorized from "./pages/Unauthorized.jsx";
+
 function App() {
   return (
     <BrowserRouter>
@@ -51,7 +54,9 @@ function App() {
           </Route>
 
           {/* 404 */}
-          <Route path="*" element={<div>404 Not Found</div>} />
+          <Route path="*" element={<NotFound />} />
+          <Route path="/unauthorized" element={<Unauthorized />} />
+
         </Routes>
       </NutritionProvider>
     </BrowserRouter>
