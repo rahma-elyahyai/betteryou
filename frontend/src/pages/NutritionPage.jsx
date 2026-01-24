@@ -17,17 +17,7 @@ export default function NutritionPage() {
     );
   }
 
-  // Si pas d'utilisateur, rediriger ou afficher message
-  if (!user) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <h2 className="text-2xl font-bold text-gray-800 mb-2">Authentication Required</h2>
-          <p className="text-gray-600">Please log in to access nutrition features.</p>
-        </div>
-      </div>
-    );
-  }
+  
 
   return (
     <Suspense fallback={
