@@ -11,16 +11,19 @@ export const useNutrition = () => {
   return context;
 };
 
-const API_BASE_URL = '/api'; // ✅ Pas besoin de localhost car api.baseURL le gère
+const API_BASE_URL = '/api'; 
 
 export const NutritionProvider = ({ children }) => {
+  // 🆕 États React pour les données (au lieu de juste useRef)
+  const [allMeals, setAllMeals] = useState(null);
+  const [recommendations, setRecommendations] = useState({});
+  const [plansByUser, setPlansByUser] = useState({});
+  const [planDetails, setPlanDetails] = useState({});
+  const [planMeals, setPlanMeals] = useState({});
+  const [mealDetails, setMealDetails] = useState({});
+  
+  // Cache pour les timestamps uniquement
   const cacheRef = useRef({
-    allMeals: null,
-    recommendations: {},
-    plansByUser: {},
-    planDetails: {},
-    planMeals: {},
-    mealDetails: {},
     lastFetch: {}
   });
   
@@ -30,7 +33,7 @@ export const NutritionProvider = ({ children }) => {
 
   const updateLoading = useCallback((key, value) => {
     loadingRef.current[key] = value;
-    setLoading({ ...loadingRef.current });
+    setLoading(prev => ({ ...prev, [key]: value }));
   }, []);
 
   const isCacheValid = useCallback((key) => {
@@ -39,13 +42,12 @@ export const NutritionProvider = ({ children }) => {
     return Date.now() - lastFetch < CACHE_DURATION;
   }, [CACHE_DURATION]);
 
-    const isPlanActive = useCallback((plan) => {
+  const isPlanActive = useCallback((plan) => {
     if (!plan || !plan.startDate || !plan.endDate) return false;
     const today = new Date().toISOString().split('T')[0];
     return today <= plan.endDate;
   }, []);
 
-  // 🆕 Détecte si une erreur est due à un plan inactif
   const isInactivePlanError = useCallback((error) => {
     const errorMessage = error?.response?.data?.error || error?.message || '';
     return errorMessage.includes('ended on') || 
@@ -53,24 +55,21 @@ export const NutritionProvider = ({ children }) => {
            errorMessage.includes('cannot modify');
   }, []);
 
-  // 🆕 Récupère le plan actif d'un utilisateur
   const getActivePlan = useCallback(async (userId, forceRefresh = false) => {
     const cacheKey = `activePlan_${userId}`;
     
-    if (!forceRefresh && cacheRef.current[cacheKey] && isCacheValid(cacheKey)) {
-      return cacheRef.current[cacheKey];
+    if (!forceRefresh && plansByUser[cacheKey] && isCacheValid(cacheKey)) {
+      return plansByUser[cacheKey];
     }
 
     try {
-      // Récupère tous les plans pour lundi (peu importe le jour)
       const { data: plans } = await api.get(
         `${API_BASE_URL}/myprograms/user/${userId}?dayOfWeek=Monday`
       );
       
-      // Trouve le plan actif
       const activePlan = plans.find(plan => isPlanActive(plan));
       
-      cacheRef.current[cacheKey] = activePlan || null;
+      setPlansByUser(prev => ({ ...prev, [cacheKey]: activePlan || null }));
       cacheRef.current.lastFetch[cacheKey] = Date.now();
       
       return activePlan || null;
@@ -78,28 +77,26 @@ export const NutritionProvider = ({ children }) => {
       console.error('Error getting active plan:', error);
       return null;
     }
-  }, [isCacheValid, isPlanActive]);
+  }, [isCacheValid, isPlanActive, plansByUser]);
   
-
   // ==================== MEALS CATALOG ====================
   
   const loadAllMeals = useCallback(async (forceRefresh = false) => {
     const cacheKey = 'allMeals';
     
-    if (!forceRefresh && cacheRef.current.allMeals && isCacheValid(cacheKey)) {
-      return cacheRef.current.allMeals;
+    if (!forceRefresh && allMeals && isCacheValid(cacheKey)) {
+      return allMeals;
     }
 
     if (loadingRef.current[cacheKey]) {
-      return cacheRef.current.allMeals;
+      return allMeals;
     }
 
     updateLoading(cacheKey, true);
     try {
-      // ✅ Utiliser api.get au lieu de fetch
       const { data } = await api.get(`${API_BASE_URL}/recommendations/meals`);
       
-      cacheRef.current.allMeals = data;
+      setAllMeals(data);
       cacheRef.current.lastFetch[cacheKey] = Date.now();
       
       return data;
@@ -109,29 +106,28 @@ export const NutritionProvider = ({ children }) => {
     } finally {
       updateLoading(cacheKey, false);
     }
-  }, [isCacheValid, updateLoading]);
+  }, [isCacheValid, updateLoading, allMeals]);
 
   const loadRecommendations = useCallback(async (userId, limit = 10, forceRefresh = false) => {
     const cacheKey = `recommendations_${userId}_${limit}`;
     
-    if (!forceRefresh && cacheRef.current.recommendations[cacheKey] && isCacheValid(cacheKey)) {
-      return cacheRef.current.recommendations[cacheKey];
+    if (!forceRefresh && recommendations[cacheKey] && isCacheValid(cacheKey)) {
+      return recommendations[cacheKey];
     }
 
     if (loadingRef.current[cacheKey]) {
-      return cacheRef.current.recommendations[cacheKey];
+      return recommendations[cacheKey];
     }
 
     updateLoading(cacheKey, true);
     try {
-      // ✅ Utiliser api.get
       const { data } = await api.get(
         `${API_BASE_URL}/recommendations/user/${userId}?limit=${limit}`
       );
       
       const meals = Array.isArray(data) ? data : (Array.isArray(data.meals) ? data.meals : []);
       
-      cacheRef.current.recommendations[cacheKey] = meals;
+      setRecommendations(prev => ({ ...prev, [cacheKey]: meals }));
       cacheRef.current.lastFetch[cacheKey] = Date.now();
       
       return meals;
@@ -141,27 +137,26 @@ export const NutritionProvider = ({ children }) => {
     } finally {
       updateLoading(cacheKey, false);
     }
-  }, [isCacheValid, updateLoading]);
+  }, [isCacheValid, updateLoading, recommendations]);
 
   const loadMealDetails = useCallback(async (userId, mealId, forceRefresh = false) => {
     const cacheKey = `mealDetails_${mealId}`;
     
-    if (!forceRefresh && cacheRef.current.mealDetails[mealId] && isCacheValid(cacheKey)) {
-      return cacheRef.current.mealDetails[mealId];
+    if (!forceRefresh && mealDetails[mealId] && isCacheValid(cacheKey)) {
+      return mealDetails[mealId];
     }
 
     if (loadingRef.current[cacheKey]) {
-      return cacheRef.current.mealDetails[mealId];
+      return mealDetails[mealId];
     }
 
     updateLoading(cacheKey, true);
     try {
-      // ✅ Utiliser api.get
       const { data } = await api.get(
         `${API_BASE_URL}/recommendations/user/${userId}/meal/${mealId}`
       );
       
-      cacheRef.current.mealDetails[mealId] = data;
+      setMealDetails(prev => ({ ...prev, [mealId]: data }));
       cacheRef.current.lastFetch[cacheKey] = Date.now();
       
       return data;
@@ -171,19 +166,19 @@ export const NutritionProvider = ({ children }) => {
     } finally {
       updateLoading(cacheKey, false);
     }
-  }, [isCacheValid, updateLoading]);
+  }, [isCacheValid, updateLoading, mealDetails]);
 
   // ==================== NUTRITION PLANS ====================
 
   const createNutritionPlan = useCallback(async (planData) => {
     try {
-      // ✅ Utiliser api.post
       const { data } = await api.post(
         `${API_BASE_URL}/myprograms/saveNutritionPlan`,
         planData
       );
       
-      // Invalider le cache des plans
+      // 🆕 Nettoyer les états
+      setPlansByUser({});
       Object.keys(cacheRef.current.lastFetch).forEach(key => {
         if (key.startsWith('plansByUser_') || key.startsWith('activePlan_')) {
           delete cacheRef.current.lastFetch[key];
@@ -200,54 +195,67 @@ export const NutritionProvider = ({ children }) => {
   const loadUserPlansForDay = useCallback(async (userId, dayOfWeek, forceRefresh = false) => {
     const cacheKey = `plansByUser_${userId}_${dayOfWeek}`;
     
-    if (!forceRefresh && cacheRef.current.plansByUser[cacheKey] && isCacheValid(cacheKey)) {
-      return cacheRef.current.plansByUser[cacheKey];
+    if (!forceRefresh && plansByUser[cacheKey] && isCacheValid(cacheKey)) {
+      return plansByUser[cacheKey];
     }
 
     if (loadingRef.current[cacheKey]) {
-      return cacheRef.current.plansByUser[cacheKey];
+      return plansByUser[cacheKey];
     }
 
     updateLoading(cacheKey, true);
     try {
-      // ✅ Utiliser api.get
       const { data } = await api.get(
         `${API_BASE_URL}/myprograms/user/${userId}?dayOfWeek=${dayOfWeek}`
       );
       
-      cacheRef.current.plansByUser[cacheKey] = data;
+      // 🆕 Trier les plans : plan actif en premier (1 seul possible), puis les inactifs par date décroissante
+const sortedPlans = [...data].sort((a, b) => {
+  const aActive = isPlanActive(a);
+  const bActive = isPlanActive(b);
+  
+  // Le plan actif vient toujours en premier
+  if (aActive && !bActive) return -1;
+  if (!aActive && bActive) return 1;
+  
+  // Pour les plans inactifs, trier par date de fin (plus récent d'abord)
+  const dateA = new Date(a.endDate || a.startDate || 0);
+  const dateB = new Date(b.endDate || b.startDate || 0);
+  return dateB - dateA;
+});
+
+      setPlansByUser(prev => ({ ...prev, [cacheKey]: sortedPlans }));
       cacheRef.current.lastFetch[cacheKey] = Date.now();
       
-      return data;
+      return sortedPlans;
     } catch (error) {
       console.error('Error loading plans:', error);
       throw error;
     } finally {
       updateLoading(cacheKey, false);
     }
-  }, [isCacheValid, updateLoading]);
+  }, [isCacheValid, updateLoading, plansByUser, isPlanActive]);
 
   const loadPlanDetails = useCallback(async (userId, planId, forceRefresh = false) => {
     const cacheKey = `planDetails_${planId}`;
     
-    if (!forceRefresh && cacheRef.current.planDetails[planId] && isCacheValid(cacheKey)) {
-      return cacheRef.current.planDetails[planId];
+    if (!forceRefresh && planDetails[planId] && isCacheValid(cacheKey)) {
+      return planDetails[planId];
     }
 
     if (loadingRef.current[cacheKey]) {
-      return cacheRef.current.planDetails[planId];
+      return planDetails[planId];
     }
 
     updateLoading(cacheKey, true);
     try {
-      // ✅ Utiliser api.get
       const { data: plans } = await api.get(
         `${API_BASE_URL}/myprograms/user/${userId}?dayOfWeek=Monday`
       );
       
       const plan = plans.find(p => p.idNutrition == planId);
       
-      cacheRef.current.planDetails[planId] = plan;
+      setPlanDetails(prev => ({ ...prev, [planId]: plan }));
       cacheRef.current.lastFetch[cacheKey] = Date.now();
       
       return plan;
@@ -257,18 +265,23 @@ export const NutritionProvider = ({ children }) => {
     } finally {
       updateLoading(cacheKey, false);
     }
-  }, [isCacheValid, updateLoading]);
+  }, [isCacheValid, updateLoading, planDetails]);
 
   const updateNutritionPlan = useCallback(async (planId, planData) => {
     try {
-      // ✅ Utiliser api.put
       await api.put(
         `${API_BASE_URL}/myprograms/nutritionplans/${planId}/update`,
         planData
       );
       
-      // Invalider le cache
-      delete cacheRef.current.planDetails[planId];
+      // 🆕 Nettoyer les états
+      setPlanDetails(prev => {
+        const newState = { ...prev };
+        delete newState[planId];
+        return newState;
+      });
+      setPlansByUser({});
+      
       Object.keys(cacheRef.current.lastFetch).forEach(key => {
         if (key.includes(planId) || key.startsWith('plansByUser_')) {
           delete cacheRef.current.lastFetch[key];
@@ -277,7 +290,6 @@ export const NutritionProvider = ({ children }) => {
       
       return true;
     } catch (error) {
-      // 🆕 Gestion spécifique des plans inactifs
       if (isInactivePlanError(error)) {
         const errorMsg = error?.response?.data?.error || 'This nutrition plan has ended and cannot be modified.';
         alert(`⚠️ ${errorMsg}`);
@@ -289,14 +301,22 @@ export const NutritionProvider = ({ children }) => {
 
   const deleteNutritionPlan = useCallback(async (planId) => {
     try {
-      // ✅ Utiliser api.delete
       await api.delete(
         `${API_BASE_URL}/myprograms/nutritionplans/${planId}/delete`
       );
       
-      // Nettoyer le cache
-      delete cacheRef.current.planDetails[planId];
-      delete cacheRef.current.planMeals[planId];
+      // 🆕 Nettoyer les états
+      setPlanDetails(prev => {
+        const newState = { ...prev };
+        delete newState[planId];
+        return newState;
+      });
+      setPlanMeals(prev => {
+        const newState = { ...prev };
+        delete newState[planId];
+        return newState;
+      });
+      setPlansByUser({});
       
       Object.keys(cacheRef.current.lastFetch).forEach(key => {
         if (key.includes(planId) || key.startsWith('plansByUser_') || key.startsWith('activePlan_')) {
@@ -317,7 +337,9 @@ export const NutritionProvider = ({ children }) => {
         `${API_BASE_URL}/myprograms/nutritionplans/${planId}/end`
       );
       
-      // Invalider tous les caches liés
+      // 🆕 Nettoyer les états
+      setPlansByUser({});
+      
       Object.keys(cacheRef.current.lastFetch).forEach(key => {
         if (key.includes(planId) || key.startsWith('plansByUser_') || key.startsWith('activePlan_')) {
           delete cacheRef.current.lastFetch[key];
@@ -336,19 +358,18 @@ export const NutritionProvider = ({ children }) => {
   const loadPlanMealsForWeek = useCallback(async (userId, planId, forceRefresh = false) => {
     const cacheKey = `planMeals_${planId}`;
     
-    if (!forceRefresh && cacheRef.current.planMeals[planId] && isCacheValid(cacheKey)) {
-      return cacheRef.current.planMeals[planId];
+    if (!forceRefresh && planMeals[planId] && isCacheValid(cacheKey)) {
+      return planMeals[planId];
     }
 
     if (loadingRef.current[cacheKey]) {
-      return cacheRef.current.planMeals[planId];
+      return planMeals[planId];
     }
 
     updateLoading(cacheKey, true);
     try {
       const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
       
-      // ✅ Utiliser api.get avec Promise.all
       const promises = days.map(day =>
         api.get(`${API_BASE_URL}/myprograms/user/${userId}?dayOfWeek=${day}`)
           .then(({ data: plans }) => ({ day, data: plans.find(p => p.idNutrition == planId) }))
@@ -367,7 +388,7 @@ export const NutritionProvider = ({ children }) => {
         }
       });
 
-      cacheRef.current.planMeals[planId] = mealsMap;
+      setPlanMeals(prev => ({ ...prev, [planId]: mealsMap }));
       cacheRef.current.lastFetch[cacheKey] = Date.now();
       
       return mealsMap;
@@ -377,26 +398,31 @@ export const NutritionProvider = ({ children }) => {
     } finally {
       updateLoading(cacheKey, false);
     }
-  }, [isCacheValid, updateLoading]);
+  }, [isCacheValid, updateLoading, planMeals]);
 
   const addMealToPlan = useCallback(async (planId, mealId, dayOfWeek, mealSlot) => {
     try {
-      // ✅ Utiliser api.post
       await api.post(
         `${API_BASE_URL}/myprograms/nutritionplans/${planId}/addMeal/${mealId}`,
         { dayOfWeek, mealSlot }
       );
 
-      // Invalider le cache
+      // 🆕 Nettoyer les états pour forcer le rechargement
+      setPlanMeals(prev => {
+        const newState = { ...prev };
+        delete newState[planId];
+        return newState;
+      });
+      setPlansByUser({});
+      
       Object.keys(cacheRef.current.lastFetch).forEach(key => {
-        if (key.startsWith('plansByUser_') && key.includes(dayOfWeek)) {
+        if (key.startsWith('plansByUser_') || key.startsWith('planMeals_')) {
           delete cacheRef.current.lastFetch[key];
         }
       });
 
       return true;
     } catch (error) {
-      // 🆕 Gestion spécifique des plans inactifs
       if (isInactivePlanError(error)) {
         const errorMsg = error?.response?.data?.error || 'This nutrition plan has ended and cannot be modified.';
         alert(`⚠️ ${errorMsg}`);
@@ -408,21 +434,26 @@ export const NutritionProvider = ({ children }) => {
 
   const removeMealFromPlan = useCallback(async (planId, mealId, dayOfWeek, mealSlot) => {
     try {
-      // ✅ Utiliser api.delete
       await api.delete(
         `${API_BASE_URL}/myprograms/nutritionplans/${planId}/removeMeal?idMeal=${mealId}&dayOfWeek=${dayOfWeek}&mealSlot=${mealSlot}`
       );
 
-      // Invalider le cache
+      // 🆕 Nettoyer les états pour forcer le rechargement
+      setPlanMeals(prev => {
+        const newState = { ...prev };
+        delete newState[planId];
+        return newState;
+      });
+      setPlansByUser({});
+      
       Object.keys(cacheRef.current.lastFetch).forEach(key => {
-        if (key.startsWith('plansByUser_') && key.includes(dayOfWeek)) {
+        if (key.startsWith('plansByUser_') || key.startsWith('planMeals_')) {
           delete cacheRef.current.lastFetch[key];
         }
       });
 
       return true;
     } catch (error) {
-       // 🆕 Gestion spécifique des plans inactifs
       if (isInactivePlanError(error)) {
         const errorMsg = error?.response?.data?.error || 'This nutrition plan has ended and cannot be modified.';
         alert(`⚠️ ${errorMsg}`);
@@ -442,28 +473,33 @@ export const NutritionProvider = ({ children }) => {
         mealSlot 
       });
       
-      // ✅ Utiliser api.put
       await api.put(
         `${API_BASE_URL}/myprograms/nutritionplans/${planId}/replaceMeal?oldMealId=${oldMealId}&newMealId=${newMealId}&dayOfWeek=${dayOfWeek}&mealSlot=${mealSlot}`
       );
 
       console.log('✅ Meal replaced successfully');
 
-      // Invalider le cache
+      // 🆕 Nettoyer les états pour forcer le rechargement
+      setPlanMeals(prev => {
+        const newState = { ...prev };
+        delete newState[planId];
+        return newState;
+      });
+      setPlansByUser({});
+      
       Object.keys(cacheRef.current.lastFetch).forEach(key => {
-        if (key.startsWith('plansByUser_') && key.includes(dayOfWeek)) {
+        if (key.startsWith('plansByUser_') || key.startsWith('planMeals_')) {
           delete cacheRef.current.lastFetch[key];
         }
       });
 
       return true;
     } catch (error) {
-       // 🆕 Gestion spécifique des plans inactifs
       if (isInactivePlanError(error)) {
         const errorMsg = error?.response?.data?.error || 'This nutrition plan has ended and cannot be modified.';
         alert(`⚠️ ${errorMsg}`);
       }
-      console.error(' Error replacing meal:', error);
+      console.error('Error replacing meal:', error);
       throw error;
     }
   }, [isInactivePlanError]);
@@ -472,7 +508,6 @@ export const NutritionProvider = ({ children }) => {
 
   const recordMealConsumption = useCallback(async (userId, mealId, consumptionDate, servings = 1) => {
     try {
-      // ✅ Utiliser api.post
       await api.post(
         `${API_BASE_URL}/myprograms/recordMealConsumption`,
         {
@@ -490,33 +525,45 @@ export const NutritionProvider = ({ children }) => {
     }
   }, []);
 
-
-
   // ==================== UTILITY FUNCTIONS ====================
 
-
   const getMealsByGoal = useCallback((goal) => {
-    if (!cacheRef.current.allMeals) return [];
-    if (!goal || goal === 'ALL') return cacheRef.current.allMeals;
-    return cacheRef.current.allMeals.filter(meal => meal.goal === goal);
-  }, []);
+    if (!allMeals) return [];
+    if (!goal || goal === 'ALL') return allMeals;
+    return allMeals.filter(meal => meal.goal === goal);
+  }, [allMeals]);
 
   const invalidateCache = useCallback((keys) => {
     if (!keys) {
       cacheRef.current.lastFetch = {};
+      // 🆕 Réinitialiser tous les états
+      setPlansByUser({});
+      setPlanMeals({});
+      setPlanDetails({});
     } else {
       keys.forEach(key => delete cacheRef.current.lastFetch[key]);
     }
   }, []);
 
-
-
-  
-
-  const getCache = useCallback(() => cacheRef.current, []);
+  const getCache = useCallback(() => ({
+    allMeals,
+    recommendations,
+    plansByUser,
+    planDetails,
+    planMeals,
+    mealDetails,
+    lastFetch: cacheRef.current.lastFetch
+  }), [allMeals, recommendations, plansByUser, planDetails, planMeals, mealDetails]);
 
   const value = {
-    cache: cacheRef.current,
+    cache: {
+      allMeals,
+      recommendations,
+      plansByUser,
+      planDetails,
+      planMeals,
+      mealDetails
+    },
     getCache,
     loading,
     

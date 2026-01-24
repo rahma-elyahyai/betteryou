@@ -27,5 +27,24 @@ public interface NutritionPlanRepository extends JpaRepository<NutritionPlan, Lo
     // ✅ Retourne une Liste, pas un Optional
     List<NutritionPlan> findByUser_IdUser(Long idUser);
 
+     // ✅ REQUÊTE OPTIMISÉE 1 : Charger plans + meals (SANS les détails des ingrédients)
+    @Query("""
+        SELECT DISTINCT np FROM NutritionPlan np
+        LEFT JOIN FETCH np.user u
+        LEFT JOIN FETCH np.composedOf co
+        LEFT JOIN FETCH co.meal
+        WHERE u.idUser = :userId
+    """)
+    List<NutritionPlan> findByUserIdWithMeals(@Param("userId") Long userId);
+    
+    // ✅ REQUÊTE OPTIMISÉE 2 : Charger un plan + meals (SANS les détails des ingrédients)
+    @Query("""
+        SELECT DISTINCT np FROM NutritionPlan np
+        LEFT JOIN FETCH np.composedOf co
+        LEFT JOIN FETCH co.meal
+        WHERE np.idNutrition = :planId
+    """)
+    Optional<NutritionPlan> findByIdWithMeals(@Param("planId") Long planId);
+
 }
 

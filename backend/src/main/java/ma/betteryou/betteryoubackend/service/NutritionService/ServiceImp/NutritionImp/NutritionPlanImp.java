@@ -23,9 +23,12 @@ import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.Iterator;
 
 @Service
 @RequiredArgsConstructor
@@ -38,21 +41,42 @@ public class NutritionPlanImp implements NutritionPlanService {
         private final UserRepository userRepository; 
 
     @Override
-    public List<NutritionPlanDto> getNutritionPlanByUserId(Long idUser, String dayOfWeek) {
-        
-        // ✅ Récupère une liste
-        List<NutritionPlan> nutritionPlans = nutritionPlanRepository.findByUser_IdUser(idUser);
-        
-        if (nutritionPlans.isEmpty()) {
-            return Collections.emptyList();
-
-        }
-
-        // ✅ Convertir chaque NutritionPlan en DTO
-        return nutritionPlans.stream()
-                .map(plan -> convertToNutritionPlanDto(plan, dayOfWeek))
-                .collect(Collectors.toList());
+public List<NutritionPlanDto> getNutritionPlanByUserId(Long idUser, String dayOfWeek) {
+    long startTime = System.currentTimeMillis();
+    
+      // ✅ ÉTAPE 1 : Charger les plans avec leurs meals (sans détails)
+    List<NutritionPlan> nutritionPlans = nutritionPlanRepository.findByUserIdWithMeals(idUser);
+    
+    if (nutritionPlans.isEmpty()) {
+        return Collections.emptyList();
     }
+
+    // ✅ ÉTAPE 2 : Collecter tous les IDs des meals
+    Set<Long> allMealIds = nutritionPlans.stream()
+        .flatMap(plan -> plan.getComposedOf().stream())
+        .map(co -> co.getMeal().getIdMeal())
+        .collect(Collectors.toSet());
+    
+    // ✅ ÉTAPE 3 : Charger les détails de TOUS les meals en UNE SEULE requête
+    if (!allMealIds.isEmpty()) {
+        mealRepository.findByIdInWithIngredients(new ArrayList<>(allMealIds));
+        // Hibernate met en cache automatiquement ces résultats
+    }
+     long queryTime = System.currentTimeMillis() - startTime;
+        System.out.println("🚀 Loaded " + nutritionPlans.size() + " plans with " + allMealIds.size() + " meals in " + queryTime + "ms");
+        
+   
+
+    // ✅ Convertir chaque NutritionPlan en DTO
+    List<NutritionPlanDto> result = nutritionPlans.stream()
+            .map(plan -> convertToNutritionPlanDto(plan, dayOfWeek))
+            .collect(Collectors.toList());
+    
+    long totalTime = System.currentTimeMillis() - startTime;
+    System.out.println("✅ Total processing time: " + totalTime + "ms");
+    
+    return result;
+}
 
     // ✅ Méthode pour convertir NutritionPlan -> NutritionPlanDto
     private NutritionPlanDto convertToNutritionPlanDto(NutritionPlan nutritionPlan, String dayOfWeek) {
@@ -154,7 +178,7 @@ public NutritionPlanDto saveNutritionPlanDto(NutritionPlanDto nutritionPlanDto) 
     }
     // 🔥 FIN
 
-    // Créer le nouveau plan (votre code existant)
+    // Créer le nouveau plan 
     NutritionPlan nutritionPlan = NutritionPlan.builder()
         .nutritionName(nutritionPlanDto.getNutritionName())
         .startDate(startDate)
@@ -180,10 +204,13 @@ public NutritionPlanDto saveNutritionPlanDto(NutritionPlanDto nutritionPlanDto) 
 }
 
     @Override
-    public NutritionPlanDto addMealToNutritionPlan(Long idNutritionPlan, Long idMeal, String dayOfWeek, String mealSlot) {
-    NutritionPlan plan = nutritionPlanRepository.findById(idNutritionPlan)
+public NutritionPlanDto addMealToNutritionPlan(Long idNutritionPlan, Long idMeal, String dayOfWeek, String mealSlot) {
+    // ✅ CHANGEMENT : Charger avec les détails optimisés
+    NutritionPlan plan = nutritionPlanRepository.findByIdWithMeals(idNutritionPlan)
             .orElseThrow(() -> new RuntimeException("Nutrition plan not found with id: " + idNutritionPlan));
+    
     checkPlanIsActive(plan);
+    
     Meal meal = mealRepository.findById(idMeal)
             .orElseThrow(() -> new RuntimeException("Meal not found with id: " + idMeal));
 
@@ -203,9 +230,17 @@ public NutritionPlanDto saveNutritionPlanDto(NutritionPlanDto nutritionPlanDto) 
 
     nutritionPlanRepository.save(plan);
 
+    // ✅ Charger les détails de tous les meals pour la conversion en DTO
+    Set<Long> mealIds = plan.getComposedOf().stream()
+        .map(co -> co.getMeal().getIdMeal())
+        .collect(Collectors.toSet());
+    
+    if (!mealIds.isEmpty()) {
+        mealRepository.findByIdInWithIngredients(new ArrayList<>(mealIds));
+    }
+
     return convertToNutritionPlanDto(plan, dayOfWeek);
 }
-
 
 
 @Override
@@ -216,7 +251,7 @@ public void removeMealFromPlan(Long idNutrition, Long idMeal, String dayOfWeek, 
     System.out.println("idMeal: " + idMeal);
     System.out.println("dayOfWeek: " + dayOfWeek);
     System.out.println("mealSlot: " + mealSlot);
-        NutritionPlan plan = nutritionPlanRepository.findById(idNutrition)
+        NutritionPlan plan = nutritionPlanRepository.findByIdWithMeals(idNutrition)
             .orElseThrow(() -> new RuntimeException("Nutrition plan not found with id: " + idNutrition));
     checkPlanIsActive(plan);
     composedOfRepository.deleteMealFromPlan(idNutrition, idMeal, dayOfWeek, mealSlot);
@@ -257,48 +292,64 @@ public void removeMealFromPlan(Long idNutrition, Long idMeal, String dayOfWeek, 
     }
 
 
+@Override
+public NutritionPlanDto replaceMealInPlan(Long idNutritionPlan, Long oldMealId, Long newMealId, String dayOfWeek, String mealSlot) {
+    System.out.println("Replacing meal in plan: " + idNutritionPlan + ", oldMealId: " + oldMealId + ", newMealId: " + newMealId + ", dayOfWeek: " + dayOfWeek + ", mealSlot: " + mealSlot);
+    
+    NutritionPlan plan = nutritionPlanRepository.findByIdWithMeals(idNutritionPlan)
+            .orElseThrow(() -> new RuntimeException("Nutrition plan not found with id: " + idNutritionPlan));
 
-    @Override
-    public NutritionPlanDto replaceMealInPlan(Long idNutritionPlan, Long oldMealId, Long newMealId, String dayOfWeek, String mealSlot) {
-        System.out.println("Replacing meal in plan: " + idNutritionPlan + ", oldMealId: " + oldMealId + ", newMealId: " + newMealId + ", dayOfWeek: " + dayOfWeek + ", mealSlot: " + mealSlot);
-        NutritionPlan plan = nutritionPlanRepository.findById(idNutritionPlan)
-                .orElseThrow(() -> new RuntimeException("Nutrition plan not found with id: " + idNutritionPlan));
+    checkPlanIsActive(plan);
+    
+    Meal newMeal = mealRepository.findById(newMealId)
+            .orElseThrow(() -> new RuntimeException("Meal not found with id: " + newMealId));
 
-        checkPlanIsActive(plan);
+    // ✅ Trouver le ComposedOf existant
+    Optional<ComposedOf> existingComposedOfOpt = composedOfRepository.findByNutritionPlanIdAndMealIdAndDayOfWeekAndMealSlot(
+        idNutritionPlan, oldMealId, dayOfWeek, mealSlot.toUpperCase()
+    );
+
+    if (existingComposedOfOpt.isPresent()) {
+        ComposedOf existingComposedOf = existingComposedOfOpt.get();
         
-        Meal newMeal = mealRepository.findById(newMealId)
-                .orElseThrow(() -> new RuntimeException("Meal not found with id: " + newMealId));
-
-        // Trouver le ComposedOf existant à remplacer
-        Optional<ComposedOf> existingComposedOfOpt = composedOfRepository.findByNutritionPlanIdAndMealIdAndDayOfWeekAndMealSlot(
-            idNutritionPlan, oldMealId, dayOfWeek, mealSlot.toUpperCase()
-        );
-
-        if (existingComposedOfOpt.isPresent()) {
-            ComposedOf existingComposedOf = existingComposedOfOpt.get();
-            composedOfRepository.delete(existingComposedOf); // Supprimer l'ancien lien car sans ça ça crée un conflit de clé primaire (unique)
+        // ⭐ ÉTAPE 1 : Retirer l'ancien de la collection EN PREMIER
+        plan.getComposedOf().remove(existingComposedOf);
         
-            ComposedOf newComposedOf = new ComposedOf();
-            ComposedOfId id = new ComposedOfId();
-            id.setIdNutrition(idNutritionPlan);
-            id.setIdMeal(newMealId);
-            id.setDayOfWeek(dayOfWeek);
-
-            newComposedOf.setId(id);
-            newComposedOf.setNutritionPlan(plan);
-            newComposedOf.setMeal(newMeal);
-            newComposedOf.setMealSlot(mealSlot);
-
-            plan.getComposedOf().add(newComposedOf);
+        // ⭐ ÉTAPE 2 : Supprimer de la BDD
+        composedOfRepository.delete(existingComposedOf);
         
+        // ⭐ ÉTAPE 3 : Créer et ajouter le nouveau
+        ComposedOf newComposedOf = new ComposedOf();
+        ComposedOfId id = new ComposedOfId();
+        id.setIdNutrition(idNutritionPlan);
+        id.setIdMeal(newMealId);
+        id.setDayOfWeek(dayOfWeek);
 
+        newComposedOf.setId(id);
+        newComposedOf.setNutritionPlan(plan);
+        newComposedOf.setMeal(newMeal);
+        newComposedOf.setMealSlot(mealSlot);
+
+        plan.getComposedOf().add(newComposedOf);
+
+        // ⭐ ÉTAPE 4 : Sauvegarder
         nutritionPlanRepository.save(plan);
-        } else {
-            throw new RuntimeException( String.format("No existing meal found: planId=%d, oldMealId=%d, day=%s, slot=%s", 
-                idNutritionPlan, oldMealId, dayOfWeek, mealSlot));
-        }
-        return convertToNutritionPlanDto(plan, dayOfWeek);
+    } else {
+        throw new RuntimeException(String.format("No existing meal found: planId=%d, oldMealId=%d, day=%s, slot=%s", 
+            idNutritionPlan, oldMealId, dayOfWeek, mealSlot));
     }
+
+    // ✅ Charger les détails pour la conversion en DTO
+    Set<Long> mealIds = plan.getComposedOf().stream()
+        .map(co -> co.getMeal().getIdMeal())
+        .collect(Collectors.toSet());
+    
+    if (!mealIds.isEmpty()) {
+        mealRepository.findByIdInWithIngredients(new ArrayList<>(mealIds));
+    }
+    
+    return convertToNutritionPlanDto(plan, dayOfWeek);
+}
 
 
 

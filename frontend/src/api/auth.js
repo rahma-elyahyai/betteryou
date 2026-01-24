@@ -4,7 +4,7 @@ import axios from "axios";
 // Solution PRO : Une ligne, zéro changement manuel
 export const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL || "http://localhost:8080",
-  timeout: 15000,
+  timeout: 30000,
 });
 
 // Vérification (optionnel, pour debug)
@@ -21,6 +21,44 @@ api.interceptors.request.use(
     return config;
   },
   (error) => Promise.reject(error)
+);
+
+// 🆕 RESPONSE INTERCEPTOR → gère les erreurs d'autorisation
+api.interceptors.response.use(
+  // ✅ Si la requête réussit, on retourne la réponse
+  (response) => response,
+  
+  // ❌ Si la requête échoue, on gère les erreurs
+  (error) => {
+    const status = error?.response?.status;
+    
+    // 🔴 Erreur 401 : Non authentifié (token invalide/expiré)
+    if (status === 401) {
+      console.warn("🔴 401 Unauthorized - Redirecting to login...");
+      
+      // Nettoyer le localStorage
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      
+      // Éviter les boucles de redirection (si on est déjà sur /login)
+      if (window.location.pathname !== "/login") {
+        window.location.href = "/login";
+      }
+    }
+    
+    // 🔴 Erreur 403 : Authentifié mais pas autorisé (accès refusé)
+    if (status === 403) {
+      console.warn("🔴 403 Forbidden - Redirecting to unauthorized...");
+      
+      // Éviter les boucles de redirection
+      if (window.location.pathname !== "/unauthorized") {
+        window.location.href = "/unauthorized";
+      }
+    }
+    
+    // Relancer l'erreur pour que les composants puissent la gérer si besoin
+    return Promise.reject(error);
+  }
 );
 
 // ✅ Auth API
