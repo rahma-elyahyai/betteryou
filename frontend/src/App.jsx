@@ -2,54 +2,60 @@
 import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
-import NutritionPage from "./features/Nutrition/components/NutritionPage";
-import MyPrograms from "./features/Nutrition/components/MyPrograms";
-import CreateNutritionPlan from "./features/Nutrition/components/CreateNutritionPlan";
-import AddMeals from "./features/Nutrition/components/AddMeals";
 import { NutritionProvider } from "./features/Nutrition/store/NutritionContext";
 
+// Pages publiques
 import LandingPage from "./pages/LandingPage.jsx";
-import ProfilePage from "./pages/ProfilePage.jsx";
-
-// 🔐 Auth pages
 import Login from "./components/auth/Login.jsx";
 import RegisterWizard from "./components/auth/RegisterWizard.jsx";
 import Welcome from "./components/auth/Welcome.jsx";
+import ForgotPassword from "./components/auth/ForgotPassword.jsx";
+import ResetPassword from "./components/auth/ResetPassword.jsx";
 
-// 🔐 Guard
+// Pages protégées
+import ProfilePage from "./pages/ProfilePage.jsx";
+import Dashboard from "@/components/dashboard/DashboardPage.jsx";
+import NutritionPage from "./pages/NutritionPage.jsx";
+import MyPrograms from "./features/Nutrition/components/MyPrograms";
+import CreateNutritionPlan from "./features/Nutrition/components/CreateNutritionPlan";
+import AddMeals from "./features/Nutrition/components/AddMeals";
+
+// Guard
 import ProtectedRoute from "./components/auth/ProtectedRoute.jsx";
+
+import NotFound from "./pages/NotFound.jsx";
+import Unauthorized from "./pages/Unauthorized.jsx";
 
 function App() {
   return (
     <BrowserRouter>
       <NutritionProvider>
         <Routes>
-          {/* Page d’accueil marketing */}
+          {/* 🌍 PUBLIC */}
           <Route path="/" element={<LandingPage />} />
-
-          {/* Auth */}
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<RegisterWizard />} />
           <Route path="/welcome" element={<Welcome />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
 
-          {/* Page protégée */}
-          <Route
-            path="/profile"
-            element={
-              <ProtectedRoute>
-                <ProfilePage />
-              </ProtectedRoute>
-            }
-          />
+          {/* 🔐 TOUT CE QUI EST ICI EST PROTÉGÉ */}
+          <Route element={<ProtectedRoute />}>
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/profile" element={<ProfilePage />} />
 
-          {/* Nutrition */}
-          <Route path="/nutrition" element={<NutritionPage />} />
-          <Route path="/myprograms" element={<MyPrograms />} />
-          <Route path="/create-nutrition-plan" element={<CreateNutritionPlan />} />
-          <Route path="/nutrition-plans/:planId/add-meals" element={<AddMeals />} />
+            <Route path="/nutrition" element={<NutritionPage />} />
+            <Route path="/myprograms" element={<MyPrograms />} />
+            <Route path="/create-nutrition-plan" element={<CreateNutritionPlan />} />
+            <Route
+              path="/nutrition-plans/:planId/add-meals"
+              element={<AddMeals />}
+            />
+          </Route>
 
-          {/* 404 en dernier */}
-          <Route path="*" element={<div>404 Not Found</div>} />
+          {/* 404 */}
+          <Route path="*" element={<NotFound />} />
+          <Route path="/unauthorized" element={<Unauthorized />} />
         </Routes>
       </NutritionProvider>
     </BrowserRouter>

@@ -50,7 +50,7 @@ public class WorkoutProgram {
     private ProgramStatus programStatus;
 
     // Relation MANY TO ONE vers USER (id_user)
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_user", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)  // Ne charge pas automatiquement l’objet User quand tu charges le programme.uniquement si on l’appelle (workoutProgram.getUser())
+    @JoinColumn(name = "id_user", nullable = false) // configure la colonne de clé étrangère dans la table workout_program.
     private User user;
 }

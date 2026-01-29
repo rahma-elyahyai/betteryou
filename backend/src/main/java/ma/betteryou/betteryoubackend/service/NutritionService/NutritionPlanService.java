@@ -12,5 +12,6 @@ public interface NutritionPlanService {
     void updateNutritionPlan( Long idNutrition,NutritionPlanDto planDto );
     void deletePlan(Long idNutrition);
     NutritionPlanDto replaceMealInPlan(Long idNutritionPlan, Long oldMealId, Long newMealId, String dayOfWeek, String mealSlot);
+    void endNutritionPlan(Long idNutrition);
 }
 

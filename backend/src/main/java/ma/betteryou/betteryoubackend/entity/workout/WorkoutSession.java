@@ -8,7 +8,6 @@ import ma.betteryou.betteryoubackend.entity.enums.SessionType;
 import ma.betteryou.betteryoubackend.entity.enums.SessionStatus;
 
 
-import ma.betteryou.betteryoubackend.entity.workout.WorkoutProgram;
 
 @Entity
 @Table(name = "workout_session")

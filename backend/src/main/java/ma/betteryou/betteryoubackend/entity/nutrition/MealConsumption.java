@@ -3,6 +3,13 @@ package ma.betteryou.betteryoubackend.entity.nutrition;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDate;
+import ma.betteryou.betteryoubackend.entity.nutrition.Meal;
+import ma.betteryou.betteryoubackend.entity.nutrition.NutritionPlan;
+import ma.betteryou.betteryoubackend.entity.nutrition.ComposedOf;
+import ma.betteryou.betteryoubackend.entity.nutrition.Contains;
+import ma.betteryou.betteryoubackend.entity.enums.Goal;
+import ma.betteryou.betteryoubackend.entity.enums.FoodPreferences;
+import ma.betteryou.betteryoubackend.entity.enums.SessionStatus;
 
 import ma.betteryou.betteryoubackend.entity.user.User;
 

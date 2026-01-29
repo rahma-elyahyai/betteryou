@@ -1,7 +1,11 @@
 import React from "react";
 import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
+import { Home } from "lucide-react";
 
 export default function AuthLayout({ title, subtitle, children }) {
+  const navigate = useNavigate();
+
   return (
     <div className="min-h-screen relative overflow-hidden bg-black text-white">
       {/* Background texture + gradient */}
@@ -19,6 +23,18 @@ export default function AuthLayout({ title, subtitle, children }) {
         animate={{ x: [0, -20, 0], y: [0, 15, 0] }}
         transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
       />
+
+      {/* Back to Home Button - Top Left */}
+      <motion.button
+        initial={{ opacity: 0, x: -20 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.5, delay: 0.2 }}
+        onClick={() => navigate('/')}
+        className="absolute top-6 left-6 z-20 flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 rounded-lg backdrop-blur-xl hover:bg-white/10 hover:border-[#D6F93D]/50 transition-all group"
+      >
+        <Home className="text-[#D6F93D] group-hover:scale-110 transition-transform" size={20} />
+        <span className="text-white/80 text-sm font-medium group-hover:text-white">Home</span>
+      </motion.button>
 
       {/* Center */}
       <div className="relative z-10 min-h-screen flex items-center justify-center px-4 py-10">

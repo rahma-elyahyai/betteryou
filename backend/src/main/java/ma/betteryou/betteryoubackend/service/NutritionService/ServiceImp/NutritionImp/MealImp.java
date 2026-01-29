@@ -157,53 +157,67 @@ public class MealImp implements MealService {
     }
 
         @Override
-        public List<MealDetailDto> getAllMeals() {
-            List<Meal> meals = mealRepository.findAll();
-            return meals.stream()
-                    .map(meal -> MealDetailDto.builder()
-                            .idMeal(meal.getIdMeal())
-                            .mealName(meal.getMealName())
-                            .description(meal.getDescription())
-                            .goal(meal.getGoal())
-                            .foodPreferences(meal.getFoodPreferences())
-                            .mealType(meal.getMealType())
-                            .imageUrl(meal.getImageUrl())
-                            .calories(computeCalories(meal))
-                            .proteins(computeProteins(meal))
-                            .carbs(computeCarbs(meal))
-                            .fats(computeFats(meal))
-                            .build())
-                    .toList();
-        }
+public List<MealDetailDto> getAllMeals() {
+    long startTime = System.currentTimeMillis();
+    
+    // ✅ CHANGEMENT : Utiliser la méthode optimisée
+    List<Meal> meals = mealRepository.findAllWithIngredientsEager();
+    
+    long queryTime = System.currentTimeMillis() - startTime;
+    System.out.println("🚀 Loaded " + meals.size() + " meals with ingredients in " + queryTime + "ms");
+    
+    List<MealDetailDto> result = meals.stream()
+            .map(meal -> MealDetailDto.builder()
+                    .idMeal(meal.getIdMeal())
+                    .mealName(meal.getMealName())
+                    .description(meal.getDescription())
+                    .goal(meal.getGoal())
+                    .foodPreferences(meal.getFoodPreferences())
+                    .mealType(meal.getMealType())
+                    .imageUrl(meal.getImageUrl())
+                    .calories(computeCalories(meal))
+                    .proteins(computeProteins(meal))
+                    .carbs(computeCarbs(meal))
+                    .fats(computeFats(meal))
+                    .build())
+            .toList();
+    
+    long totalTime = System.currentTimeMillis() - startTime;
+    System.out.println("✅ Total processing time: " + totalTime + "ms");
+    
+    return result;
+}
 
-        @Override
-        public List<MealDetailDto> getAllMeals(String mealType, Goal goal) {
-                List<Meal> meals;
-                if (mealType != null && goal != null) {
-                        meals = mealRepository.findByMealTypeAndGoal(mealType, Goal.valueOf(goal.name()));
-                } else if (mealType != null) {
-                        meals = mealRepository.findByMealType(mealType);
-                } else if (goal != null) {
-                        meals = mealRepository.findByGoal(Goal.valueOf(goal.name()));
-                } else {
-                        meals = mealRepository.findAll();
-                }
-        
-                return meals.stream()
-                        .map(meal -> MealDetailDto.builder()
-                                .idMeal(meal.getIdMeal())
-                                .mealName(meal.getMealName())
-                                .description(meal.getDescription())
-                                .goal(meal.getGoal())
-                                .foodPreferences(meal.getFoodPreferences())
-                                .mealType(meal.getMealType())
-                                .imageUrl(meal.getImageUrl())
-                                .calories(computeCalories(meal))
-                                .proteins(computeProteins(meal))
-                                .carbs(computeCarbs(meal))
-                                .fats(computeFats(meal))
-                                .build())
-                        .toList();
-                }
+@Override
+public List<MealDetailDto> getAllMeals(String mealType, Goal goal) {
+    List<Meal> meals;
+    
+    // ✅ Utiliser les méthodes optimisées
+    if (mealType != null && goal != null) {
+        meals = mealRepository.findByMealTypeAndGoalWithIngredients(mealType, goal);
+    } else if (mealType != null) {
+        meals = mealRepository.findByMealTypeWithIngredients(mealType);
+    } else if (goal != null) {
+        meals = mealRepository.findByGoalWithIngredients(goal);
+    } else {
+        meals = mealRepository.findAllWithIngredientsEager();
+    }
+
+    return meals.stream()
+            .map(meal -> MealDetailDto.builder()
+                    .idMeal(meal.getIdMeal())
+                    .mealName(meal.getMealName())
+                    .description(meal.getDescription())
+                    .goal(meal.getGoal())
+                    .foodPreferences(meal.getFoodPreferences())
+                    .mealType(meal.getMealType())
+                    .imageUrl(meal.getImageUrl())
+                    .calories(computeCalories(meal))
+                    .proteins(computeProteins(meal))
+                    .carbs(computeCarbs(meal))
+                    .fats(computeFats(meal))
+                    .build())
+            .toList();
+}
 
 }

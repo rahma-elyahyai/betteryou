@@ -4,11 +4,27 @@ server:
 spring:
   application:
     name: betteryou-backend
+  config:
+    import: optional:file:.env[.properties]
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${MAIL_USERNAME:cmail@gmail.com}
+    password: ${MAIL_PASSWORD:"password"}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
 
   datasource:
-    url: jdbc:postgresql://ep-crimson-queen-ab7d5yoc-pooler.eu-west-2.aws.neon.tech/betteryou_db?user=neondb_owner&password=npg_yzkwA5gZb7BT&sslmode=require&channelBinding=require
+    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/betteryou}
     driver-class-name: org.postgresql.Driver
 
+  openai:
+    api-key: ${OPENAI_API_KEY:your_openai_api_key}
+    model: ${OPENAI_MODEL:gpt-4o-mini}
   jpa:
     hibernate:
       ddl-auto: validate
@@ -20,15 +36,20 @@ spring:
 
   mvc:
     cors:
-      allowed-origins: "http://localhost:5173"
+      allowed-origins: "http://localhost:5174"
       allowed-methods: "*"
       allowed-headers: "*"
 
 app:
   jwt:
-    secret: "betteryou_super_secret_key_very_long_64_chars_1234567890_abcdef"
-    expiration-ms: 100000
+    secret: ${JWT_SECRET:default_jwt_secret_key_1234567890}
+    expiration-ms: 10000000
+
+  frontend:
+    reset-url: ${FRONTEND_URL:http://defaulturl}
+
 logging:
   level:
     org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping: DEBUG
     org.springframework.web.servlet.DispatcherServlet: DEBUG
+

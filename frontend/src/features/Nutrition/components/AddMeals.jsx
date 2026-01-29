@@ -1,15 +1,27 @@
 import React, { useState, useEffect } from 'react';
 import { ArrowLeft, Plus, X, Search, Calendar, Check, Loader } from 'lucide-react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useNutrition } from '../store/NutritionContext';
+import { useAuth } from '../store/AuthContext.jsx';
+
+
 
 const AddMealsToPlan = () => {
-  // Si vous utilisez React Router
-  // const { planId } = useParams();
-  // const navigate = useNavigate();
-  
-  // Pour la démo, on utilise planId directement
-  const { planId } = useParams(); // Remplacer par useParams() en production
+  const { planId } = useParams();
   const navigate = useNavigate();
+  const { user, loadingUser } = useAuth();
+  const userId = user?.idUser;
+
+  // Utilisation du contexte
+  const {
+    loadAllMeals,
+    loadPlanMealsForWeek,
+    loadPlanDetails,
+    addMealToPlan,
+    removeMealFromPlan,
+    loading: contextLoading
+  } = useNutrition();
+
   const [plan, setPlan] = useState(null);
   const [selectedDay, setSelectedDay] = useState('Monday');
   const [selectedSlot, setSelectedSlot] = useState(null);
@@ -23,6 +35,8 @@ const AddMealsToPlan = () => {
   const [adding, setAdding] = useState(false);
   const [error, setError] = useState(null);
 
+
+
   const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
   const mealSlots = ['BREAKFAST', 'LUNCH', 'DINNER', 'SNACK'];
 
@@ -33,158 +47,90 @@ const AddMealsToPlan = () => {
     SNACK: '🍎'
   };
 
-  // Charger les données au montage
-  useEffect(() => {
-    loadAllData();
-  }, [planId]);
+useEffect(() => {
+  if (loadingUser || !userId) return;
+  loadAllData();
+}, [loadingUser, userId, planId]);
 
-  const loadAllData = async () => {
-    setLoading(true);
-    try {
-      await Promise.all([
-        loadAvailableMeals(),
-        loadPlanMealsForAllDays()
-      ]);
-    } catch (error) {
-      console.error('Error loading data:', error);
-      setError('Failed to load data. Please refresh the page.');
-    } finally {
-      setLoading(false);
-    }
-  };
+const loadAllData = async () => {
+  setLoading(true);
+  setError(null);
 
-  // Charger tous les meals disponibles
-  const loadAvailableMeals = async () => {
-    try {
-      const response = await fetch('http://localhost:8080/api/recommendations/meals');
-      if (!response.ok) throw new Error('Failed to load meals');
-      const data = await response.json();
-      // ✅ Filtrer selon l'objectif du plan (si le plan est chargé)
-    const filtered = plan?.objective 
-      ? data.filter(meal => meal.goal === plan.objective)
-      : data;
-      setAvailableMeals(filtered);
-    } catch (error) {
-      console.error('Error loading available meals:', error);
-      throw error;
-    }
-  };
+  try {
+    const planDetails = await loadPlanDetails(userId, planId);
+    setPlan(planDetails);
 
-  // Charger les meals déjà ajoutés au plan pour tous les jours
-  const loadPlanMealsForAllDays = async () => {
-    try {
-      const mealsMap = {};
-      
-      // Charger les meals pour chaque jour
-      for (const day of days) {
-        const response = await fetch(
-          `http://localhost:8080/api/myprograms/user/1?dayOfWeek=${day}`
-        );
-        
-        if (response.ok) {
-          const plans = await response.json();
-          const currentPlan = plans.find(p => p.idNutrition === planId);
-          
-          if (currentPlan && currentPlan.meals) {
-            currentPlan.meals.forEach(meal => {
-              const key = `${day}-${meal.mealSlot}`;
-              mealsMap[key] = meal;
-            });
-          }
-        }
-      }
-      
-      setPlanMeals(mealsMap);
-      
-      // Charger les détails du plan (si pas encore chargé)
-      if (!plan && Object.keys(mealsMap).length > 0) {
-        const firstDay = await fetch(
-          `http://localhost:8080/api/myprograms/user/1?dayOfWeek=Monday`
-        );
-        if (firstDay.ok) {
-          const plans = await firstDay.json();
-          const currentPlan = plans.find(p => p.idNutrition === planId);
-          if (currentPlan) setPlan(currentPlan);
-        }
-      }
-    } catch (error) {
-      console.error('Error loading plan meals:', error);
-    }
-  };
+    const meals = await loadAllMeals();
+    console.log('All meals loaded:', meals);
+    const filtered = planDetails?.objective
+      ? meals.filter(m => m.goal === planDetails.objective)
+      : meals;
+    setAvailableMeals(filtered);
+
+    const weekMeals = await loadPlanMealsForWeek(userId, planId);
+    setPlanMeals(weekMeals || {});
+  } catch (e) {
+    console.error(e);
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   const openMealLibrary = (day, slot) => {
     setSelectedDay(day);
     setSelectedSlot(slot);
     setShowMealLibrary(true);
-    setFilterMealType(slot); // Filtrer automatiquement par le type de slot
+    setFilterMealType(slot);
   };
 
-  const addMealToPlan = async (meal) => {
-    setAdding(true);
-    setError(null);
-    
-    try {
-      const response = await fetch(
-        `http://localhost:8080/api/myprograms/nutritionplans/${planId}/addMeal/${meal.idMeal}`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            dayOfWeek: selectedDay,
-            mealSlot: selectedSlot
-          })
-        }
-      );
+const handleAddMeal = async (meal) => {
+  setAdding(true);
+  setError(null);
+  try {
+    await addMealToPlan(planId, meal.idMeal, selectedDay, selectedSlot);
 
-      if (!response.ok) {
-        throw new Error('Failed to add meal');
-      }
+    // update local immédiat
+    const key = `${selectedDay}-${selectedSlot}`;
+    setPlanMeals(prev => ({ ...prev, [key]: meal }));
 
-      // Mise à jour locale
-      const key = `${selectedDay}-${selectedSlot}`;
-      setPlanMeals(prev => ({
-        ...prev,
-        [key]: meal
-      }));
+    setShowMealLibrary(false);
+  } catch (e) {
+    setError("Failed to add meal.");
+if (error.response?.data?.message?.includes("cannot modify a completed plan")) {
+  alert("⚠️ This plan has ended. You can no longer modify it.");
+} else {
+  alert("Error: " + error.message);
+}
+    // reload
+    const weekMeals = await loadPlanMealsForWeek(userId, planId, true);
+    setPlanMeals(weekMeals || {});
+  } finally {
+    setAdding(false);
+  }
+};
 
-      setShowMealLibrary(false);
-      setSearchQuery('');
-      setFilterGoal('ALL');
-      setFilterMealType('ALL');
-    } catch (error) {
-      console.error('Error adding meal:', error);
-      setError('Failed to add meal. Please try again.');
-    } finally {
-      setAdding(false);
-    }
-  };
+const handleRemoveMeal = async (day, slot) => {
+  const meal = getMealForSlot(day, slot);
+  if (!meal) return;
 
-  const removeMealFromPlan = async (day, slot) => {
-    const meal = getMealForSlot(day, slot);
-    if (!meal) return;
+  setError(null);
+  try {
+    await removeMealFromPlan(planId, meal.idMeal, day, slot);
 
-    try {
-      const response = await fetch(
-        `http://localhost:8080/api/myprograms/nutritionplans/${planId}/removeMeal?idMeal=${meal.idMeal}&dayOfWeek=${day}&mealSlot=${slot}`,
-        { method: 'DELETE' }
-      );
+    const key = `${day}-${slot}`;
+    setPlanMeals(prev => {
+      const copy = { ...prev };
+      delete copy[key];
+      return copy;
+    });
+  } catch (e) {
+    setError("Failed to remove meal.");
+    const weekMeals = await loadPlanMealsForWeek(userId, planId, true);
+    setPlanMeals(weekMeals || {});
+  }
+};
 
-      if (!response.ok) {
-        throw new Error('Failed to remove meal');
-      }
-
-      // Mise à jour locale
-      const key = `${day}-${slot}`;
-      setPlanMeals(prev => {
-        const newMeals = { ...prev };
-        delete newMeals[key];
-        return newMeals;
-      });
-    } catch (error) {
-      console.error('Error removing meal:', error);
-      setError('Failed to remove meal. Please try again.');
-    }
-  };
 
   const filteredMeals = availableMeals.filter(meal => {
     const matchesSearch = meal.mealName.toLowerCase().includes(searchQuery.toLowerCase());
@@ -202,13 +148,12 @@ const AddMealsToPlan = () => {
   };
 
   const finishPlanning = () => {
-    // navigate('/myprograms');
-    window.location.href = '/myprograms';
+    navigate('/myprograms');
   };
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-[#0B0B12] via-[#1a1625] to-[#0f0f1a] flex items-center justify-center">
         <div className="text-center">
           <Loader className="w-12 h-12 text-lime-400 animate-spin mx-auto mb-4" />
           <div className="text-lime-400 text-xl font-semibold">Loading your plan...</div>
@@ -218,13 +163,13 @@ const AddMealsToPlan = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 p-4">
+    <div className="min-h-screen bg-gradient-to-br from-[#0B0B12] via-[#1a1625] to-[#0f0f1a] p-4">
       <div className="max-w-7xl mx-auto py-8">
         
         {/* Header */}
         <div className="mb-8">
           <button 
-            onClick={() => window.history.back()}
+            onClick={() => navigate(-1)}
             className="flex items-center gap-2 text-gray-400 hover:text-lime-400 transition-all mb-4"
           >
             <ArrowLeft className="w-5 h-5" />
@@ -309,7 +254,7 @@ const AddMealsToPlan = () => {
                         </span>
                         {meal && (
                           <button
-                            onClick={() => removeMealFromPlan(day, slot)}
+                            onClick={() => handleRemoveMeal(day, slot)}
                             className="text-red-400 hover:text-red-300 transition-all p-1 hover:bg-red-900/20 rounded"
                             title="Remove meal"
                           >
@@ -434,7 +379,7 @@ const AddMealsToPlan = () => {
                               )}
                             </div>
                             <button
-                              onClick={() => addMealToPlan(meal)}
+                              onClick={() => handleAddMeal(meal)}
                               disabled={adding}
                               className="w-full py-2 bg-lime-400 hover:bg-lime-500 disabled:bg-gray-600 disabled:cursor-not-allowed text-gray-900 font-semibold rounded-lg transition-all"
                             >

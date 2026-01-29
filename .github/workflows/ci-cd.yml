@@ -25,6 +25,8 @@ jobs:
 
       - name: Backend tests
         working-directory: backend
+        env:
+          SPRING_PROFILES_ACTIVE: test
         run: ./mvnw clean test
 
       - name: Build backend
@@ -76,11 +78,13 @@ jobs:
         with:
           node-version: "20"
 
+## 🔁 On reconstruit le frontend (pour ce que ton Dockerfile.frontend va copier) en injectant pour prod 
       - name: Build frontend for Docker
         run: |
           cd frontend
           npm install
-          npm run build
+          VITE_API_URL=https://betteryou-backend-rbly.onrender.com npm run build
+
 
       - name: Log in to Docker Hub
         uses: docker/login-action@v3
@@ -101,3 +105,30 @@ jobs:
 
       - name: Logout Docker
         run: docker logout
+        
+  # deploy:
+  #   runs-on: ubuntu-latest
+  #   needs: [docker-build-push]
+  #   steps:
+  #     - name: Deploy on Oracle VM
+  #       uses: appleboy/ssh-action@v1.0.3
+  #       with:
+  #         host: ${{ secrets.SSH_HOST }}
+  #         username: ${{ secrets.SSH_USER }}
+  #         key: ${{ secrets.SSH_PRIVATE_KEY }}
+  #         script: |
+  #           cd ~/betteryou
+  #           podman-compose pull
+  #           podman-compose up -d
+  #           podman image prune -f
+  deploy-render:
+    runs-on: ubuntu-latest
+    needs: [docker-build-push]
+    if: github.ref == 'refs/heads/main'  # ⬅️ AJOUTEZ CETTE LIGNE
+    steps:
+      - name: Trigger Render Backend Deploy
+        run: |
+          curl -X POST "${{ secrets.RENDER_DEPLOY_HOOK_BACKEND }}"
+      - name: Trigger Render Frontend Deploy
+        run: |
+          curl -X POST "${{ secrets.RENDER_DEPLOY_HOOK_FRONTEND }}"

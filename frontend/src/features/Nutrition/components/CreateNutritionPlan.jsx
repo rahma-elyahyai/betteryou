@@ -3,11 +3,13 @@ import { Calendar, Target, FileText, Flame, ArrowLeft, Check, Sparkles } from 'l
 import { useNutrition } from '../store/NutritionContext';
 
  import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../store/AuthContext.jsx';
+
 
 
 const CreateNutritionPlanForm = () => {
   const {createNutritionPlan} = useNutrition();
-
+  const { user } = useAuth();
   const [formData, setFormData] = useState({
     nutritionName: '',
     startDate: '',
@@ -97,7 +99,7 @@ const handleSubmit = async (e) => {
         objective: formData.objective,
         description: formData.description,
         caloriesPerDay: formData.caloriesPerDay,
-        idUser: 1
+        idUser: user.idUser
       });
 
       console.log('Plan created:', data);
@@ -105,7 +107,6 @@ const handleSubmit = async (e) => {
       
     } catch (error) {
       console.error('Error creating plan:', error);
-      setErrors({ submit: 'Failed to create program. Please try again.' });
     } finally {
       setIsSubmitting(false);
     }
@@ -119,7 +120,7 @@ const handleSubmit = async (e) => {
 
   if (showSuccess) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-gradient-to-br from-[#0B0B12] via-[#1a1625] to-[#0f0f1a] flex items-center justify-center p-4">
         <div className="bg-gray-800 rounded-2xl p-8 border-2 border-lime-400 max-w-md w-full text-center">
           <div className="w-20 h-20 bg-lime-400 rounded-full flex items-center justify-center mx-auto mb-4 animate-bounce">
             <Check className="w-10 h-10 text-gray-900" />
