@@ -19,7 +19,7 @@ public class ProgramService {
     private final WorkoutProgramRepository programRepository;
 
     public List<ProgramCardDTO> getProgramsForUser(Integer userId) {
-        List<WorkoutProgram> programs = programRepository.findWithSessionsByUserId(userId);
+        List<WorkoutProgram> programs = programRepository.findActiveProgramsByUserId(userId);
         return programs.stream()
                 .map(this::mapToDto)
                 .toList();

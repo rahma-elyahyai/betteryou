@@ -104,7 +104,7 @@ const WorkoutCatalog = ({ onGoPrograms }) => {
 
 
   if (showCreateWizard) {
-    return <CreateProgramWizard />;
+    return <CreateProgramWizard onClose={() => setShowCreateWizard(false)} />;
   }
 
   return (
@@ -224,6 +224,10 @@ const WorkoutCatalog = ({ onGoPrograms }) => {
         onClose={() => setOpenGenerate(false)}
         onGenerate={handleGenerate}
       />
+      {/* Create modal */}
+      {showCreateWizard && (
+        <CreateProgramWizard onClose={() => setShowCreateWizard(false)} />
+      )}
     </div>
   );
 };
