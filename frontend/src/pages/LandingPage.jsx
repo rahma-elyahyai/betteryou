@@ -9,7 +9,7 @@ import workoutImg from "../assets/workout-image.png";
 
 export default function LandingPage() {
   const nav = useNavigate();
-  
+
   return (
     <div className="min-h-screen relative overflow-hidden bg-black text-white">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(214,249,61,0.10),transparent_35%),radial-gradient(circle_at_80%_30%,rgba(139,92,246,0.18),transparent_35%),radial-gradient(circle_at_50%_90%,rgba(214,249,61,0.10),transparent_40%)]" />
@@ -113,12 +113,12 @@ export default function LandingPage() {
 
       {/* Header */}
       <header className="relative flex justify-end items-center p-6 gap-4 animate-slide-in">
-        <button 
+        <button
           onClick={() => nav("/login")}
           className="px-6 py-2.5 bg-[#D6F93D] text-gray-900 font-bold rounded-lg hover:bg-yellow-300 transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-[#D6F93D]/40">
           LOGIN
         </button>
-        <button 
+        <button
           onClick={() => nav("/register")}
           className="px-6 py-2.5 bg-[#D6F93D] text-gray-900 font-bold rounded-lg btn-glow relative z-10">
           SIGN UP
@@ -128,9 +128,9 @@ export default function LandingPage() {
       {/* Hero Section */}
       <section className="relative text-center px-6 py-20 max-w-4xl mx-auto animate-slide-in">
         <h1 className="text-5xl md:text-6xl font-bold text-white mb-6 leading-tight">
-          Transform <span className="text-[#D6F93D] text-glow shine-effect">your body</span> with a smart,
+          Transform <span className="text-[#D6F93D] text-glow">your body</span> with a smart,
           <br />
-          fully personalized <span className="text-[#D6F93D] text-glow shine-effect">AI Coach.</span>
+          fully personalized <span className="text-[#D6F93D] text-glow">AI Coach.</span>
         </h1>
         <p className="text-white/90 text-lg mb-8 max-w-2xl mx-auto leading-relaxed">
           BetterYou is your all-in-one wellness partner — custom workouts, tailored meal plans,
@@ -138,7 +138,7 @@ export default function LandingPage() {
           <br />
           and daily guidance designed just for you
         </p>
-        <button 
+        <button
           onClick={() => nav("/login")}
           className="px-10 py-3.5 bg-[#D6F93D] text-gray-900 font-bold text-lg rounded-lg btn-glow hover:scale-105 transition-transform relative z-10">
           Start now
@@ -148,7 +148,7 @@ export default function LandingPage() {
       {/* Features Overview */}
       <section className="relative px-6 py-16 max-w-7xl mx-auto">
         <h2 className="text-4xl font-bold text-center mb-12">
-          <span className="text-[#D6F93D] shine-effect">Unlock Your Full Potential</span>
+          <span className="text-[#D6F93D] text-glow">Unlock Your Full Potential</span>
           <span className="text-white"> with BetterYou AI</span>
         </h2>
 
@@ -220,7 +220,7 @@ export default function LandingPage() {
             <p className="text-white/90 mb-6 text-lg leading-relaxed">
               Let our intelligent coach analyze your goals, fitness level, and daily routine to deliver training patterns.
             </p>
-            
+
             <div className="space-y-4 mb-6">
               <div className="bg-indigo-900/50 backdrop-blur-sm border-2 border-indigo-700 rounded-lg p-4 flex items-start gap-3 hover:border-pink-500 transition-all hover:translate-x-2">
                 <Dumbbell className="text-pink-400 mt-1" size={20} />
@@ -228,7 +228,7 @@ export default function LandingPage() {
                   Creates personalized workout plans based on your goals and fitness level
                 </p>
               </div>
-              
+
               <div className="bg-indigo-900/50 backdrop-blur-sm border-2 border-indigo-700 rounded-lg p-4 flex items-start gap-3 hover:border-pink-500 transition-all hover:translate-x-2">
                 <Dumbbell className="text-pink-400 mt-1" size={20} />
                 <p className="text-white text-sm">
@@ -237,7 +237,7 @@ export default function LandingPage() {
               </div>
             </div>
 
-            <button 
+            <button
               onClick={() => nav("/register")}
               className="px-8 py-3 bg-gradient-to-r from-pink-500 to-pink-600 text-white font-bold rounded-lg hover:shadow-xl hover:shadow-pink-500/50 transition-all flex items-center gap-2 group hover:scale-105">
               Follow My Program
@@ -247,7 +247,7 @@ export default function LandingPage() {
 
           <div className="relative">
             <div className="absolute inset-0 bg-pink-500/20 rounded-lg blur-2xl"></div>
-            <img 
+            <img
               src={workoutImg}
               alt="Person working out"
               className="relative rounded-lg shadow-2xl hover:scale-105 transition-transform duration-500"
@@ -261,8 +261,8 @@ export default function LandingPage() {
         <div className="grid md:grid-cols-2 gap-12 items-center">
           <div className="relative order-2 md:order-1">
             <div className="absolute inset-0 bg-cyan-500/20 rounded-lg blur-2xl"></div>
-            <img 
-              src={nutritionImg} 
+            <img
+              src={nutritionImg}
               alt="Healthy food"
               className="relative rounded-lg shadow-2xl hover:scale-105 transition-transform duration-500"
             />
@@ -278,7 +278,7 @@ export default function LandingPage() {
             <p className="text-white/90 mb-6 text-lg leading-relaxed">
               Receive daily food recommendations crafted according to your body metrics and nutritional needs.
             </p>
-            
+
             <div className="space-y-4 mb-6">
               <div className="bg-indigo-900/50 backdrop-blur-sm border-2 border-indigo-700 rounded-lg p-4 flex items-start gap-3 hover:border-cyan-500 transition-all hover:translate-x-2">
                 <Apple className="text-cyan-400 mt-1" size={20} />
@@ -286,7 +286,7 @@ export default function LandingPage() {
                   Provides daily meal suggestions tailored to your body metrics
                 </p>
               </div>
-              
+
               <div className="bg-indigo-900/50 backdrop-blur-sm border-2 border-indigo-700 rounded-lg p-4 flex items-start gap-3 hover:border-cyan-500 transition-all hover:translate-x-2">
                 <Apple className="text-cyan-400 mt-1" size={20} />
                 <p className="text-white text-sm">
@@ -295,7 +295,7 @@ export default function LandingPage() {
               </div>
             </div>
 
-            <button 
+            <button
               onClick={() => nav("/register")}
               className="px-8 py-3 bg-gradient-to-r from-cyan-500 to-cyan-600 text-white font-bold rounded-lg hover:shadow-xl hover:shadow-cyan-500/50 transition-all flex items-center gap-2 group hover:scale-105">
               Follow My Plan
@@ -318,7 +318,7 @@ export default function LandingPage() {
             <p className="text-white/90 mb-6 text-lg leading-relaxed">
               BetterYou uses your lifestyle and habits and provides dynamic, trackable routines to improve your daily flexibility, awareness, and lasting habits.
             </p>
-            
+
             <div className="space-y-4 mb-6">
               <div className="bg-indigo-900/50 backdrop-blur-sm border-2 border-indigo-700 rounded-lg p-4 flex items-start gap-3 hover:border-purple-500 transition-all hover:translate-x-2">
                 <Heart className="text-purple-400 mt-1" size={20} />
@@ -326,7 +326,7 @@ export default function LandingPage() {
                   Creates simple daily routines to improve your lifestyle
                 </p>
               </div>
-              
+
               <div className="bg-indigo-900/50 backdrop-blur-sm border-2 border-indigo-700 rounded-lg p-4 flex items-start gap-3 hover:border-purple-500 transition-all hover:translate-x-2">
                 <Heart className="text-purple-400 mt-1" size={20} />
                 <p className="text-white text-sm">
@@ -335,7 +335,7 @@ export default function LandingPage() {
               </div>
             </div>
 
-            <button 
+            <button
               onClick={() => nav("/register")}
               className="px-8 py-3 bg-gradient-to-r from-purple-500 to-purple-600 text-white font-bold rounded-lg hover:shadow-xl hover:shadow-purple-500/50 transition-all flex items-center gap-2 group hover:scale-105">
               See My Routine
@@ -345,7 +345,7 @@ export default function LandingPage() {
 
           <div className="relative">
             <div className="absolute inset-0 bg-purple-500/20 rounded-lg blur-2xl"></div>
-            <img 
+            <img
               src={habitsImg}
               alt="Person exercising"
               className="relative rounded-lg shadow-2xl hover:scale-105 transition-transform duration-500"
@@ -359,8 +359,8 @@ export default function LandingPage() {
         <div className="grid md:grid-cols-2 gap-12 items-center">
           <div className="relative order-2 md:order-1">
             <div className="absolute inset-0 bg-green-500/20 rounded-lg blur-2xl"></div>
-            <img 
-              src={iaImg} 
+            <img
+              src={iaImg}
               alt="AI Assistant"
               className="relative rounded-lg shadow-2xl hover:scale-105 transition-transform duration-500"
             />
@@ -376,7 +376,7 @@ export default function LandingPage() {
             <p className="text-white/90 mb-6 text-lg leading-relaxed">
               Ask anything, anytime. Your AI coach provides personalized advice, instant recommendations, and motivation based on your progress.
             </p>
-            
+
             <div className="space-y-4 mb-6">
               <div className="bg-indigo-900/50 backdrop-blur-sm border-2 border-indigo-700 rounded-lg p-4 flex items-start gap-3 hover:border-green-500 transition-all hover:translate-x-2">
                 <MessageSquare className="text-green-400 mt-1" size={20} />
@@ -384,7 +384,7 @@ export default function LandingPage() {
                   Answers your questions instantly with AI-powered advice
                 </p>
               </div>
-              
+
               <div className="bg-indigo-900/50 backdrop-blur-sm border-2 border-indigo-700 rounded-lg p-4 flex items-start gap-3 hover:border-green-500 transition-all hover:translate-x-2">
                 <MessageSquare className="text-green-400 mt-1" size={20} />
                 <p className="text-white text-sm">
@@ -393,7 +393,7 @@ export default function LandingPage() {
               </div>
             </div>
 
-            <button 
+            <button
               onClick={() => nav("/register")}
               className="px-8 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white font-bold rounded-lg hover:shadow-xl hover:shadow-green-500/50 transition-all flex items-center gap-2 group hover:scale-105">
               Ask My assistant

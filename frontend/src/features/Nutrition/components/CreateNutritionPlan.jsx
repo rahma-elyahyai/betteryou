@@ -2,13 +2,13 @@ import React, { useState } from 'react';
 import { Calendar, Target, FileText, Flame, ArrowLeft, Check, Sparkles } from 'lucide-react';
 import { useNutrition } from '../store/NutritionContext';
 
- import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../store/AuthContext.jsx';
 
 
 
 const CreateNutritionPlanForm = () => {
-  const {createNutritionPlan} = useNutrition();
+  const { createNutritionPlan } = useNutrition();
   const { user } = useAuth();
   const [formData, setFormData] = useState({
     nutritionName: '',
@@ -48,18 +48,18 @@ const CreateNutritionPlanForm = () => {
 
   const validate = () => {
     const newErrors = {};
-    
+
     if (!formData.nutritionName.trim()) {
       newErrors.nutritionName = 'Program name is required';
     } else if (formData.nutritionName.length < 3) {
       newErrors.nutritionName = 'Name must be at least 3 characters';
     }
-    
+
     if (!formData.startDate) {
       newErrors.startDate = 'Start date is required';
     }
-    
-    
+
+
     if (formData.startDate && formData.endDate) {
       const start = new Date(formData.startDate);
       const end = new Date(formData.endDate);
@@ -67,15 +67,15 @@ const CreateNutritionPlanForm = () => {
         newErrors.endDate = 'End date must be after start date';
       }
     }
-    
+
     if (!formData.objective) {
       newErrors.objective = 'Please select an objective';
     }
-    
+
     if (!formData.description.trim()) {
       newErrors.description = 'Description is required';
     }
-    
+
     if (formData.caloriesPerDay < 1000 || formData.caloriesPerDay > 5000) {
       newErrors.caloriesPerDay = 'Calories must be between 1000 and 5000';
     }
@@ -84,9 +84,9 @@ const CreateNutritionPlanForm = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-const handleSubmit = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!validate()) return;
 
     setIsSubmitting(true);
@@ -104,7 +104,7 @@ const handleSubmit = async (e) => {
 
       console.log('Plan created:', data);
       navigate(`/nutrition-plans/${data.idNutrition}/add-meals`);
-      
+
     } catch (error) {
       console.error('Error creating plan:', error);
     } finally {
@@ -113,9 +113,7 @@ const handleSubmit = async (e) => {
   };
 
   const handleAutoGenerate = () => {
-    // Redirection vers la page de génération automatique
-    alert('Redirecting to auto-generate...');
-    // window.location.href = '/generate-program';
+    navigate('/nutrition/ai');
   };
 
   if (showSuccess) {
@@ -129,26 +127,26 @@ const handleSubmit = async (e) => {
           <p className="text-gray-400">Your nutrition program has been created</p>
           <p className="text-gray-500 text-sm mt-2">Redirecting to your programs...</p>
         </div>
-        
+
       </div>
     );
-    
+
   }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 p-4">
       <div className="max-w-4xl mx-auto py-8">
-        
+
         {/* Header */}
         <div className="mb-8">
-          <button 
+          <button
             onClick={() => window.history.back()}
             className="flex items-center gap-2 text-gray-400 hover:text-lime-400 transition-all mb-4"
           >
             <ArrowLeft className="w-5 h-5" />
             Back
           </button>
-          
+
           <div className="text-center mb-6">
             <h1 className="text-4xl font-bold text-lime-400 mb-2">Create Nutrition Plan</h1>
             <p className="text-gray-400">Design your personalized nutrition program</p>
@@ -174,7 +172,7 @@ const handleSubmit = async (e) => {
 
         {/* Form */}
         <div className="bg-gray-800/50 backdrop-blur-md rounded-2xl p-8 border border-gray-700 shadow-xl">
-          
+
           {/* Error global */}
           {errors.submit && (
             <div className="mb-6 p-4 bg-red-900/20 border border-red-500/50 rounded-xl text-red-400">
@@ -188,7 +186,7 @@ const handleSubmit = async (e) => {
               <FileText className="w-6 h-6" />
               Program Information
             </h2>
-            
+
             <div className="mb-4">
               <label className="block text-gray-300 text-sm font-semibold mb-2">
                 Program Name *
@@ -200,9 +198,8 @@ const handleSubmit = async (e) => {
                 onChange={handleChange}
                 placeholder="e.g., Summer Shred 2025"
                 maxLength={100}
-                className={`w-full px-4 py-3 bg-gray-900 border ${
-                  errors.nutritionName ? 'border-red-500' : 'border-gray-700'
-                } rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-lime-400 transition-all`}
+                className={`w-full px-4 py-3 bg-gray-900 border ${errors.nutritionName ? 'border-red-500' : 'border-gray-700'
+                  } rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-lime-400 transition-all`}
               />
               {errors.nutritionName && (
                 <p className="text-red-400 text-sm mt-1">{errors.nutritionName}</p>
@@ -223,9 +220,8 @@ const handleSubmit = async (e) => {
                 placeholder="Describe your nutrition program goals and approach..."
                 rows={4}
                 maxLength={255}
-                className={`w-full px-4 py-3 bg-gray-900 border ${
-                  errors.description ? 'border-red-500' : 'border-gray-700'
-                } rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-lime-400 transition-all resize-none`}
+                className={`w-full px-4 py-3 bg-gray-900 border ${errors.description ? 'border-red-500' : 'border-gray-700'
+                  } rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-lime-400 transition-all resize-none`}
               />
               {errors.description && (
                 <p className="text-red-400 text-sm mt-1">{errors.description}</p>
@@ -248,11 +244,10 @@ const handleSubmit = async (e) => {
                   key={obj.value}
                   type="button"
                   onClick={() => handleObjectiveSelect(obj.value)}
-                  className={`p-4 rounded-xl border-2 transition-all text-left ${
-                    formData.objective === obj.value
+                  className={`p-4 rounded-xl border-2 transition-all text-left ${formData.objective === obj.value
                       ? 'bg-lime-400/20 border-lime-400 shadow-lg shadow-lime-400/20'
                       : 'bg-gray-900 border-gray-700 hover:border-gray-600'
-                  }`}
+                    }`}
                 >
                   <div className="text-2xl mb-2">{obj.label.split(' ')[0]}</div>
                   <div className="font-bold text-white mb-1">
@@ -273,7 +268,7 @@ const handleSubmit = async (e) => {
               <Calendar className="w-6 h-6" />
               Program Duration *
             </h2>
-            
+
             <div className="grid md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-gray-300 text-sm font-semibold mb-2">
@@ -285,9 +280,8 @@ const handleSubmit = async (e) => {
                   value={formData.startDate}
                   onChange={handleChange}
                   min={new Date().toISOString().split('T')[0]}
-                  className={`w-full px-4 py-3 bg-gray-900 border ${
-                    errors.startDate ? 'border-red-500' : 'border-gray-700'
-                  } rounded-xl text-white focus:outline-none focus:border-lime-400 transition-all`}
+                  className={`w-full px-4 py-3 bg-gray-900 border ${errors.startDate ? 'border-red-500' : 'border-gray-700'
+                    } rounded-xl text-white focus:outline-none focus:border-lime-400 transition-all`}
                 />
                 {errors.startDate && (
                   <p className="text-red-400 text-sm mt-1">{errors.startDate}</p>
@@ -304,20 +298,19 @@ const handleSubmit = async (e) => {
                   readOnly
                   disabled
                   value={
-                    formData.startDate 
+                    formData.startDate
                       ? new Date(new Date(formData.startDate).getTime() + 6 * 24 * 60 * 60 * 1000)
-                          .toISOString()
-                          .split('T')[0]
+                        .toISOString()
+                        .split('T')[0]
                       : ''
                   }
                   onChange={handleChange}
                   min={formData.startDate || new Date().toISOString().split('T')[0]}
-                  className={`w-full px-4 py-3 bg-gray-900 border ${
-                    errors.startDate ? 'border-red-500' : 'border-gray-700'
-                  } rounded-xl text-white focus:outline-none focus:border-lime-400 transition-all`}
-                
-/>
-               
+                  className={`w-full px-4 py-3 bg-gray-900 border ${errors.startDate ? 'border-red-500' : 'border-gray-700'
+                    } rounded-xl text-white focus:outline-none focus:border-lime-400 transition-all`}
+
+                />
+
               </div>
             </div>
 
@@ -336,7 +329,7 @@ const handleSubmit = async (e) => {
               <Flame className="w-6 h-6" />
               Daily Calorie Target *
             </h2>
-            
+
             <div>
               <label className="block text-gray-300 text-sm font-semibold mb-2">
                 Calories Per Day
@@ -349,14 +342,13 @@ const handleSubmit = async (e) => {
                 min="1000"
                 max="5000"
                 step="50"
-                className={`w-full px-4 py-3 bg-gray-900 border ${
-                  errors.caloriesPerDay ? 'border-red-500' : 'border-gray-700'
-                } rounded-xl text-white focus:outline-none focus:border-lime-400 transition-all`}
+                className={`w-full px-4 py-3 bg-gray-900 border ${errors.caloriesPerDay ? 'border-red-500' : 'border-gray-700'
+                  } rounded-xl text-white focus:outline-none focus:border-lime-400 transition-all`}
               />
               {errors.caloriesPerDay && (
                 <p className="text-red-400 text-sm mt-1">{errors.caloriesPerDay}</p>
               )}
-              
+
               {/* Visual Slider */}
               <input
                 type="range"
@@ -368,7 +360,7 @@ const handleSubmit = async (e) => {
                 step="50"
                 className="w-full mt-3 h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-lime-400"
               />
-              
+
               <div className="mt-2 flex items-center justify-between text-xs text-gray-500">
                 <span>1000 kcal</span>
                 <span className="text-lime-400 font-bold text-lg">{formData.caloriesPerDay} kcal/day</span>
@@ -414,7 +406,7 @@ const handleSubmit = async (e) => {
         {/* Info Box */}
         <div className="mt-6 bg-gray-800/30 border border-gray-700 rounded-xl p-4">
           <p className="text-gray-400 text-sm">
-            <span className="text-lime-400 font-semibold">💡 Next Step:</span> After creating your program, 
+            <span className="text-lime-400 font-semibold">💡 Next Step:</span> After creating your program,
             you'll be able to add meals for each day of the week.
           </p>
         </div>

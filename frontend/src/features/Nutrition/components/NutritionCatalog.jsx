@@ -5,19 +5,18 @@ import MealDetailModal from "./MealDetail.jsx";
 import { useNutrition } from "../store/NutritionContext.jsx";
 import Sidebar from "@/layout/Sidebar";
 
-export default function NutritionCatalog({ userId , limit = 4 }) {
-  if (!userId) return null; 
-  const { 
-    loadRecommendations, 
-    loadMealDetails, 
-    loading 
+export default function NutritionCatalog({ userId, limit = 4 }) {
+  if (!userId) return null;
+  const {
+    loadRecommendations,
+    loadMealDetails,
+    loading
   } = useNutrition();
   const [meals, setMeals] = useState([]);
   const [error, setError] = useState("");
   const [selectedMeal, setSelectedMeal] = useState(null);
   const [loadingDetail, setLoadingDetail] = useState(false);
-
-  const { loadRecommendations, loadMealDetails } = useNutrition();
+  const [isInitialLoading, setIsInitialLoading] = useState(true);
 
   // 🔥 Mémoïser les fonctions de callback
   const handleViewDetails = useCallback(async (meal) => {
@@ -42,7 +41,7 @@ export default function NutritionCatalog({ userId , limit = 4 }) {
     const fetchRecommendations = async () => {
       setIsInitialLoading(true);
       setError("");
-      
+
       try {
         const data = await loadRecommendations(userId, limit);
         if (isMounted) {
@@ -83,7 +82,7 @@ export default function NutritionCatalog({ userId , limit = 4 }) {
   return (
     <div className="flex min-h-screen bg-gradient-to-br from-[#0B0B12] via-[#1a1625] to-[#0f0f1a]">
       {/* 🎨 Sidebar */}
-      <Sidebar active="nutrition"/>
+      <Sidebar active="nutrition" />
 
       {/* 🎨 Main Content */}
       <div className="flex-1 flex flex-col">
@@ -92,14 +91,14 @@ export default function NutritionCatalog({ userId , limit = 4 }) {
           <div className="max-w-7xl mx-auto px-8 py-6">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
-  
+
                 <div>
                   <h1 className="text-4xl font-bold text-white">NUTRITION CATALOG</h1>
                   <p className="text-gray-500 text-sm">Personalized Meal Recommendations</p>
                 </div>
               </div>
-              
-              <button 
+
+              <button
                 onClick={() => window.location.href = '/myprograms'}
                 className="flex items-center gap-2 px-5 py-2.5 bg-gray-800 hover:bg-gray-700 text-lime-400 hover:text-lime-300 rounded-xl font-semibold transition-all border border-gray-700 hover:border-lime-400/30"
               >
@@ -117,7 +116,7 @@ export default function NutritionCatalog({ userId , limit = 4 }) {
           <div className="max-w-7xl mx-auto px-8 py-12">
 
             {/* Loading State */}
-            {isLoadingRecommendations && (
+            {isInitialLoading ? (
               <div className="flex flex-col items-center justify-center py-32">
                 <div className="relative">
                   <div className="w-20 h-20 border-4 border-gray-800 border-t-lime-400 rounded-full animate-spin"></div>
@@ -131,7 +130,7 @@ export default function NutritionCatalog({ userId , limit = 4 }) {
                   <div className="bg-red-900/20 border-2 border-red-500/50 rounded-2xl p-8 text-center backdrop-blur-sm">
                     <div className="text-5xl mb-4">⚠️</div>
                     <p className="text-red-400 text-lg font-semibold">{error}</p>
-                    <button 
+                    <button
                       onClick={() => window.location.reload()}
                       className="mt-4 px-6 py-2 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-lg transition-all"
                     >
@@ -164,14 +163,14 @@ export default function NutritionCatalog({ userId , limit = 4 }) {
 
                     {/* Action Button */}
                     <div className="flex justify-center items-center py-12 border-t border-gray-800">
-                      <button 
+                      <button
                         onClick={() => {
                           const hasConfirmed = window.confirm(
                             "⚠️ IMPORTANT\n\n" +
                             "If you already have an active nutrition plan, creating a new one will automatically end it.\n\n" +
                             "Do you want to continue?"
                           );
-                          
+
                           if (hasConfirmed) {
                             window.location.href = '/create-nutrition-plan';
                           }
@@ -187,7 +186,7 @@ export default function NutritionCatalog({ userId , limit = 4 }) {
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M9 5l7 7-7 7" />
                           </svg>
                         </span>
-                        
+
                         <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-transparent via-white/20 to-transparent transform translate-x-[-200%] group-hover:translate-x-[200%] transition-transform duration-700"></div>
                       </button>
                     </div>
@@ -198,7 +197,7 @@ export default function NutritionCatalog({ userId , limit = 4 }) {
           </div>
         </div>
       </div>
-      
+
       {/* Detail Modal */}
       {selectedMeal && (
         <MealDetailModal
