@@ -3,8 +3,8 @@ import axios from "axios";
 
 // Solution PRO : Une ligne, zéro changement manuel
 export const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || "http://localhost:8080",
-  timeout: 30000,
+  baseURL: import.meta.env.VITE_API_URL || "http://localhost:8080/api",
+  timeout: 15000,
 });
 
 // Vérification (optionnel, pour debug)
@@ -63,9 +63,18 @@ api.interceptors.response.use(
 
 // ✅ Auth API
 export const authApi = {
-  login: (data) => api.post("/api/auth/login", data),
-  register: (data) => api.post("/api/auth/register", data),
-  me: () => api.get("/api/auth/me"),
-  forgotPassword: (data) => api.post("/api/auth/forgot-password", data),
-  resetPassword: (data) => api.post("/api/auth/reset-password", data),
+  login: (data) => api.post("/auth/login", data),
+  register: (data) => api.post("/auth/register", data),
+  me: () => api.get("/auth/me"),
+  forgotPassword: (data) => api.post("/auth/forgot-password", data),
+  resetPassword: (data) => api.post("/auth/reset-password", data),
 };
+// ✅ AI Nutrition API
+export const aiNutritionApi = {
+  test: () => api.get("/nutrition/ai/test"),
+  generate: (payload) => api.post("/nutrition/ai/generate", payload, { timeout: 300000 }),
+  getWeek: (planId) => api.get(`/nutrition/ai/plans/${planId}/week`),
+  getDay: (planId, dayOfWeek) =>
+    api.get(`/nutrition/ai/plans/${planId}/day`, { params: { dayOfWeek } }),
+};
+

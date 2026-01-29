@@ -7,7 +7,7 @@ import ReplaceMealModal from './ReplaceMealModal.jsx';
 import AddMealToDayModal from './AddMealToDayModal.jsx';
 import { useNutrition } from '../store/NutritionContext.jsx';
 import { useAuth } from "../store/AuthContext";
-import Sidebar from "@/layout/Sidebar"; 
+import Sidebar from "../../../layout/Sidebar"; // on dois remonté trois fichiers 
 
 
 const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
@@ -42,9 +42,8 @@ const MyPrograms = () => {
   const [removingMealId, setRemovingMealId] = useState(null);
   const [savingMealId, setSavingMealId] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false);
-  const  [isEndingPlan, setIsEndingPlan] = useState(false); 
-  const { user, loadingUser } = useAuth();
-const userId = user?.idUser;
+
+  const userId = 1;
 
 useEffect(() => {
   if (loadingUser || !userId) return;
@@ -73,47 +72,8 @@ useEffect(() => {
     }
   };
 
-  fetchPrograms();
-}, [loadingUser, userId, currentDay, loadUserPlansForDay, selectedProgram]);
-
-
-  //fonction pur terminer un plan 
-  const handleEndPlan = async () => {
-    if (!selectedProgram) return;
-    
-    const confirmEnd = window.confirm(
-      `Are you sure you want to end "${selectedProgram.nutritionName}"?\n\nThis action will mark the plan as completed and you won't be able to modify it anymore.`
-    );
-    
-    if (!confirmEnd) return;
-
-    setIsEndingPlan(true);
-    try {
-      await endNutritionPlan(selectedProgram.idNutrition);
-      
-      setSaveMsg('✅ Plan ended successfully!');
-      setTimeout(() => setSaveMsg(""), 3000);
-      
-      // Recharger les programmes
-      const data = await loadUserPlansForDay(userId, currentDay, true);
-      setPrograms(data || []);
-      
-      // Mettre à jour le plan sélectionné
-      const updatedPlan = data.find(p => p.idNutrition === selectedProgram.idNutrition);
-      setSelectedProgram(updatedPlan || data[0] || null);
-    } catch (e) {
-      console.error('End plan error:', e);
-      const errorMsg = e?.response?.data?.error || e.message;
-      setSaveErr(`❌ Failed to end plan: ${errorMsg}`);
-      setTimeout(() => setSaveErr(""), 5000);
-    } finally {
-      setIsEndingPlan(false);
-    }
-  };
-
-  // 🔥 Vérifier si le plan sélectionné est actif
-  const isCurrentPlanActive = selectedProgram ? isPlanActive(selectedProgram) : false;
-
+    fetchPrograms();
+  }, [currentDay, loadUserPlansForDay]);
 
   // 🔥 Mettre à jour un plan
   const handleUpdatePlan = async (formData) => {
@@ -330,78 +290,50 @@ useEffect(() => {
   const currentDayIndex = fullDays.indexOf(currentDay);
 
   return (
-    <div className="flex min-h-screen bg-gradient-to-br from-[#0B0B12] via-[#1a1625] to-[#0f0f1a]">
-      <Sidebar active="nutrition" />
-      
-      <div className="flex-1 p-4 overflow-y-auto">
-        <div className="max-w-4xl mx-auto">
-                  {/* Header */}
-          <div className="mb-6">
-            <div className="flex items-center justify-between mb-4">
-              <h1 className="text-4xl font-bold text-lime-400">My Nutrition Programs</h1>
-              <button
-                onClick={() => window.location.href = '/nutrition'}
-                className="px-6 py-3 bg-gray-800 hover:bg-lime-400 text-lime-400 hover:text-gray-900 font-semibold rounded-xl border-2 border-gray-700 hover:border-lime-400 transition-all flex items-center gap-2"
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 p-4">
+      <div className="max-w-4xl mx-auto">
+        {/* Header */}
+        <div className="mb-6">
+          <h1 className="text-4xl font-bold text-lime-400 mb-4 text-center">My Nutrition Programs</h1>
+          
+          <div className="flex gap-3">
+            {programs.length > 1 && (
+              <select 
+                value={selectedProgram?.idNutrition || ''}
+                onChange={(e) => {
+                  const program = programs.find(p => p.idNutrition === parseInt(e.target.value));
+                  setSelectedProgram(program);
+                }}
+                className="flex-1 p-3 rounded-xl bg-gray-800 text-white border-2 border-gray-700 hover:border-lime-400 focus:outline-none focus:border-lime-400 transition-all"
               >
-                <Calendar className="w-5 h-5" />
-                Nutrition Catalog
-              </button>
-            </div> 
-            <div className="flex gap-3">
-              {programs.length > 1 && (
-                <select 
-                  value={selectedProgram?.idNutrition || ''}
-                  onChange={(e) => {
-                    const program = programs.find(p => p.idNutrition === parseInt(e.target.value));
-                    setSelectedProgram(program);
-                  }}
-                  className="flex-1 p-3 rounded-xl bg-gray-800 text-white border-2 border-gray-700 hover:border-lime-400 focus:outline-none focus:border-lime-400 transition-all"
+                {programs.map(program => (
+                  <option key={program.idNutrition} value={program.idNutrition}>
+                    {program.nutritionName}
+                  </option>
+                ))}
+              </select>
+            )}
+            
+            {selectedProgram && (
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setEditingPlan(selectedProgram)}
+                  className="p-3 bg-gray-800 hover:bg-lime-400 text-lime-400 hover:text-gray-900 rounded-xl border-2 border-gray-700 hover:border-lime-400 transition-all"
+                  title="Edit Plan"
                 >
-                   {programs.map(program => {
-                    const active = isPlanActive(program);
-                    return (
-                      <option key={program.idNutrition} value={program.idNutrition}>
-                        {active ? '🟢' : ''} {program.nutritionName}
-                      </option>
-                    );
-                  })}
-                </select>
-              )}
-              
-             {selectedProgram && (
-                <div className="flex gap-2">
-                  {/* 🆕 Bouton "End Plan" visible uniquement pour les plans actifs */}
-                  {isCurrentPlanActive && (
-                    <button
-                      onClick={handleEndPlan}
-                      disabled={isEndingPlan}
-                      className="p-3 bg-gray-800 hover:bg-orange-500 text-orange-400 hover:text-white rounded-xl border-2 border-gray-700 hover:border-orange-500 transition-all disabled:opacity-50"
-                      title="End Plan"
-                    >
-                      <StopCircle className="w-5 h-5" />
-                    </button>
-                  )}
-                  
-                  {/* 🆕 Boutons Edit/Delete grisés si le plan est inactif */}
-                  <button
-                    onClick={() => isCurrentPlanActive ? setEditingPlan(selectedProgram) : alert('⚠️ This plan has ended and cannot be modified.')}
-                    disabled={!isCurrentPlanActive}
-                    className="p-3 bg-gray-800 hover:bg-lime-400 text-lime-400 hover:text-gray-900 rounded-xl border-2 border-gray-700 hover:border-lime-400 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
-                    title={isCurrentPlanActive ? "Edit Plan" : "Plan ended - cannot edit"}
-                  >
-                    <Edit2 className="w-5 h-5" />
-                  </button>
-                  <button
-                    onClick={() => setDeletingPlan(selectedProgram)}
-                    className="p-3 bg-gray-800 hover:bg-red-500 text-red-400 hover:text-white rounded-xl border-2 border-gray-700 hover:border-red-500 transition-all"
-                    title="Delete Plan"
-                  >
-                    <Trash2 className="w-5 h-5" />
-                  </button>
-                </div>
-              )}
-            </div>
+                  <Edit2 className="w-5 h-5" />
+                </button>
+                <button
+                  onClick={() => setDeletingPlan(selectedProgram)}
+                  className="p-3 bg-gray-800 hover:bg-red-500 text-red-400 hover:text-white rounded-xl border-2 border-gray-700 hover:border-red-500 transition-all"
+                  title="Delete Plan"
+                >
+                  <Trash2 className="w-5 h-5" />
+                </button>
+              </div>
+            )}
           </div>
+        </div>
 
           {/* Notifications */}
           {saveMsg && (
@@ -416,47 +348,33 @@ useEffect(() => {
             </div>
           )}
 
-          {selectedProgram && (
-            <>
-              {/* 🆕 Warning Banner pour plans inactifs */}
-              {!isCurrentPlanActive && (
-                <div className="mb-6 p-4 rounded-xl bg-gray-900/30 border-2 border-gray-500/50 flex items-start gap-3">
-                  <XCircle className="w-6 h-6 text-red-400 flex-shrink-0 mt-0.5" />
+        {selectedProgram && (
+          <>
+            {/* Info Card */}
+            <div className="bg-gray-800/50 backdrop-blur-md rounded-2xl p-6 mb-6 border border-gray-700">
+              <h2 className="text-2xl font-bold text-lime-400 mb-4">{selectedProgram.nutritionName}</h2>
+              <div className="grid grid-cols-2 gap-4 text-gray-300">
+                <div className="flex items-center gap-2">
+                  <Target className="w-5 h-5 text-lime-400" />
                   <div>
-                    <h3 className="text-red-400 font-bold text-lg mb-1">Plan Ended</h3>
-                    <p className="text-red-300 text-sm">
-                      This nutrition plan ended on <strong>{selectedProgram.endDate}</strong>. 
-                      You cannot modify it anymore, but you can still view the meals and save them to your diary.
-                    </p>
+                    <div className="text-xs text-gray-500 uppercase">Objective</div>
+                    <div className="font-semibold text-white">{selectedProgram.objective}</div>
                   </div>
                 </div>
-              )}
-              {/* Info Card */}
-              <div className="bg-gray-800/50 backdrop-blur-md rounded-2xl p-6 mb-6 border border-gray-700">
-                <h2 className="text-2xl font-bold text-lime-400 mb-4">{selectedProgram.nutritionName}</h2>
-
-                <div className="grid grid-cols-2 gap-4 text-gray-300">
-                  <div className="flex items-center gap-2">
-                    <Target className="w-5 h-5 text-lime-400" />
-                    <div>
-                      <div className="text-xs text-gray-500 uppercase">Objective</div>
-                      <div className="font-semibold text-white">{selectedProgram.objective}</div>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Calendar className="w-5 h-5 text-lime-400" />
-                    <div>
-                      <div className="text-xs text-gray-500 uppercase">Duration</div>
-                      <div className="font-semibold text-white text-sm">
-                        {selectedProgram.startDate} → {selectedProgram.endDate}
-                      </div>
+                <div className="flex items-center gap-2">
+                  <Calendar className="w-5 h-5 text-lime-400" />
+                  <div>
+                    <div className="text-xs text-gray-500 uppercase">Duration</div>
+                    <div className="font-semibold text-white text-sm">
+                      {selectedProgram.startDate} → {selectedProgram.endDate}
                     </div>
                   </div>
                 </div>
-                {selectedProgram.description && (
-                  <p className="text-gray-400 mt-4 text-sm">{selectedProgram.description}</p>
-                )}
               </div>
+              {selectedProgram.description && (
+                <p className="text-gray-400 mt-4 text-sm">{selectedProgram.description}</p>
+              )}
+            </div>
 
               {/* Weekly Calendar */}
               <div className="bg-gray-800/50 backdrop-blur-md rounded-2xl p-4 mb-6 border border-gray-700">
@@ -495,43 +413,41 @@ useEffect(() => {
                 </div>
               </div>
 
-              {/* Meals Section */}
-              {selectedProgram.meals && selectedProgram.meals.length > 0 ? (
-                <div className="space-y-4 mb-6">
-                  {selectedProgram.meals.map((meal, idx) => (
-                    <div key={idx} className="bg-gray-800 rounded-2xl p-6 shadow-lg border-2 border-gray-700 hover:border-lime-400/50 transition-all">
-                      <div className="flex items-start justify-between mb-4">
-                        <div className="flex items-center gap-3">
-                          <div className="text-3xl">{getMealIcon(meal.mealType)}</div>
-                          <div>
-                            <h3 className="text-xl font-bold text-white">{meal.mealName}</h3>
-                            {meal.mealType && (
-                              <span className="text-sm text-lime-400 font-medium capitalize">
-                                {meal.mealType}
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                        {/* 🆕 Boutons grisés si le plan est inactif */}
-                        <div className="flex gap-2">
-                          <button
-                            onClick={() => isCurrentPlanActive ? setReplacingMeal({ meal, dayOfWeek: currentDay }) : alert('⚠️ This plan has ended and cannot be modified.')}
-                            disabled={!isCurrentPlanActive}
-                            className="p-2 text-lime-400 hover:bg-lime-400/20 rounded-lg transition-all disabled:opacity-30 disabled:cursor-not-allowed"
-                            title={isCurrentPlanActive ? "Replace meal" : "Plan ended - cannot replace"}
-                          >
-                            <RefreshCw className="w-5 h-5" />
-                          </button>
-                          <button
-                            onClick={() => isCurrentPlanActive && handleRemoveMeal(meal)}
-                            disabled={removingMealId === meal.idMeal || !isCurrentPlanActive}
-                            className="p-2 text-red-400 hover:bg-red-900/30 rounded-lg transition-all disabled:opacity-30 disabled:cursor-not-allowed"
-                            title={isCurrentPlanActive ? "Remove meal" : "Plan ended - cannot remove"}
-                          >
-                            <Trash2 className="w-5 h-5" />
-                          </button>
+            {/* Meals Section */}
+            {selectedProgram.meals && selectedProgram.meals.length > 0 ? (
+              <div className="space-y-4 mb-6">
+                {selectedProgram.meals.map((meal, idx) => (
+                  <div key={idx} className="bg-gray-800 rounded-2xl p-6 shadow-lg border-2 border-gray-700 hover:border-lime-400/50 transition-all">
+                    <div className="flex items-start justify-between mb-4">
+                      <div className="flex items-center gap-3">
+                        <div className="text-3xl">{getMealIcon(meal.mealType)}</div>
+                        <div>
+                          <h3 className="text-xl font-bold text-white">{meal.mealName}</h3>
+                          {meal.mealType && (
+                            <span className="text-sm text-lime-400 font-medium capitalize">
+                              {meal.mealType}
+                            </span>
+                          )}
                         </div>
                       </div>
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => setReplacingMeal({ meal, dayOfWeek: currentDay })}
+                          className="p-2 text-lime-400 hover:bg-lime-400/20 rounded-lg transition-all"
+                          title="Replace meal"
+                        >
+                          <RefreshCw className="w-5 h-5" />
+                        </button>
+                        <button
+                          onClick={() => handleRemoveMeal(meal)}
+                          disabled={removingMealId === meal.idMeal}
+                          className="p-2 text-red-400 hover:bg-red-900/30 rounded-lg transition-all disabled:opacity-50"
+                          title="Remove meal"
+                        >
+                          <Trash2 className="w-5 h-5" />
+                        </button>
+                      </div>
+                    </div>
 
                       {meal.description && (
                         <p className="text-gray-400 text-sm mb-4">{meal.description}</p>
@@ -565,91 +481,55 @@ useEffect(() => {
                         </>
                       )}
 
-                      <div className="flex gap-3">
-                        <button
-                          onClick={() => setSelectedMeal(meal)}
-                          className="flex-1 py-3 bg-gray-700 hover:bg-gray-600 text-white font-semibold rounded-xl transition-all"
-                        >
-                          View Recipe
-                        </button>
-                        
-                        <button
-                          onClick={() => handleSaveMeal(meal)}
-                          disabled={savingMealId === meal.idMeal}
-                          className="flex-1 py-3 bg-lime-400 hover:bg-lime-500 disabled:opacity-60 text-gray-900 font-semibold rounded-xl transition-all"
-                        >
-                          {savingMealId === meal.idMeal ? "Saving..." : "Save Meal"}
-                        </button>
-                      </div>
+                    <div className="flex gap-3">
+                      <button
+                        onClick={() => setSelectedMeal(meal)}
+                        className="flex-1 py-3 bg-gray-700 hover:bg-gray-600 text-white font-semibold rounded-xl transition-all"
+                      >
+                        View Recipe
+                      </button>
+                      
+                      <button
+                        onClick={() => handleSaveMeal(meal)}
+                        disabled={savingMealId === meal.idMeal}
+                        className="flex-1 py-3 bg-lime-400 hover:bg-lime-500 disabled:opacity-60 text-gray-900 font-semibold rounded-xl transition-all"
+                      >
+                        {savingMealId === meal.idMeal ? "Saving..." : "Save Meal"}
+                      </button>
                     </div>
-                  ))}
-                  
-{selectedProgram.meals.length < 4 && (
-  <button
-    onClick={() => {
-      // 🔴 VÉRIFIER SI LE PLAN EST ACTIF AVANT D'AUTORISER L'AJOUT
-      if (!isCurrentPlanActive) {
-        alert('⚠️ This plan has ended. You cannot add new meals.');
-        return;
-      }
-      
-      // Si actif, continuer avec votre logique normale
-      setAddingMealToDay({
-        dayOfWeek: currentDay,
-        existingMealTypes: selectedProgram.meals.map(m => m.mealType.toUpperCase())
-      });
-    }}
-    disabled={!isCurrentPlanActive}
-    className={`w-full py-4 rounded-2xl transition-all flex items-center justify-center gap-2 ${
-      isCurrentPlanActive 
-        ? "bg-gray-800/50 hover:bg-lime-400/10 border-2 border-dashed border-gray-600 hover:border-lime-400 text-gray-400 hover:text-lime-400"
-        : "bg-gray-800/30 border-2 border-dashed border-gray-700 text-gray-500 cursor-not-allowed"
-    } group`}
-  >
-    <Plus className={`w-5 h-5 ${isCurrentPlanActive ? 'group-hover:scale-110 transition-transform' : ''}`} />
-    <span className="font-semibold">
-      {isCurrentPlanActive 
-        ? `Add Another Meal (${selectedProgram.meals.length}/4)`
-        : 'Plan Ended - Cannot Add Meals'
-      }
-    </span>
-  </button>
-)}
-                </div>
-              ) : (
-                <div className="bg-gray-800/50 backdrop-blur-md rounded-2xl p-12 text-center border border-gray-700 mb-6">
-    <div className="text-6xl mb-4">🍽️</div>
-    <h3 className="text-2xl font-bold text-white mb-2">No Meals for {currentDay}</h3>
-    <p className="text-gray-400 mb-6">
-      {isCurrentPlanActive 
-        ? "Add your first meal to this day"
-        : "This plan has ended. View meals only"
-      }
-    </p>
-    
-    <button 
-      onClick={() => {
-        if (!isCurrentPlanActive) {
-          alert('⚠️ This plan has ended. You cannot add new meals.');
-          return;
-        }
-        setAddingMealToDay({
-          dayOfWeek: currentDay,
-          existingMealTypes: []
-        });
-      }}
-      disabled={!isCurrentPlanActive}
-      className={`px-6 py-3 font-semibold rounded-full transition-all flex items-center gap-2 mx-auto ${
-        isCurrentPlanActive
-          ? "bg-lime-400 hover:bg-lime-500 text-gray-900"
-          : "bg-gray-700 text-gray-400 cursor-not-allowed"
-      }`}
-    >
-      <Plus className="w-5 h-5" />
-      {isCurrentPlanActive ? "Add First Meal" : "Plan Ended"}
-    </button>
-  </div>
-)}
+                  </div>
+                ))}
+                
+                {selectedProgram.meals.length < 4 && (
+                  <button
+                    onClick={() => setAddingMealToDay({
+                      dayOfWeek: currentDay,
+                      existingMealTypes: selectedProgram.meals.map(m => m.mealType.toUpperCase())
+                    })}
+                    className="w-full py-4 bg-gray-800/50 hover:bg-lime-400/10 border-2 border-dashed border-gray-600 hover:border-lime-400 rounded-2xl transition-all flex items-center justify-center gap-2 text-gray-400 hover:text-lime-400 group"
+                  >
+                    <Plus className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                    <span className="font-semibold">Add Another Meal ({selectedProgram.meals.length}/4)</span>
+                  </button>
+                )}
+              </div>
+            ) : (
+              <div className="bg-gray-800/50 backdrop-blur-md rounded-2xl p-12 text-center border border-gray-700 mb-6">
+                <div className="text-6xl mb-4">🍽️</div>
+                <h3 className="text-2xl font-bold text-white mb-2">No Meals for {currentDay}</h3>
+                <p className="text-gray-400 mb-6">Add your first meal to this day</p>
+                <button 
+                  onClick={() => setAddingMealToDay({
+                    dayOfWeek: currentDay,
+                    existingMealTypes: []
+                  })}
+                  className="px-6 py-3 bg-lime-400 hover:bg-lime-500 text-gray-900 font-semibold rounded-full transition-all flex items-center gap-2 mx-auto"
+                >
+                  <Plus className="w-5 h-5" />
+                  Add First Meal
+                </button>
+              </div>
+            )}
 
               {/* Daily Summary */}
               <div className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl p-6 shadow-xl border-2 border-lime-400/30">

@@ -5,9 +5,13 @@ import MealDetailModal from "./MealDetail.jsx";
 import { useNutrition } from "../store/NutritionContext.jsx";
 import Sidebar from "@/layout/Sidebar";
 
-export default function NutritionCatalog({ userId, limit = 4 }) {
-  // 🔥 État local pour gérer le chargement
-  const [isInitialLoading, setIsInitialLoading] = useState(true);
+export default function NutritionCatalog({ userId , limit = 4 }) {
+  if (!userId) return null; 
+  const { 
+    loadRecommendations, 
+    loadMealDetails, 
+    loading 
+  } = useNutrition();
   const [meals, setMeals] = useState([]);
   const [error, setError] = useState("");
   const [selectedMeal, setSelectedMeal] = useState(null);
@@ -78,21 +82,17 @@ export default function NutritionCatalog({ userId, limit = 4 }) {
 
   return (
     <div className="flex min-h-screen bg-gradient-to-br from-[#0B0B12] via-[#1a1625] to-[#0f0f1a]">
-      <Sidebar 
-        active="nutrition"
-        onLogout={() => {
-          localStorage.removeItem("token");
-          window.location.href = '/';
-        }}
-      />
-      
-      {/* Main Content */}
+      {/* 🎨 Sidebar */}
+      <Sidebar active="nutrition"/>
+
+      {/* 🎨 Main Content */}
       <div className="flex-1 flex flex-col">
         {/* Header avec Navigation */}
         <div className="border-b border-gray-800 bg-gray-900/80 backdrop-blur-xl sticky top-0 z-10">
           <div className="max-w-7xl mx-auto px-8 py-6">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
+  
                 <div>
                   <h1 className="text-4xl font-bold text-white">NUTRITION CATALOG</h1>
                   <p className="text-gray-500 text-sm">Personalized Meal Recommendations</p>
@@ -115,8 +115,9 @@ export default function NutritionCatalog({ userId, limit = 4 }) {
         {/* Content Area */}
         <div className="flex-1 overflow-auto">
           <div className="max-w-7xl mx-auto px-8 py-12">
-            {/* Loading State - Montré seulement pendant le chargement initial */}
-            {isInitialLoading ? (
+
+            {/* Loading State */}
+            {isLoadingRecommendations && (
               <div className="flex flex-col items-center justify-center py-32">
                 <div className="relative">
                   <div className="w-20 h-20 border-4 border-gray-800 border-t-lime-400 rounded-full animate-spin"></div>

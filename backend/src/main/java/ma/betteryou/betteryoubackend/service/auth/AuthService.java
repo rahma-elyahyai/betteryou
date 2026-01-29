@@ -18,17 +18,15 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-
 @Service
 @RequiredArgsConstructor
 public class AuthService {
-    //La logique métier de l’authentification
+    // La logique métier de l’authentification
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
@@ -37,22 +35,19 @@ public class AuthService {
     private final PasswordResetTokenRepository passwordResetTokenRepository;
     private final EmailService emailService;
 
-    @Value("${app.frontend.reset-url}") //depuis application.yaml
+    @Value("${app.frontend.reset-url}") // depuis application.yaml
     private String resetUrl;
-
-
 
     public AuthResponse login(LoginRequest req) {
         authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(req.getEmail(), req.getPassword())
-        );
+                new UsernamePasswordAuthenticationToken(req.getEmail(), req.getPassword()));
         String token = jwtService.generateToken(req.getEmail());
         return new AuthResponse(token);
     }
 
     public AuthResponse register(RegisterRequest req) {
         if (userRepository.existsByEmail(req.getEmail())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Email already used");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email already used");
         }
 
         User user = User.builder()
@@ -91,71 +86,70 @@ public class AuthService {
                 .build();
     }
 
-
     @Transactional
     public void forgotPassword(ForgotPasswordRequest req) {
-    var userOpt = userRepository.findByEmail(req.getEmail());
+        var userOpt = userRepository.findByEmail(req.getEmail());
 
-    // sécurité : on renvoie "OK" même si email n'existe pas
-    if (userOpt.isEmpty()) return;
+        // sécurité : on renvoie "OK" même si email n'existe pas
+        if (userOpt.isEmpty())
+            return;
 
-    var user = userOpt.get();
+        var user = userOpt.get();
 
-    // optionnel : supprimer anciens tokens pour ce user
-    passwordResetTokenRepository.deleteByUser_IdUser(user.getIdUser());
+        // optionnel : supprimer anciens tokens pour ce user
+        passwordResetTokenRepository.deleteByUser_IdUser(user.getIdUser());
 
-    String rawtoken = UUID.randomUUID().toString();//generation token temporaire
-    String token = sha256(rawtoken); //hashage token pour securite
+        String rawtoken = UUID.randomUUID().toString();// generation token temporaire
+        String token = sha256(rawtoken); // hashage token pour securite
 
-    PasswordResetToken prt = PasswordResetToken.builder()
-            .token(token)//stocker le token hashé
-            .user(user)
-            .expiresAt(LocalDateTime.now().plusMinutes(15))
-            .used(false)
-            .build();
+        PasswordResetToken prt = PasswordResetToken.builder()
+                .token(token)// stocker le token hashé
+                .user(user)
+                .expiresAt(LocalDateTime.now().plusMinutes(15))
+                .used(false)
+                .build();
 
-    passwordResetTokenRepository.save(prt);
+        passwordResetTokenRepository.save(prt);
 
-    // Lien frontend (à adapter selon votre app)
-    String resetLink = resetUrl + "?token=" + rawtoken;
-    emailService.sendResetLink(user.getEmail(), resetLink);
+        // Lien frontend (à adapter selon votre app)
+        String resetLink = resetUrl + "?token=" + rawtoken;
+        emailService.sendResetLink(user.getEmail(), resetLink);
 
-}
-
-public void resetPassword(ResetPasswordRequest req) {
-    String tokenHash = sha256(req.getToken());
-
-    PasswordResetToken prt = passwordResetTokenRepository.findByToken(tokenHash)
-        .orElseThrow(() -> new IllegalArgumentException("Invalid token"));
-
-
-    if (prt.isUsed()) {
-        throw new IllegalArgumentException("Token already used");
     }
 
-    if (prt.getExpiresAt().isBefore(LocalDateTime.now())) {
-        throw new IllegalArgumentException("Token expired");
+    public void resetPassword(ResetPasswordRequest req) {
+        String tokenHash = sha256(req.getToken());
+
+        PasswordResetToken prt = passwordResetTokenRepository.findByToken(tokenHash)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid token"));
+
+        if (prt.isUsed()) {
+            throw new IllegalArgumentException("Token already used");
+        }
+
+        if (prt.getExpiresAt().isBefore(LocalDateTime.now())) {
+            throw new IllegalArgumentException("Token expired");
+        }
+
+        var user = prt.getUser();
+        user.setPassword(passwordEncoder.encode(req.getNewPassword()));
+        userRepository.save(user);
+
+        prt.setUsed(true);
+        passwordResetTokenRepository.save(prt);
     }
 
-    var user = prt.getUser();
-    user.setPassword(passwordEncoder.encode(req.getNewPassword()));
-    userRepository.save(user);
-
-    prt.setUsed(true);
-    passwordResetTokenRepository.save(prt);
-}
-
-private String sha256(String input) {
-    try {
-        MessageDigest md = MessageDigest.getInstance("SHA-256");
-        byte[] hash = md.digest(input.getBytes(StandardCharsets.UTF_8));
-        StringBuilder sb = new StringBuilder();
-        for (byte b : hash) sb.append(String.format("%02x", b));
-        return sb.toString();
-    } catch (NoSuchAlgorithmException e) {
-        throw new IllegalStateException("SHA-256 not available", e);
+    private String sha256(String input) {
+        try {
+            MessageDigest md = MessageDigest.getInstance("SHA-256");
+            byte[] hash = md.digest(input.getBytes(StandardCharsets.UTF_8));
+            StringBuilder sb = new StringBuilder();
+            for (byte b : hash)
+                sb.append(String.format("%02x", b));
+            return sb.toString();
+        } catch (NoSuchAlgorithmException e) {
+            throw new IllegalStateException("SHA-256 not available", e);
+        }
     }
-}
-
 
 }

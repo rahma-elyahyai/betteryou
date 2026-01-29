@@ -94,21 +94,17 @@ const handleAddMeal = async (meal) => {
     const key = `${selectedDay}-${selectedSlot}`;
     setPlanMeals(prev => ({ ...prev, [key]: meal }));
 
-    setShowMealLibrary(false);
-  } catch (e) {
-    setError("Failed to add meal.");
-if (error.response?.data?.message?.includes("cannot modify a completed plan")) {
-  alert("⚠️ This plan has ended. You can no longer modify it.");
-} else {
-  alert("Error: " + error.message);
-}
-    // reload
-    const weekMeals = await loadPlanMealsForWeek(userId, planId, true);
-    setPlanMeals(weekMeals || {});
-  } finally {
-    setAdding(false);
-  }
-};
+      setShowMealLibrary(false);
+      setSearchQuery('');
+      setFilterGoal('ALL');
+      setFilterMealType('ALL');
+    } catch (error) {
+      console.error('Error adding meal:', error);
+      setError('Failed to add meal. Please try again.');
+    } finally {
+      setAdding(false);
+    }
+  };
 
 const handleRemoveMeal = async (day, slot) => {
   const meal = getMealForSlot(day, slot);

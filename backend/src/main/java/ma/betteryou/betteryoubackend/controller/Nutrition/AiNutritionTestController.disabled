@@ -1,0 +1,18 @@
+package ma.betteryou.betteryoubackend.controller.nutrition;
+
+import lombok.RequiredArgsConstructor;
+import ma.betteryou.betteryoubackend.service.ai.nutrition.AiNutritionService;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@RequiredArgsConstructor
+public class AiNutritionTestController {
+
+    private final AiNutritionService aiNutritionService;
+
+    @GetMapping("/api/nutrition/ai/test")
+    public String testAi() {
+        return aiNutritionService.testJson();
+    }
+}

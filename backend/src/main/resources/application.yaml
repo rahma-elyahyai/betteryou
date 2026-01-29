@@ -36,9 +36,16 @@ spring:
 
   mvc:
     cors:
-      allowed-origins: "http://localhost:5174"
+      allowed-origins: "http://localhost:5173,http://localhost:5174"
       allowed-methods: "*"
       allowed-headers: "*"
+
+ai:
+  provider: openai
+  openai:
+    base-url: https://api.openai.com/v1
+    model: ${OPENAI_MODEL:gpt-4o-mini}
+    timeout-seconds: 90
 
 app:
   jwt:
