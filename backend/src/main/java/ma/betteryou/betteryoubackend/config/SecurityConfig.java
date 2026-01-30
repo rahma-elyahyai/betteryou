@@ -68,6 +68,8 @@ static {
                         .requestMatchers("/api/program-wizard/exercises/**").permitAll()
                         .requestMatchers("/api/programs/**").permitAll()
                         .requestMatchers("/api/sessions/**").permitAll()
+                        .requestMatchers("/api/ai/programs/**").permitAll()
+                        .requestMatchers("/api/ai/programs/generate-week").permitAll()
                         .anyRequest().authenticated()
                 )
 
