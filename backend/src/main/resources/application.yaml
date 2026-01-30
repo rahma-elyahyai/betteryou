@@ -18,7 +18,7 @@ spring:
             enable: true
 
   datasource:
-    url: jdbc:postgresql://ep-crimson-queen-ab7d5yoc-pooler.eu-west-2.aws.neon.tech/betteryou_db?user=neondb_owner&password=npg_yzkwA5gZb7BT&sslmode=require&channelBinding=require
+    url: ${DATABASE_URL}
     driver-class-name: org.postgresql.Driver
 
   jpa:
