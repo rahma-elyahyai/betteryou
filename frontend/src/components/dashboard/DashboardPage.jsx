@@ -53,7 +53,7 @@ export default function DashboardPage() {
       <div className="min-h-screen w-full app-bg flex items-center justify-center p-6">
         <div className="max-w-xl w-full bg-red-500/10 border border-red-500/30 rounded-2xl p-6 text-center">
           <div className="text-red-300 font-semibold text-lg mb-2">
-            Dashboard Error
+            Dashboard Error , il y a un probleme
           </div>
           <div className="text-red-200 text-sm break-words">
             {error || "No data"}
