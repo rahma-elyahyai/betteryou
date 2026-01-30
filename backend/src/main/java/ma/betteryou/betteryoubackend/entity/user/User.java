@@ -1,10 +1,15 @@
 package ma.betteryou.betteryoubackend.entity.user;
 
-import jakarta.persistence.*;
-import lombok.*;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.math.BigDecimal;
+
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import ma.betteryou.betteryoubackend.entity.enums.ActivityLevel;
 import ma.betteryou.betteryoubackend.entity.enums.FitnessLevel;
@@ -13,7 +18,7 @@ import ma.betteryou.betteryoubackend.entity.enums.Goal;
 import ma.betteryou.betteryoubackend.entity.enums.FoodPreferences;
 
 @Entity
-@Table(name = "users") 
+@Table(name = "users")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -41,9 +46,9 @@ public class User {
     @Column(name = "birth_date")
     private LocalDate birthDate;
 
-        @Enumerated(EnumType.STRING)
+    @Enumerated(EnumType.STRING)
     @Column(name = "gender", length = 10)
-    private Gender gender;
+    private Gender gender;       // 'MALE' / 'FEMALE'
 
     @Column(name = "height_cm")
     private Integer heightCm;

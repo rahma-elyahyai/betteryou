@@ -5,6 +5,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { NutritionProvider } from "./features/Nutrition/store/NutritionContext";
 
 // Pages publiques
+// Pages publiques
 import LandingPage from "./pages/LandingPage.jsx";
 import Login from "./components/auth/Login.jsx";
 import RegisterWizard from "./components/auth/RegisterWizard.jsx";
@@ -22,10 +23,8 @@ import AddMeals from "./features/Nutrition/components/AddMeals";
 
 // Guard
 import ProtectedRoute from "./components/auth/ProtectedRoute.jsx";
-
-import NotFound from "./pages/NotFound.jsx";
-import Unauthorized from "./pages/Unauthorized.jsx";
-
+//import NutritionAiWizard from "@/pages/NutritionAiWizard.jsx";
+import TrainingLayout from "./components/Workout/TrainingLayout.jsx"; 
 function App() {
   return (
     <BrowserRouter>
@@ -39,6 +38,9 @@ function App() {
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password" element={<ResetPassword />} />
 
+          {/* ✅ NUTRITION AI ACCESSIBLE SANS LOGIN */}
+          
+
           {/* 🔐 TOUT CE QUI EST ICI EST PROTÉGÉ */}
           <Route element={<ProtectedRoute />}>
             <Route path="/dashboard" element={<Dashboard />} />
@@ -51,11 +53,13 @@ function App() {
               path="/nutrition-plans/:planId/add-meals"
               element={<AddMeals />}
             />
+            {/* 🔥 Workout Layout */}
+            <Route path="/workout/*" element={<TrainingLayout />} />
+
           </Route>
 
           {/* 404 */}
-          <Route path="*" element={<NotFound />} />
-          <Route path="/unauthorized" element={<Unauthorized />} />
+          <Route path="*" element={<div>404 Not Found</div>} />
         </Routes>
       </NutritionProvider>
     </BrowserRouter>

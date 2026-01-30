@@ -1,40 +1,70 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+:root {
+  --purple-dark: #24113a;
+  --purple-sidebar: #2d0b45;
+  --card-bg: #3a3e52;
+  --card-bg-dark: #252736;
+  --accent-yellow: #f1ff26;
+  --text-main: #ffffff;
+  --text-muted: #c7c7d2;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: "Roboto", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+body {
+  background-color: #000;
+}
+
+.app-root,
+.main-content {
+  width: 100%;
+  max-width: none;
+}
+
+
+/* SIDEBAR */
+
+.sidebar {
+  width: 220px;
+  background-color: var(--purple-sidebar);
+  display: flex;
+  flex-direction: column;
+  padding: 20px 15px;
+  justify-content: space-between;
 }
 
 .logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+  color: var(--accent-yellow);
+  font-weight: 700;
+  font-size: 1.4rem;
+  margin-bottom: 30px;
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.sidebar-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
+.menu-item {
+  border: none;
+  background-color: transparent;
+  color: var(--text-muted);
+  text-align: left;
+  padding: 10px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.95rem;
 }
 
-.card {
-  padding: 2em;
+.menu-item.active,
+.menu-item:hover {
+  background-color: #3b255a;
+  color: var(--text-main);
 }
 
 .read-the-docs {

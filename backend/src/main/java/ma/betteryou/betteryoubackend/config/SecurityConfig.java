@@ -49,6 +49,13 @@ public class SecurityConfig {
 .authorizeHttpRequests(auth -> auth
     .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()   // ✅ AJOUTE ÇA
     .requestMatchers("/api/auth/**").permitAll()
+    .requestMatchers("/api/workouts/**").permitAll()
+    .requestMatchers("/api/program-wizard/metadata").permitAll()
+    .requestMatchers("/api/program-wizard/exercises/**").permitAll()
+    .requestMatchers("/api/programs/**").permitAll()
+    .requestMatchers("/api/sessions/**").permitAll()
+    .requestMatchers("/api/ai/programs/**").permitAll()
+    .requestMatchers("/api/ai/programs/generate-week").permitAll()
     .anyRequest().authenticated()
 )
 
