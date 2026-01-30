@@ -1,0 +1,95 @@
+[33m9ab2793[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/maintest[m[33m, [m[1;32mmaintest[m[33m)[m test de clé
+[33md16de00[m test de clé
+[33m3b81da4[m[33m ([m[1;31morigin/LastChanges_soukaina[m[33m)[m merge dev-Rahma
+[33m583fe8e[m final merging manar
+[33m128a245[m[33m ([m[1;31morigin/dev-rahma[m[33m, [m[1;32mdev-rahma[m[33m)[m modif final
+[33mc45abe6[m Merge branch 'feature/NutritionPlanAi-manar' resolving conflicts intelligently
+[33m7d935a4[m shjskk
+[33m0ca1fed[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m  améliorer les performances nutrition
+[33mc454edb[m add notfound + améliorer les performances nutrition
+[33m41a8ff7[m correction path
+[33mefcad87[m[33m ([m[1;31morigin/feature/NutritionPlanAi-manar[m[33m)[m complete plan nutrition with ai task
+[33mce08a86[m chore: stop tracking .env
+[33m9a918cb[m ia valide (remove secrets)
+[33mc2fcd65[m ia valide
+[33mafd9e52[m ia valide
+[33m7936344[m ia valide
+[33m2080f62[m ia valide
+[33m5b53fcc[m[33m ([m[1;31morigin/NutritionFix[m[33m)[m corrections
+[33m40af848[m resolve resetpass bug and add responsive design
+[33m34734ad[m some corrections
+[33m7ec8096[m Test CI/CD with Render deploy
+[33m854a177[m modifs
+[33mb28cc4b[m modifs
+[33m97da00e[m gestion des variables d'environnement et deploiment
+[33m273e225[m desing
+[33m17e1ea4[m Fix dashboardApi
+[33m744979c[m Fix auth tests and null authentication handling
+[33mf70623a[m Fix CORS preflight OPTIONS
+[33m5665fca[m Fix: nginx proxy
+[33mf7580b8[m Fix: nginx SPA fallback for React routes
+[33mcc313f6[m Fix VITE API baseURL et mise en place de deploiment auto et correction docker compose
+[33ma6b953c[m Test: sidebar fixes and build corrections
+[33md65ab49[m Merge pull request #4 from rahma-elyahyai/test-branch
+[33ma7b2d4b[m conflit resolu
+[33m6300738[m merge main into test-branch
+[33mafab295[m jdjjd
+[33m1ca53e7[m les derniers changements dans les tests
+[33m6a000a3[m Merge pull request #3 from rahma-elyahyai/resetPass
+[33m4536b4c[m[33m ([m[1;31morigin/resetPass[m[33m)[m correct NutritionPlanImp
+[33mdc44c3d[m correct NutritionPlanImp
+[33m1f997ce[m correct NutritionPlanImp
+[33m7ae4d8d[m add reset and forgot pass + modern side bar + AuthContext
+[33m5d7dae6[m Merge pull request #2 from rahma-elyahyai/integration/nutrition-dashboard-profile
+[33m9f20722[m[33m ([m[1;31morigin/integration/nutrition-dashboard-profile[m[33m)[m Update frontend package-lock.json
+[33m26e6128[m Remove root package files (frontend is the Node project)
+[33ma919a5d[m les tests
+[33m900b475[m model
+[33mf247661[m merge conflicts auth+nutrition+profil+dash
+[33m5b6bfd1[m add dash
+[33m5542db2[m jeudi push
+[33m2d0cc54[m ++++++
+[33macc5513[m resolve merge conflicts and api config
+[33me617069[m merge conflicts config application.yaml postcss tailwind.config
+[33m90f09ce[m Add root .gitignore (node_modules, dist, IDE files)
+[33m229b069[m merge nutrition feature
+[33mccad9e3[m  resolve conflicts merge loadingPage+auth+profile
+[33m8dc583f[m[33m ([m[1;31morigin/merge-manar[m[33m)[m  laoding page + auth + Profile
+[33m1d772e6[m[33m ([m[1;31morigin/Nutrition_feature_by_Sara[m[33m)[m modification des assets
+[33m464a6ae[m Nutrition components added
+[33m3ff36bd[m[33m ([m[1;31morigin/soukaina_ChatAi[m[33m)[m AI non complet
+[33mb58a488[m dashbaord done
+[33m76bd075[m[33m ([m[1;31morigin/feature/profile-page-manar[m[33m)[m adding profile feature
+[33mbdac398[m Fix Spring Boot main class and skip tests for build
+[33m4f099aa[m CI/CD Docker Hub setup
+[33m87ec6aa[m CI/CD Docker Hub setup
+[33me8045dc[m CI/CD Docker Hub setup
+[33m4a430db[m CI/CD Docker Hub setup
+[33mc0263e2[m correction de script
+[33mb33c748[m correction de script
+[33mb9911f8[m Remove deprecated UserProfile feature and duplicate application file
+[33mec9fb11[m Remove deprecated UserProfile feature and duplicate application file
+[33m77f212d[m adding some dependencies
+[33m7ab1fa3[m adding some dependencies
+[33me972ba8[m Configure Neon DB, update schema and backend package
+[33mbd5400f[m Configure Neon DB, update schema and backend package
+[33mf0c27e2[m Update config, schema and package-lock
+[33m326dfd1[m Update config, schema and package-lock
+[33md2feaeb[m feat: add JPA entities for BetterYou
+[33mc5aef43[m feat: add JPA entities for BetterYou
+[33m556e26e[m Add database schema (PostgreSQL) - 12 tables created
+[33m8da7205[m Add database schema (PostgreSQL) - 12 tables created
+[33m06ac33f[m postgre
+[33m9099c7d[m postgre
+[33m9040ac6[m fix backend mvnw permissions in C.I
+[33m400343e[m fix backend mvnw permissions in C.I
+[33maf128e6[m fix backend mvnw permissions in C.I
+[33m6f5ba61[m fix backend mvnw permissions in C.I
+[33m86ecd6a[m fix backend mvnw permissions in CI
+[33m05d843d[m fix backend mvnw permissions in CI
+[33md9b0064[m fix backend mvnw permissions in CI
+[33m7344603[m fix backend mvnw permissions in CI
+[33m8d6e3ba[m initial push
+[33m8e94c0e[m initial push
+[33m079dbd7[m Initial commit
+[33mcd1c297[m[33m ([m[1;31morigin/betteryou-frontend[m[33m, [m[1;31morigin/betteryou-devops[m[33m, [m[1;31morigin/betteryou-backend[m[33m)[m Initial commit
