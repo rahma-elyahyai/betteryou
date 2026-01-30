@@ -35,4 +35,5 @@ public class FoodItem {
 
     @Column(name = "fats_per_100g", precision = 6, scale = 2)
     private BigDecimal fatsPer100g;
+
 }

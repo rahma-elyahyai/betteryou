@@ -2,8 +2,8 @@ import axios from "axios";
 
 
 export const api = axios.create({
-  baseURL: "", // même origine => http://92.5.238.53:3000
-  timeout: 15000,
+  baseURL: import.meta.env.VITE_API_URL, // même origine => http://92.5.238.53:3000
+  timeout: 1500000,
 });
 
 // ✅ Interceptor → ajoute le token automatiquement
