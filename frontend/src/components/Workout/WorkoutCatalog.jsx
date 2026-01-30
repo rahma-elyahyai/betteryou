@@ -6,6 +6,7 @@ import CreateProgramWizard from "./CreateProgramWizard";
 import GenerateProgramModal from "./GenerateProgramModal";
 import { generateWeekProgramAI } from "../../api/Workout/aiProgramApi";
 import Sidebar from "@/Layout/Sidebar";
+import { getCurrentUserId } from "@/utils/authUtils.js";
 
 const WorkoutCatalog = ({ onGoPrograms }) => {
   const [workouts, setWorkouts] = useState([]);
@@ -54,7 +55,8 @@ const WorkoutCatalog = ({ onGoPrograms }) => {
         timestamp: new Date().toISOString()
       });
 
-      const userId = 1;
+      const userId = await getCurrentUserId(); // 🔥 depuis /api/auth/me
+      console.log("User ID:", userId);
 
       console.log("➡️ Calling POST /api/ai/programs/generate-week with:", {
         userId,
