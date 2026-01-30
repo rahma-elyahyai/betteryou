@@ -1,5 +1,5 @@
 // src/App.jsx
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import { NutritionProvider } from "./features/Nutrition/store/NutritionContext";
@@ -25,7 +25,13 @@ import AddMeals from "./features/Nutrition/components/AddMeals";
 import ProtectedRoute from "./components/auth/ProtectedRoute.jsx";
 //import NutritionAiWizard from "@/pages/NutritionAiWizard.jsx";
 import TrainingLayout from "./components/Workout/TrainingLayout.jsx"; 
+
+
+import ChatbotGate  from "@/components/chatboot/ChatbotGate";
+
+
 function App() {
+
   return (
     <BrowserRouter>
       <NutritionProvider>
@@ -61,6 +67,9 @@ function App() {
           {/* 404 */}
           <Route path="*" element={<div>404 Not Found</div>} />
         </Routes>
+
+        <ChatbotGate />
+
       </NutritionProvider>
     </BrowserRouter>
   );

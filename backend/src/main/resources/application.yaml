@@ -22,9 +22,7 @@ spring:
     url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/betteryou}
     driver-class-name: org.postgresql.Driver
 
-  openai:
-    api-key: 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
-    model: gpt-4o-mini
+
   jpa:
     hibernate:
       ddl-auto: validate
@@ -59,3 +57,4 @@ logging:
   level:
     org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping: DEBUG
     org.springframework.web.servlet.DispatcherServlet: DEBUG
+
