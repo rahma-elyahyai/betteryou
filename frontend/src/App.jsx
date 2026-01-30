@@ -24,7 +24,7 @@ import AddMeals from "./features/Nutrition/components/AddMeals";
 // Guard
 import ProtectedRoute from "./components/auth/ProtectedRoute.jsx";
 import NutritionAiWizard from "@/pages/NutritionAiWizard.jsx";
-
+import TrainingLayout from "./components/Workout/TrainingLayout.jsx"; 
 function App() {
   return (
     <BrowserRouter>
@@ -53,6 +53,9 @@ function App() {
               path="/nutrition-plans/:planId/add-meals"
               element={<AddMeals />}
             />
+            {/* 🔥 Workout Layout */}
+            <Route path="/workout/*" element={<TrainingLayout />} />
+
           </Route>
 
           {/* 404 */}

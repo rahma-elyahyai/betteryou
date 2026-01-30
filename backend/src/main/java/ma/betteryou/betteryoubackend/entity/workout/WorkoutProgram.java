@@ -10,6 +10,7 @@ import ma.betteryou.betteryoubackend.entity.enums.Goal;
 import ma.betteryou.betteryoubackend.entity.enums.ProgramStatus;
 
 import ma.betteryou.betteryoubackend.entity.user.User;
+import java.util.List;
 
 @Entity
 @Table(name = "workout_program")
@@ -53,4 +54,7 @@ public class WorkoutProgram {
     @ManyToOne(fetch = FetchType.LAZY)  // Ne charge pas automatiquement l’objet User quand tu charges le programme.uniquement si on l’appelle (workoutProgram.getUser())
     @JoinColumn(name = "id_user", nullable = false) // configure la colonne de clé étrangère dans la table workout_program.
     private User user;
+    @OneToMany(mappedBy = "workoutProgram", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<WorkoutSession> sessions;
+
 }

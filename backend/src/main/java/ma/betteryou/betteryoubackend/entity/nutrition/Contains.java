@@ -3,6 +3,7 @@ package ma.betteryou.betteryoubackend.entity.nutrition;
 import jakarta.persistence.*;
 import lombok.*;
 import java.math.BigDecimal;
+import java.io.Serializable;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;

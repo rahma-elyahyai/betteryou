@@ -63,6 +63,11 @@ static {
                 // Routes publiques / protégées
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/api/workouts/**").permitAll()
+                        .requestMatchers("/api/program-wizard/metadata").permitAll()
+                        .requestMatchers("/api/program-wizard/exercises/**").permitAll()
+                        .requestMatchers("/api/programs/**").permitAll()
+                        .requestMatchers("/api/sessions/**").permitAll()
                         .anyRequest().authenticated()
                 )
 
@@ -97,4 +102,5 @@ static {
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
     }
+    
 }
