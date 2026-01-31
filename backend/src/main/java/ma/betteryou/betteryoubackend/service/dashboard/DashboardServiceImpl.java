@@ -178,121 +178,135 @@ public class DashboardServiceImpl implements DashboardService {
      * Burned   : somme par jour (durationMinutes * 7)
      */
     private List<DashboardResponse.DayCaloriesDto> buildWeeklyCalories(
-            long userId,
-            NutritionPlan nutritionPlan,
-            LocalDate start,
-            LocalDate end
-    ) {
-        // burned
-        List<WorkoutSession> sessions =
-                workoutSessionRepository.findSessionsForUserBetween(userId, start, end);
+        long userId,
+        NutritionPlan nutritionPlan,
+        LocalDate start,
+        LocalDate end
+) {
+    // burned
+    List<WorkoutSession> sessions =
+            workoutSessionRepository.findSessionsForUserBetween(userId, start, end);
 
-        Map<LocalDate, Integer> burnedPerDay = new HashMap<>();
-        for (WorkoutSession ws : sessions) {
-            if (ws.getDurationMinutes() == null || ws.getSessionDate() == null) continue;
-            int burned = ws.getDurationMinutes() * 7;
-            burnedPerDay.merge(ws.getSessionDate(), burned, Integer::sum);
-        }
-
-        // consumed
-        List<MealConsumption> consumptions =
-                mealConsumptionRepository.findByUser_IdUserAndConsumptionDateBetween(userId, start, end);
-
-        Map<LocalDate, Integer> consumedPerDay = new HashMap<>();
-        for (MealConsumption mc : consumptions) {
-            if (mc.getConsumptionDate() == null) continue;
-
-            int servings = (mc.getServings() == null || mc.getServings() <= 0) ? 1 : mc.getServings();
-            int mealCalories = computeMealCalories(mc.getMeal());
-            int total = mealCalories * servings;
-
-            consumedPerDay.merge(mc.getConsumptionDate(), total, Integer::sum);
-        }
-        
-        System.out.println("DEBUG consumedPerDay = " + consumedPerDay);
-        // résultat final
-        List<DashboardResponse.DayCaloriesDto> result = new ArrayList<>();
-        LocalDate d = start;
-        while (!d.isAfter(end)) {
-            result.add(
-                    DashboardResponse.DayCaloriesDto.builder()
-                            .dayLabel(d.getDayOfWeek().name())
-                            .consumed(consumedPerDay.getOrDefault(d, 0))
-                            .burned(burnedPerDay.getOrDefault(d, 0))
-                            .build()
-            );
-            d = d.plusDays(1);
-        }
-
-        return result;
+    Map<LocalDate, Integer> burnedPerDay = new HashMap<>();
+    for (WorkoutSession ws : sessions) {
+        if (ws.getDurationMinutes() == null || ws.getSessionDate() == null) continue;
+        int burned = ws.getDurationMinutes() * 7;
+        burnedPerDay.merge(ws.getSessionDate(), burned, Integer::sum);
     }
+
+    // 🔹 CHANGEZ CETTE LIGNE
+    List<MealConsumption> consumptions =
+            mealConsumptionRepository.findByUserWithDetailsAndConsumptionDateBetween(userId, start, end);
+
+    Map<LocalDate, Integer> consumedPerDay = new HashMap<>();
+    for (MealConsumption mc : consumptions) {
+        if (mc.getConsumptionDate() == null) continue;
+
+        int servings = (mc.getServings() == null || mc.getServings() <= 0) ? 1 : mc.getServings();
+        int mealCalories = computeMealCalories(mc.getMeal());
+        int total = mealCalories * servings;
+
+        consumedPerDay.merge(mc.getConsumptionDate(), total, Integer::sum);
+    }
+    
+    System.out.println("DEBUG consumedPerDay = " + consumedPerDay);
+    
+    // résultat final
+    List<DashboardResponse.DayCaloriesDto> result = new ArrayList<>();
+    LocalDate d = start;
+    while (!d.isAfter(end)) {
+        result.add(
+                DashboardResponse.DayCaloriesDto.builder()
+                        .dayLabel(d.getDayOfWeek().name())
+                        .consumed(consumedPerDay.getOrDefault(d, 0))
+                        .burned(burnedPerDay.getOrDefault(d, 0))
+                        .build()
+        );
+        d = d.plusDays(1);
+    }
+
+    return result;
+}
 
     // =====================================================================
     // 3) MACROS (placeholder)
     // =====================================================================
     private DashboardResponse.MacroDistributionDto buildMacroDistribution(
-        long userId,
-        LocalDate today
+    long userId,
+    LocalDate today
 ) {
-    // On prend uniquement les repas consommés aujourd’hui
-    List<MealConsumption> consumptions =
-            mealConsumptionRepository.findByUser_IdUserAndConsumptionDateBetween(userId, today, today);
+    try {
+        // On prend uniquement les repas consommés aujourd'hui
+        List<MealConsumption> consumptions =
+                mealConsumptionRepository.findByUser_IdUserAndConsumptionDateBetween(userId, today, today);
 
-    BigDecimal totalProteins = BigDecimal.ZERO; // en grammes
-    BigDecimal totalCarbs = BigDecimal.ZERO;    // en grammes
-    BigDecimal totalFats = BigDecimal.ZERO;     // en grammes
+        BigDecimal totalProteins = BigDecimal.ZERO;
+        BigDecimal totalCarbs = BigDecimal.ZERO;
+        BigDecimal totalFats = BigDecimal.ZERO;
 
-    for (MealConsumption mc : consumptions) {
-        if (mc == null || mc.getMeal() == null) continue;
-
-        int servings = (mc.getServings() == null || mc.getServings() <= 0) ? 1 : mc.getServings();
-
-        Meal meal = mc.getMeal();
-        if (meal.getContains() == null) continue;
-
-        for (Contains c : meal.getContains()) {
-            if (c == null || c.getFoodItem() == null) continue;
-            if (c.getQuantityGrams() == null) continue;
-
-            BigDecimal grams = c.getQuantityGrams(); // ex: 150g
-
-            // ⚠️ Adapte ces getters selon ton entity FoodItem
-            BigDecimal p100 = c.getFoodItem().getProteinsPer100g();
-            BigDecimal c100 = c.getFoodItem().getCarbsPer100g();
-            BigDecimal f100 = c.getFoodItem().getFatsPer100g();
-
-            // proteins
-            if (p100 != null) {
-                BigDecimal p = p100.multiply(grams)
-                        .divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP)
-                        .multiply(BigDecimal.valueOf(servings));
-                totalProteins = totalProteins.add(p);
+        for (MealConsumption mc : consumptions) {
+            if (mc == null || mc.getMeal() == null || mc.getMeal().getContains() == null) {
+                continue;
             }
 
-            // carbs
-            if (c100 != null) {
-                BigDecimal carbs = c100.multiply(grams)
-                        .divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP)
-                        .multiply(BigDecimal.valueOf(servings));
-                totalCarbs = totalCarbs.add(carbs);
-            }
+            int servings = (mc.getServings() == null || mc.getServings() <= 0) ? 1 : mc.getServings();
+            Meal meal = mc.getMeal();
 
-            // fats
-            if (f100 != null) {
-                BigDecimal fats = f100.multiply(grams)
-                        .divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP)
-                        .multiply(BigDecimal.valueOf(servings));
-                totalFats = totalFats.add(fats);
+            for (Contains c : meal.getContains()) {
+                if (c == null || c.getFoodItem() == null || c.getQuantityGrams() == null) {
+                    continue;
+                }
+
+                BigDecimal grams = c.getQuantityGrams();
+                
+                // Proteins
+                if (c.getFoodItem().getProteinsPer100g() != null) {
+                    BigDecimal p = c.getFoodItem().getProteinsPer100g()
+                            .multiply(grams)
+                            .divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP)
+                            .multiply(BigDecimal.valueOf(servings));
+                    totalProteins = totalProteins.add(p);
+                }
+
+                // Carbs
+                if (c.getFoodItem().getCarbsPer100g() != null) {
+                    BigDecimal carbs = c.getFoodItem().getCarbsPer100g()
+                            .multiply(grams)
+                            .divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP)
+                            .multiply(BigDecimal.valueOf(servings));
+                    totalCarbs = totalCarbs.add(carbs);
+                }
+
+                // Fats
+                if (c.getFoodItem().getFatsPer100g() != null) {
+                    BigDecimal fats = c.getFoodItem().getFatsPer100g()
+                            .multiply(grams)
+                            .divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP)
+                            .multiply(BigDecimal.valueOf(servings));
+                    totalFats = totalFats.add(fats);
+                }
             }
         }
-    }
 
-                return DashboardResponse.MacroDistributionDto.builder()
-                        .totalProteins(totalProteins)
-                        .totalCarbs(totalCarbs)
-                        .totalFats(totalFats)
-                        .build();
-                }
+        return DashboardResponse.MacroDistributionDto.builder()
+                .totalProteins(totalProteins)
+                .totalCarbs(totalCarbs)
+                .totalFats(totalFats)
+                .build();
+                
+    } catch (Exception e) {
+        // Log l'erreur pour debug
+        System.err.println("Error in buildMacroDistribution: " + e.getMessage());
+        e.printStackTrace();
+        
+        // Retourner des valeurs par défaut au lieu de crasher
+        return DashboardResponse.MacroDistributionDto.builder()
+                .totalProteins(BigDecimal.ZERO)
+                .totalCarbs(BigDecimal.ZERO)
+                .totalFats(BigDecimal.ZERO)
+                .build();
+    }
+}
 
 
     // =====================================================================
@@ -366,25 +380,42 @@ public class DashboardServiceImpl implements DashboardService {
     // 6) UPCOMING SESSIONS
     // =====================================================================
     private List<DashboardResponse.UpcomingSessionDto> buildUpcomingSessions(
-            long userId,
-            LocalDate today
-    ) {
+        long userId,
+        LocalDate today
+) {
+    try {
         List<WorkoutSession> sessions =
                 workoutSessionRepository.findUpcomingSessions(userId, today);
 
         List<DashboardResponse.UpcomingSessionDto> result = new ArrayList<>();
+        
         for (WorkoutSession ws : sessions) {
+            if (ws == null || ws.getSessionDate() == null || ws.getSessionType() == null) {
+                continue;
+            }
+            
+            String sessionTitle = "Workout Session"; // Valeur par défaut
+            if (ws.getWorkoutProgram() != null && ws.getWorkoutProgram().getProgramName() != null) {
+                sessionTitle = ws.getWorkoutProgram().getProgramName();
+            }
+
             result.add(
                     DashboardResponse.UpcomingSessionDto.builder()
                             .sessionId(ws.getIdSession())
-                            .sessionTitle(ws.getWorkoutProgram().getProgramName())
+                            .sessionTitle(sessionTitle)
                             .sessionType(ws.getSessionType().name())
                             .dayLabel(ws.getSessionDate().getDayOfWeek().name())
                             .date(ws.getSessionDate().toString())
-                            .durationMinutes(ws.getDurationMinutes())
+                            .durationMinutes(ws.getDurationMinutes() != null ? ws.getDurationMinutes() : 0)
                             .build()
             );
         }
         return result;
+        
+    } catch (Exception e) {
+        System.err.println("Error in buildUpcomingSessions: " + e.getMessage());
+        e.printStackTrace();
+        return new ArrayList<>();
     }
+}
 }
