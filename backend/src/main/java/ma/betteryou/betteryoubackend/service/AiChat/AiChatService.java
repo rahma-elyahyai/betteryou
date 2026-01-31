@@ -1,6 +1,8 @@
 package ma.betteryou.betteryoubackend.service.AiChat;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import ma.betteryou.betteryoubackend.dto.AiChat.AiChatResponse;
@@ -40,17 +42,37 @@ public class AiChatService {
 
     private static final String OPENAI_URL = "https://api.openai.com/v1/chat/completions";
 
+    @PostConstruct
+    public void init() {
+        // Affiche un petit résumé de la clé (sécurité : jamais tout afficher)
+        if (apiKey != null && !apiKey.isBlank()) {
+            log.info("OPENAI_API_KEY chargée ✅");
+            log.info("Clé complète : {}", apiKey);
+            log.info("Longueur totale de la clé : {}", apiKey.length());
+        } else {
+            log.warn("OPENAI_API_KEY non trouvée ⚠️");
+        }
+
+        log.info("OpenAI model configuré : {}", model);
+    }
     public AiChatResponse chat(long userId, String conversationId, String userMessage) {
 
         //if (userId == null) throw new IllegalArgumentException("userId is required");
         if (userMessage == null || userMessage.trim().isEmpty())
             throw new IllegalArgumentException("message is required");
 
-        // Logs utiles (sans afficher la clé)
-        log.info("AI chat called: userId={}, conversationId={}", userId, conversationId);
-        log.info("OpenAI model={}", model);
-        log.info("OpenAI apiKey present? {}", (apiKey != null && !apiKey.isBlank()));
+        log.info("========== DEBUG API KEY ==========");
+    log.info("API Key présente ? {}", (apiKey != null && !apiKey.isBlank()));
+    log.info("API Key commence par 'sk-' ? {}", (apiKey != null && apiKey.startsWith("sk-")));
+    log.info("Longueur de la clé : {}", (apiKey != null ? apiKey.length() : 0));
+    log.info("Premières 20 caractères : {}", (apiKey != null && apiKey.length() >= 20 ? apiKey.substring(0, 20) + "..." : "N/A"));
+    log.info("Model configuré : {}", model);
+    log.info("===================================");
 
+    log.info("AI chat called: userId={}, conversationId={}", userId, conversationId);
+    log.info("OpenAI model={}", model);
+    log.info("OpenAI apiKey present? {}", (apiKey != null && !apiKey.isBlank()));
+    
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found: " + userId));
 
