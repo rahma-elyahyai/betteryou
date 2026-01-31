@@ -1,42 +1,56 @@
-# src/test/resources/application-test.yml
+# Configuration H2 pour les tests
 spring:
   datasource:
     url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE;MODE=PostgreSQL
     driver-class-name: org.h2.Driver
     username: sa
-    password:
-
+    password: ""
+  
   jpa:
     database-platform: org.hibernate.dialect.H2Dialect
     hibernate:
-      ddl-auto: create-drop  # IMPORTANT: créer les tables automatiquement
-    show-sql: true
+      ddl-auto: create-drop
+    show-sql: false
     properties:
       hibernate:
         format_sql: true
-        use_sql_comments: true
         dialect: org.hibernate.dialect.H2Dialect
-        hbm2ddl.auto: create-drop
-  # Configuration JWT pour les tests
-  app:
-    jwt:
-      secret: 8f3b2e7a9c1d4f6b0a2e9d7c3f1b6a5d
 
-      expiration-ms: 3600000  # 1 heure pour les tests
-  # Désactiver les fonctionnalités non nécessaires pour les tests
+  # Désactiver les auto-configurations non nécessaires
   autoconfigure:
     exclude:
       - org.springframework.boot.autoconfigure.flyway.FlywayAutoConfiguration
       - org.springframework.boot.autoconfigure.liquibase.LiquibaseAutoConfiguration
-      - org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration
 
-# Désactiver le cache pour les tests
-cache:
-  type: none
+  # Configuration mail pour tests (optionnel)
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: test@gmail.com
+    password: testpassword
 
-# Désactiver la validation des migrations
+# ✅ Configuration JWT à la RACINE (pas sous spring)
+app:
+  jwt:
+    secret: test-secret-key-for-testing-purposes-must-be-at-least-256-bits-long-so-adding-more-characters
+    expiration-ms: 3600000
+  frontend:
+    reset-url: http://localhost:5174
+
+# Configuration OpenAI pour tests
+openai:
+  api-key: test-api-key
+  model: gpt-4o-mini
+  timeout-ms: 15000
+
+# Désactiver Flyway et Liquibase
 flyway:
   enabled: false
-
 liquibase:
   enabled: false
+
+# Logs
+logging:
+  level:
+    org.springframework: WARN
+    org.hibernate: WARN
