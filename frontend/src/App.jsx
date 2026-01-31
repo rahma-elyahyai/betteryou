@@ -23,7 +23,7 @@ import AddMeals from "./features/Nutrition/components/AddMeals";
 
 // Guard
 import ProtectedRoute from "./components/auth/ProtectedRoute.jsx";
-//import NutritionAiWizard from "@/pages/NutritionAiWizard.jsx";
+import NutritionAiWizard from "@/pages/NutritionAiWizard.jsx";
 import TrainingLayout from "./components/Workout/TrainingLayout.jsx"; 
 
 
@@ -45,7 +45,7 @@ function App() {
           <Route path="/reset-password" element={<ResetPassword />} />
 
           {/* ✅ NUTRITION AI ACCESSIBLE SANS LOGIN */}
-          
+          <Route path="/ai-nutrition" element={<NutritionAiWizard />} />
 
           {/* 🔐 TOUT CE QUI EST ICI EST PROTÉGÉ */}
           <Route element={<ProtectedRoute />}>

@@ -114,8 +114,7 @@ const handleSubmit = async (e) => {
 
   const handleAutoGenerate = () => {
     // Redirection vers la page de génération automatique
-    alert('Redirecting to auto-generate...');
-    // window.location.href = '/generate-program';
+    navigate('/ai-nutrition');
   };
 
   if (showSuccess) {
