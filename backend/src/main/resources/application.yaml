@@ -23,8 +23,7 @@ spring:
     driver-class-name: org.postgresql.Driver
 
   openai:
-    api-key: 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
-    model: gpt-4o-mini
+    api-key: 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
   jpa:
     hibernate:
       ddl-auto: validate
