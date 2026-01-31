@@ -4,13 +4,12 @@ server:
 spring:
   application:
     name: betteryou-backend
-  config:
-    import: optional:file:.env[.properties]
+
   mail:
     host: smtp.gmail.com
     port: 587
-    username: ${MAIL_USERNAME:cmail@gmail.com}
-    password: ${MAIL_PASSWORD:"password"}
+    username: ${MAIL_USERNAME:default@gmail.com}
+    password: ${MAIL_PASSWORD:defaultpassword}
     properties:
       mail:
         smtp:
@@ -19,9 +18,8 @@ spring:
             enable: true
 
   datasource:
-    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/betteryou}
+    url: ${DATABASE_URL}
     driver-class-name: org.postgresql.Driver
-
 
   jpa:
     hibernate:
@@ -34,27 +32,25 @@ spring:
 
   mvc:
     cors:
-      allowed-origins: "http://localhost:5173,http://localhost:5174"
+      allowed-origins: "http://localhost:5174"
       allowed-methods: "*"
       allowed-headers: "*"
 
-ai:
-  provider: openai
-  openai:
-    base-url: https://api.openai.com/v1
-    model: ${OPENAI_MODEL:gpt-4o-mini}
-    timeout-seconds: 90
-
 app:
   jwt:
-    secret: ${JWT_SECRET:default_jwt_secret_key_1234567890}
+    secret: ${JWT_SECRET}
     expiration-ms: 10000000
 
   frontend:
-    reset-url: ${FRONTEND_URL:http://defaulturl}
+    reset-url: ${FRONTEND_URL}
 
 logging:
   level:
     org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping: DEBUG
     org.springframework.web.servlet.DispatcherServlet: DEBUG
 
+openai:
+  # ✅ Ici tu peux soit utiliser la variable d'environnement
+  api-key: ${OPENAI_API_KEY}  
+  model: ${OPENAI_MODEL:gpt-4o-mini}
+  timeout-ms: 15000

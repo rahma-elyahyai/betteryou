@@ -1,6 +1,8 @@
 package ma.betteryou.betteryoubackend.service.AiChat;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import ma.betteryou.betteryoubackend.dto.AiChat.AiChatResponse;
@@ -40,6 +42,19 @@ public class AiChatService {
 
     private static final String OPENAI_URL = "https://api.openai.com/v1/chat/completions";
 
+    @PostConstruct
+    public void init() {
+        // Affiche un petit résumé de la clé (sécurité : jamais tout afficher)
+        if (apiKey != null && !apiKey.isBlank()) {
+            log.info("OPENAI_API_KEY chargée ✅");
+            log.info("Clé complète : {}", apiKey);
+            log.info("Longueur totale de la clé : {}", apiKey.length());
+        } else {
+            log.warn("OPENAI_API_KEY non trouvée ⚠️");
+        }
+
+        log.info("OpenAI model configuré : {}", model);
+    }
     public AiChatResponse chat(long userId, String conversationId, String userMessage) {
 
         //if (userId == null) throw new IllegalArgumentException("userId is required");
