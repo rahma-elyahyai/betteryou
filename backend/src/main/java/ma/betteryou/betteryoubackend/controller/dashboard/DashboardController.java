@@ -15,7 +15,7 @@ public class DashboardController {
 
     
     @GetMapping("/{userId}")
-    public DashboardResponse getDashboard(@PathVariable Integer userId) {    //récupère {userId} depuis l’URL.
+    public DashboardResponse getDashboard(@PathVariable long userId) {    //récupère {userId} depuis l’URL.
         return dashboardService.getDashboardForUser(userId);
     }
 }
