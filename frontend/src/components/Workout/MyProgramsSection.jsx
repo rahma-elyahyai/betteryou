@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import { Calendar, Dumbbell, Plus } from 'lucide-react';
 import { fetchUserPrograms } from "../../api/Workout/programApi";
 import SessionDetailModal from "./SessionDetailModal";
-import Sidebar from "@/Layout/Sidebar";
+import Sidebar from "@/layout/Sidebar.jsx";
 import WorkoutCatalog from "./WorkoutCatalog";
 import { getCurrentUserId } from "@/utils/authUtils.js";
 
