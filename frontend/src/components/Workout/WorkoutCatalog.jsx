@@ -5,7 +5,7 @@ import WorkoutDetailModal from "./WorkoutDetailModal";
 import CreateProgramWizard from "./CreateProgramWizard";
 import GenerateProgramModal from "./GenerateProgramModal";
 import { generateWeekProgramAI } from "../../api/Workout/aiProgramApi";
-import Sidebar from "@/Layout/Sidebar";
+import Sidebar from "@/layout/Sidebar.jsx";
 import { getCurrentUserId } from "@/utils/authUtils.js";
 
 const WorkoutCatalog = ({ onGoPrograms }) => {
