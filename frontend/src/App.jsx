@@ -20,7 +20,7 @@ import NutritionPage from "./pages/NutritionPage.jsx";
 import MyPrograms from "./features/Nutrition/components/MyPrograms";
 import CreateNutritionPlan from "./features/Nutrition/components/CreateNutritionPlan";
 import AddMeals from "./features/Nutrition/components/AddMeals";
-
+import Notfound from "./pages/NotFound.jsx";
 // Guard
 import ProtectedRoute from "./components/auth/ProtectedRoute.jsx";
 import NutritionAiWizard from "@/pages/NutritionAiWizard.jsx";
@@ -65,7 +65,7 @@ function App() {
           </Route>
 
           {/* 404 */}
-          <Route path="*" element={<div>404 Not Found</div>} />
+          <Route path="*" element={<Notfound />} />
         </Routes>
 
         <ChatbotGate />

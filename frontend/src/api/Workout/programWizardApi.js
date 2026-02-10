@@ -1,12 +1,4 @@
-import axios from "axios";
-
-const WIZARD_BASE = "http://localhost:8080/api/program-wizard";
-
-const wizardApi = axios.create({
-  baseURL: WIZARD_BASE,
-  timeout: 15000,
-  headers: { "Content-Type": "application/json" },
-});
+import { api } from "../auth";
 
 const errorMessage = (err, fallback = "Request failed") => {
   const msg =
@@ -23,7 +15,7 @@ const errorMessage = (err, fallback = "Request failed") => {
 // =========================
 export const fetchMetadata = async () => {
   try {
-    const { data } = await wizardApi.get("/metadata");
+    const { data } = await api.get("/api/program-wizard/metadata");
     return data; // { sessionTypes, equipmentOptions, muscles }
   } catch (err) {
     throw new Error(errorMessage(err, "Failed to load metadata"));
@@ -59,7 +51,7 @@ export const searchExercises = async ({ category,  muscles }) => {
       params.muscles = muscles.filter(Boolean);
     }
 
-    const { data } = await wizardApi.get("/exercises/search", { params });
+    const { data } = await api.get("/api/program-wizard/exercises/search", { params });
     return data;
   } catch (err) {
     throw new Error(errorMessage(err, "Failed to search exercises"));

@@ -46,7 +46,7 @@ api.interceptors.response.use(
       }
     }
     
-    // 🔴 Erreur 403 : Authentifié mais pas autorisé (accès refusé)
+/*     // 🔴 Erreur 403 : Authentifié mais pas autorisé (accès refusé)
     if (status === 403) {
       console.warn("🔴 403 Forbidden - Redirecting to unauthorized...");
       
@@ -54,7 +54,7 @@ api.interceptors.response.use(
       if (window.location.pathname !== "/unauthorized") {
         window.location.href = "/unauthorized";
       }
-    }
+    } */
     
     // Relancer l'erreur pour que les composants puissent la gérer si besoin
     return Promise.reject(error);

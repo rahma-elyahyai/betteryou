@@ -1,10 +1,6 @@
-import axios from "axios";
+import { api } from "../auth";
 
-const API = axios.create({
-  baseURL: "http://localhost:8080/api",
-  timeout: 15000,
-  headers: { "Content-Type": "application/json" },
-});
+
 
 const errorMessage = (err, fallback = "Request failed") => {
   const msg =
@@ -18,7 +14,7 @@ const errorMessage = (err, fallback = "Request failed") => {
 
 export const fetchUserPrograms = async (userId) => {
   try {
-    const { data } = await API.get(`/programs/user/${userId}`);
+    const { data } = await api.get(`/api/programs/user/${userId}`);
     return data;
   } catch (err) {
     throw new Error(errorMessage(err, "Failed to load programs"));
@@ -28,7 +24,7 @@ export const fetchUserPrograms = async (userId) => {
 // ✅ POST /api/programs?userId=1
 export const createProgram = async (payload, userId) => {
   try {
-    const { data } = await API.post(`/programs`, payload, {
+    const { data } = await api.post(`/api/programs`, payload, {
       params: { userId },
     });
     return data; // { programId, message, sessionIds }
