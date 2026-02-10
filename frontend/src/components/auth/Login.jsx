@@ -29,7 +29,7 @@ export default function Login() {
       }
 
       localStorage.setItem("token", token);
-      nav("/profile");
+      nav("/dashboard");
     } catch (err) {
       setError("Email ou mot de passe invalide.");
     } finally {
