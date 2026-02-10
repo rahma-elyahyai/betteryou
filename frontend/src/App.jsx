@@ -1,7 +1,7 @@
 // src/App.jsx
 import React, { useEffect, useState } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-
+import Notfound from "./pages/NotFound.jsx ";
 import { NutritionProvider } from "./features/Nutrition/store/NutritionContext";
 
 // Pages publiques
@@ -65,7 +65,7 @@ function App() {
           </Route>
 
           {/* 404 */}
-          <Route path="*" element={<div>404 Not Found</div>} />
+          <Route path="*" element={<Notfound />} />
         </Routes>
 
         <ChatbotGate />
