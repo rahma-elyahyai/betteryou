@@ -115,6 +115,15 @@ export default function NutritionCatalog({ userId, limit = 4 }) {
         {/* Content Area */}
         <div className="flex-1 overflow-auto">
           <div className="max-w-7xl mx-auto px-8 py-12">
+            <div className="mb-12">
+              <h2 className="text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-lime-400 via-lime-300 to-lime-500 mb-4 tracking-tight">
+                NUTRITION CATALOG
+              </h2>
+              <p className="text-gray-400 text-lg max-w-3xl">
+                Discover our curated selection of Personalized Meal Recommendations designed
+                to transform your body and maximize your results
+              </p>
+            </div>
             {/* Loading State - Montré seulement pendant le chargement initial */}
             {isInitialLoading ? (
               <div className="flex flex-col items-center justify-center py-32">
