@@ -31,7 +31,7 @@ export default function LoadingScreen({ stepIndex = 0 }) {
 
             <h2 className="mt-10 text-4xl font-black text-white tracking-tight">AI Synthesis</h2>
             <p className="mt-3 text-white/50 text-lg leading-relaxed italic max-w-sm">
-              Our neural engine is calculating your personalized biological roadmap.
+              Our neural engine is calculating your personalized nutrition plan.
             </p>
           </div>
 

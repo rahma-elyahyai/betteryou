@@ -81,11 +81,11 @@ export default function NutritionAiWizard() {
     let userIdRaw = getCurrentUserId?.();
     let userId = Number(userIdRaw);
 
-    // ✅ Fallback for testing when not logged in
-    if (!userId || Number.isNaN(userId)) {
-      console.warn("User not logged in, using fallback userId=1 for testing.");
-      userId = 1;
-    }
+    // // ✅ Fallback for testing when not logged in
+    // if (!userId || Number.isNaN(userId)) {
+    //   console.warn("User not logged in, using fallback userId=1 for testing.");
+    //   userId = 1;
+    // }
 
     setStep("loading");
     setLoadingStep(0);
