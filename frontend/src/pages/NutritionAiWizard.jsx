@@ -1,5 +1,7 @@
 // src/pages/NutritionAiWizard.jsx
 import React, { useMemo, useState } from "react";
+import Sidebar from "@/layout/Sidebar.jsx";
+
 import ObjectiveCard from "@/components/nutritionAi/ObjectiveCard.jsx";
 import LoadingScreen from "@/components/nutritionAi/LoadingScreen.jsx";
 import DayTabs from "@/components/nutritionAi/DayTabs.jsx";
@@ -145,8 +147,15 @@ export default function NutritionAiWizard() {
   }
 
   return (
-    <div className="min-h-screen w-full bg-gradient-to-br from-black via-gray-900 to-black px-6 py-10">
+    <div className="flex min-h-screen bg-black">
+    {/* Sidebar */}
+    <Sidebar />
+
+    {/* ===== MAIN CONTENT ===== */}
+    <div className="flex-1 overflow-y-auto bg-gradient-to-br from-black via-gray-900 to-black px-6 py-10">
       <div className="mx-auto w-full max-w-6xl">
+
+        {/* ===== HEADER ===== */}
         <div className="mb-10 flex items-center justify-between gap-4">
           <div className="max-w-2xl">
             <h1 className="text-4xl md:text-5xl font-black tracking-tight text-white">
@@ -377,5 +386,7 @@ export default function NutritionAiWizard() {
 
       </div>
     </div>
+  </div>
+    
   );
 }
