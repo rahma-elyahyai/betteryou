@@ -1,7 +1,7 @@
 // src/App.jsx
 import React, { useEffect, useState } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Notfound from "./pages/NotFound.jsx ";
+
 import { NutritionProvider } from "./features/Nutrition/store/NutritionContext";
 
 // Pages publiques
@@ -20,7 +20,7 @@ import NutritionPage from "./pages/NutritionPage.jsx";
 import MyPrograms from "./features/Nutrition/components/MyPrograms";
 import CreateNutritionPlan from "./features/Nutrition/components/CreateNutritionPlan";
 import AddMeals from "./features/Nutrition/components/AddMeals";
-
+import Notfound from "./pages/NotFound.jsx";
 // Guard
 import ProtectedRoute from "./components/auth/ProtectedRoute.jsx";
 import NutritionAiWizard from "@/pages/NutritionAiWizard.jsx";
