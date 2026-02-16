@@ -136,7 +136,7 @@ console.log('- availableMeals:', availableMeals?.length);
 console.log('- filterGoal:', filterGoal);
 console.log('- filterMealType:', filterMealType);
 console.log('- searchQuery:', searchQuery);
-  const filteredMeals = availableMeals.filter(meal => {
+  const filteredMeals = (availableMeals|| []).filter(meal => {
     const matchesSearch = meal.mealName.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesGoal = filterGoal === 'ALL' || meal.goal === filterGoal;
     const matchesType = filterMealType === 'ALL' || meal.mealType === filterMealType;
@@ -355,7 +355,9 @@ console.log('- searchQuery:', searchQuery);
 
                 {/* Meals Grid */}
                 <div className="p-6 max-h-[60vh] overflow-y-auto">
-                  {filteredMeals.length > 0 ? (
+                  {!availableMeals || availableMeals.length === 0 ? (
+                    <div>Loading meals...</div>
+                  ) : filteredMeals.length > 0 ? (
                     <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
                       {filteredMeals.map(meal => (
                         <div
