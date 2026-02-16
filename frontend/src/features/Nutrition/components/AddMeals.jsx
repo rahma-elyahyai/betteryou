@@ -131,7 +131,11 @@ const handleRemoveMeal = async (day, slot) => {
   }
 };
 
-
+console.log('🔍 Debugging filters:');
+console.log('- availableMeals:', availableMeals?.length);
+console.log('- filterGoal:', filterGoal);
+console.log('- filterMealType:', filterMealType);
+console.log('- searchQuery:', searchQuery);
   const filteredMeals = availableMeals.filter(meal => {
     const matchesSearch = meal.mealName.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesGoal = filterGoal === 'ALL' || meal.goal === filterGoal;
