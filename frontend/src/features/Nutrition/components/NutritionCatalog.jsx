@@ -14,7 +14,7 @@ export default function NutritionCatalog({ userId, limit = 4 }) {
   const [loadingDetail, setLoadingDetail] = useState(false);
 
   const { loadRecommendations, loadMealDetails } = useNutrition();
-
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
   // 🔥 Mémoïser les fonctions de callback
   const handleViewDetails = useCallback(async (meal) => {
     setLoadingDetail(true);
@@ -157,6 +157,32 @@ export default function NutritionCatalog({ userId, limit = 4 }) {
                   </div>
                 )}
 
+{showConfirmModal && (
+  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
+    <div className="bg-gray-900 border border-gray-700 rounded-2xl p-8 max-w-md w-full mx-4 shadow-2xl">
+      <div className="text-4xl mb-4 text-center">⚠️</div>
+      <h3 className="text-white text-xl font-bold text-center mb-2">Replace Current Plan?</h3>
+      <p className="text-gray-400 text-center text-sm mb-8">
+        If you already have an active nutrition plan, creating a new one will 
+        <span className="text-lime-400 font-semibold"> automatically end it</span>.
+      </p>
+      <div className="flex gap-4">
+        <button
+          onClick={() => setShowConfirmModal(false)}
+          className="flex-1 px-6 py-3 bg-gray-800 hover:bg-gray-700 text-gray-300 rounded-xl font-semibold transition-all border border-gray-700"
+        >
+          Cancel
+        </button>
+        <button
+          onClick={() => window.location.href = '/create-nutrition-plan'}
+          className="flex-1 px-6 py-3 bg-gradient-to-r from-lime-400 to-lime-500 hover:from-lime-500 hover:to-lime-600 text-gray-900 rounded-xl font-bold transition-all"
+        >
+          Continue
+        </button>
+      </div>
+    </div>
+  </div>
+)}
                 {/* Meals Grid */}
                 {!error && meals.length > 0 && (
                   <>
@@ -173,17 +199,7 @@ export default function NutritionCatalog({ userId, limit = 4 }) {
                     {/* Action Button */}
                     <div className="flex justify-center items-center py-12 border-t border-gray-800">
                       <button 
-                        onClick={() => {
-                          const hasConfirmed = window.confirm(
-                            "⚠️ IMPORTANT\n\n" +
-                            "If you already have an active nutrition plan, creating a new one will automatically end it.\n\n" +
-                            "Do you want to continue?"
-                          );
-                          
-                          if (hasConfirmed) {
-                            window.location.href = '/create-nutrition-plan';
-                          }
-                        }}
+                        onClick={() => setShowConfirmModal(true)}
                         className="group relative px-12 py-5 bg-gradient-to-r from-lime-400 to-lime-500 hover:from-lime-500 hover:to-lime-600 text-gray-900 font-black text-xl uppercase tracking-wider rounded-2xl transition-all duration-300 hover:shadow-2xl hover:shadow-lime-500/40 transform hover:scale-105 hover:-translate-y-1"
                       >
                         <span className="relative z-10 flex items-center gap-3">

@@ -34,7 +34,8 @@ Tu dois retourner un JSON STRICT (sans texte).
 Contraintes:
 - Programme sur EXACTEMENT 7 jours (dayIndex 1..7).
 - Respecter l'objectif utilisateur (goal) fourni.
-- REST day => sessionType="REST", durationMinutes=0, exercises=[]
+- Chaque jour DOIT avoir des exercices (pas de jour REST).
+- sessionType uniquement: STRENGTH, CARDIO, ou MIXED
 - Retourne UNIQUEMENT le JSON.
 Format JSON:
 {
@@ -44,7 +45,7 @@ Format JSON:
   {
    "dayIndex":1,
    "dayLabel":"Day 1",
-   "sessionType":"STRENGTH|CARDIO|MIXED|REST",
+   "sessionType":"STRENGTH|CARDIO|MIXED",
    "durationMinutes":45,
    "exercises":[
      {"idExercise":123,"sets":3,"reps":10,"restSeconds":60,"orderInSession":1}
@@ -53,7 +54,6 @@ Format JSON:
  ]
 }
 """;
-
     public ProgramWizardResponse generateWeekProgram(GenerateProgramRequest req) {
 
         Long userId = req.getUserId();
@@ -80,7 +80,7 @@ Format JSON:
 
         String userNotes = req.getUserNotes() == null ? "" : req.getUserNotes().trim();
 
-        String prompt = """
+String prompt = """
 User goal (from DB): %s
 Optional user notes: %s
 
@@ -89,7 +89,8 @@ IMPORTANT:
 [%s]
 - Do NOT invent ids outside this list.
 - Generate exactly 7 days (dayIndex 1..7).
-- If REST day => sessionType REST and exercises=[]
+- EVERY day MUST have exercises (no REST days allowed).
+- sessionType must be one of: STRENGTH, CARDIO, MIXED
 """.formatted(goal, userNotes, allowedIdsText);
 
         // --- appel IA ---
@@ -116,51 +117,59 @@ IMPORTANT:
         List<SessionRequest> sessions = new ArrayList<>();
 
         for (AiDay d : ai.days) {
-            if (d.dayIndex < 1 || d.dayIndex > 7) {
-                throw new IllegalStateException("Invalid dayIndex: " + d.dayIndex);
+    if (d.dayIndex < 1 || d.dayIndex > 7) {
+        throw new IllegalStateException("Invalid dayIndex: " + d.dayIndex);
+    }
+
+    LocalDate sessionDate = startDate.plusDays(d.dayIndex - 1);
+
+    SessionRequest sr = new SessionRequest();
+
+    // ✅ Valider le sessionType — fallback sur STRENGTH si invalide
+    String type = d.sessionType != null ? d.sessionType.toUpperCase() : "STRENGTH";
+    if (!List.of("STRENGTH", "CARDIO", "MIXED").contains(type)) {
+        type = "STRENGTH";
+    }
+    sr.setSessionType(type);
+
+    // ✅ Durée toujours > 0
+    int duration = d.durationMinutes == null ? 45 : Math.max(20, Math.min(75, d.durationMinutes));
+    sr.setDurationMinutes(duration);
+    sr.setSessionDate(sessionDate);
+
+    // ✅ Exercices pour tous les types
+    List<ExerciseRequest> exs = new ArrayList<>();
+    if (d.exercises != null) {
+        int orderFallback = 1;
+        for (AiExercise e : d.exercises) {
+            Long chosen = e.idExercise;
+            if (chosen == null || !allowedSet.contains(chosen)) {
+                chosen = allowedIds.get(0);
             }
-
-            LocalDate sessionDate = startDate.plusDays(d.dayIndex - 1);
-
-            SessionRequest sr = new SessionRequest();
-            sr.setSessionType(nonEmptyOr(d.sessionType, "CARDIO"));
-
-            int duration = d.durationMinutes == null ? 0 : d.durationMinutes;
-            if (!"CARDIO".equalsIgnoreCase(sr.getSessionType())) {
-                duration = Math.max(20, Math.min(75, duration));
-            } else {
-                duration = 0;
-            }
-            sr.setDurationMinutes(duration);
-
-            // ✅ FIX 1: envoyer la date
-            sr.setSessionDate(sessionDate);
-
-            // exercises
-            List<ExerciseRequest> exs = new ArrayList<>();
-            if (d.exercises != null && !"CARDIO".equalsIgnoreCase(sr.getSessionType())) {
-                int orderFallback = 1;
-                for (AiExercise e : d.exercises) {
-
-                    // ✅ FIX 2: choisir un ID valide
-                    Long chosen = e.idExercise;
-                    if (chosen == null || !allowedSet.contains(chosen)) {
-                        chosen = allowedIds.get(0); // fallback sur un id existant
-                    }
-
-                    ExerciseRequest ex = new ExerciseRequest();
-                    ex.setIdExercise(chosen);
-                    ex.setSets(e.sets != null ? e.sets : 3);
-                    ex.setReps(e.reps != null ? e.reps : 10);
-                    ex.setRestSeconds(e.restSeconds != null ? e.restSeconds : 60);
-                    ex.setOrderInSession(e.orderInSession != null ? e.orderInSession : orderFallback++);
-                    exs.add(ex);
-                }
-            }
-            sr.setExercises(exs);
-
-            sessions.add(sr);
+            ExerciseRequest ex = new ExerciseRequest();
+            ex.setIdExercise(chosen);
+            ex.setSets(e.sets != null ? e.sets : 3);
+            ex.setReps(e.reps != null ? e.reps : 10);
+            ex.setRestSeconds(e.restSeconds != null ? e.restSeconds : 60);
+            ex.setOrderInSession(e.orderInSession != null ? e.orderInSession : orderFallback++);
+            exs.add(ex);
         }
+    }
+
+    // ✅ Fallback si IA renvoie une liste vide
+    if (exs.isEmpty()) {
+        ExerciseRequest ex = new ExerciseRequest();
+        ex.setIdExercise(allowedIds.get(0));
+        ex.setSets(3);
+        ex.setReps(10);
+        ex.setRestSeconds(60);
+        ex.setOrderInSession(1);
+        exs.add(ex);
+    }
+
+    sr.setExercises(exs);
+    sessions.add(sr);
+}
 
         payload.setSessions(sessions);
 

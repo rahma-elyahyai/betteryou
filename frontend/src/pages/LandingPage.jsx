@@ -249,7 +249,7 @@ export default function LandingPage() {
             and daily guidance designed just for you
           </p>
           <button 
-            onClick={() => nav("/register")}
+            onClick={() => nav("/login")}
             className="px-10 py-3.5 bg-[#D6F93D] text-gray-900 font-bold text-lg rounded-lg btn-glow hover:scale-105 transition-transform relative z-10">
             Start now
           </button>

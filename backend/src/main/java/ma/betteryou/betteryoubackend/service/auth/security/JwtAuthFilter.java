@@ -6,42 +6,49 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
+import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 
 @Component
 @RequiredArgsConstructor
-public class JwtAuthFilter extends GenericFilter {
+public class JwtAuthFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
     private final UserDetailsService userDetailsService;
+@Override
+protected void doFilterInternal(HttpServletRequest request,
+                                HttpServletResponse response,
+                                FilterChain filterChain)
+        throws ServletException, IOException {
 
-    @Override
-    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
-            throws IOException, ServletException {
-
-        HttpServletRequest req = (HttpServletRequest) request;
-            // ✅ 1) Laisser passer les requêtes OPTIONS (CORS preflight)
-    if ("OPTIONS".equalsIgnoreCase(req.getMethod())) {
-        chain.doFilter(request, response);
+    if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
+        filterChain.doFilter(request, response);
         return;
     }
 
-        String auth = req.getHeader("Authorization");
+    String auth = request.getHeader("Authorization");
 
-        if (auth != null && auth.startsWith("Bearer ")) {
+    if (auth != null && auth.startsWith("Bearer ")) {
+        try {                                          // ← ajoute ça
             String token = auth.substring(7);
             if (jwtService.isValid(token)) {
                 String email = jwtService.extractEmail(token);
                 var userDetails = userDetailsService.loadUserByUsername(email);
-
                 var authentication = new UsernamePasswordAuthenticationToken(
-                        userDetails, null, userDetails.getAuthorities()
+                    userDetails, null, userDetails.getAuthorities()
+                );
+                authentication.setDetails(
+                    new WebAuthenticationDetailsSource().buildDetails(request)
                 );
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
+        } catch (Exception e) {                        // ← et ça
+            System.out.println("❌ JWT invalide: " + e.getMessage());
         }
-
-        chain.doFilter(request, response);
     }
+
+    filterChain.doFilter(request, response);
+}
 }
