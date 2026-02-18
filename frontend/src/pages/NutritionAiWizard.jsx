@@ -158,7 +158,7 @@ function NutritionAiWizardContent({ user }) {
     try {
       const payload = {
         userId,
-        //nutritionName: programName, // ✅ Envoyer le nom du programme
+        nutritionName: programName, // ✅ Envoyer le nom du programme
         objective,
         startDate,
         caloriesPerDay: cal,
@@ -205,7 +205,7 @@ function NutritionAiWizardContent({ user }) {
     setWeek([]);
     setActiveDay("");
     setLoadingStep(0);
- //   setProgramName("");
+    setProgramName("");
     setObjective("");
     setCaloriesPerDay("");
   }
@@ -251,14 +251,13 @@ function NutritionAiWizardContent({ user }) {
                 <form onSubmit={handleGenerate} className="space-y-6">
                   <div className="group">
                     <label className="block text-white/50 text-xs font-bold uppercase tracking-widest mb-2.5 transition-colors group-focus-within:text-[#D6F93D]">
-                      Program Designation (optionnal)
+                      Program Designation (optional)
                     </label>
                     <input
                       value={programName}
                       onChange={(e) => setProgramName(e.target.value)}
                       placeholder='e.g. "Summer Transformation 2026"'
                       className="w-full rounded-2xl border border-white/10 bg-black/40 px-5 py-4 text-white outline-none focus:ring-2 focus:ring-[#D6F93D]/30 focus:border-[#D6F93D]/60 transition-all placeholder:text-white/20"
-                     
                     />
                   </div>
 

@@ -39,7 +39,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(AbstractHttpConfigurer::disable)
+                .csrf(AbstractHttpConfigurer::disable) // CSRF est utile pour les applications avec sessions , ici n'est pas necessaire
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
 
                 //  JWT => pas de session
@@ -47,7 +47,7 @@ public class SecurityConfig {
 
                 // Routes publiques / protégées
 .authorizeHttpRequests(auth -> auth
-    .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()   // ✅ AJOUTE ÇA
+    .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()   // nécessaire pour CORS
     .requestMatchers("/api/auth/**").permitAll()
     .requestMatchers("/api/workouts/**").permitAll()
     .requestMatchers("/api/program-wizard/metadata").permitAll()
@@ -56,7 +56,9 @@ public class SecurityConfig {
     .requestMatchers("/api/sessions/**").permitAll()
     .requestMatchers("/api/ai/programs/**").permitAll()
     .requestMatchers("/api/ai/programs/generate-week").permitAll()
-    .anyRequest().authenticated()
+    .anyRequest().authenticated() //Toute route non listée : nécessite un token JWT valide
+
+
 )
 
 

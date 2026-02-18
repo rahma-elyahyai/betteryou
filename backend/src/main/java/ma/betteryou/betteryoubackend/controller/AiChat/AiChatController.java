@@ -20,6 +20,6 @@ public class AiChatController {
                 request.getUserId(),
                 request.getConversationId(),
                 request.getMessage()
-        );
+        ); //Ces données arrivent en JSON depuis le frontend.
     }
 }

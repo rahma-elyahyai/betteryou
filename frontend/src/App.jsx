@@ -29,6 +29,8 @@ import TrainingLayout from "./components/Workout/TrainingLayout.jsx";
 
 import ChatbotGate  from "@/components/chatboot/ChatbotGate";
 
+import Team from "@/pages/TeamPage.jsx";
+
 
 function App() {
 
@@ -43,15 +45,16 @@ function App() {
           <Route path="/welcome" element={<Welcome />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password" element={<ResetPassword />} />
+          <Route path="/TeamPage" element={<Team/>} />
 
           {/* ✅ NUTRITION AI ACCESSIBLE SANS LOGIN */}
-          <Route path="/ai-nutrition" element={<NutritionAiWizard />} />
+
 
           {/* 🔐 TOUT CE QUI EST ICI EST PROTÉGÉ */}
           <Route element={<ProtectedRoute />}>
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/profile" element={<ProfilePage />} />
-
+            <Route path="/ai-nutrition" element={<NutritionAiWizard />} />
             <Route path="/nutrition" element={<NutritionPage />} />
             <Route path="/myprograms" element={<MyPrograms />} />
             <Route path="/create-nutrition-plan" element={<CreateNutritionPlan />} />

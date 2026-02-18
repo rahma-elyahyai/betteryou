@@ -22,7 +22,7 @@ public class WorkoutProgramCleanupScheduler {
     private final WorkoutProgramRepositoryR workoutProgramRepository;
 
     @Transactional
-    @Scheduled(fixedDelay = 10000) // tous les jours à 02:00
+    @Scheduled(fixedDelay = 100000000)
     public void cleanupPrograms() {
 
         LocalDate today = LocalDate.now();

@@ -11,4 +11,5 @@ public class AiNutritionGenerateRequest {
     private LocalDate startDate;   // 2025-01-01
     private LocalDate endDate;     // 2025-01-07 (on va FORCER 7 jours)
     private Integer caloriesPerDay;
+    private String nutritionName;  // "My AI Nutrition Plan"
 }
