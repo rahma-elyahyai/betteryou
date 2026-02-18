@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { X, Plus, Search } from 'lucide-react';
 import { useNutrition } from '../store/NutritionContext';
 
-const AddMealToDayModal = ({ dayOfWeek, programId, objective, existingMealTypes, onClose, onAdd }) => {
+const AddMealToDayModal = ({ dayOfWeek, programId, existingMealTypes, onClose, onAdd }) => {
   const { loadAllMeals, cache, loading } = useNutrition();
   
   const [searchTerm, setSearchTerm] = useState('');
@@ -26,10 +26,6 @@ const AddMealToDayModal = ({ dayOfWeek, programId, objective, existingMealTypes,
   const isLoading = loading['allMeals'];
 
   const filteredMeals = meals.filter(meal => {
-    // 🆕 Filtrage par objectif du plan (optionnel via toggle)
-    if (filterByObjective && planObjective && meal.goal && meal.goal !== planObjective) {
-      return false;
-    }
     const matchSlot = !selectedSlot || meal.mealType === selectedSlot;
     const s = searchTerm.toLowerCase();
     const matchSearch =
