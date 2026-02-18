@@ -26,9 +26,9 @@ const CreateNutritionPlanForm = () => {
 
   // Objectifs prédéfinis
   const objectives = [
-    { value: 'Gain Mass', label: '💪 Gain Mass', desc: 'Build lean muscle mass' },
-    { value: 'Lose Weight', label: '🔥 Lose Weight', desc: 'Reduce body fat' },
-    { value: 'Maintain', label: '⚖️ Maintain', desc: 'Maintain current weight' },
+    { value: 'GAIN_MASS', label: '💪 Gain Mass', desc: 'Build lean muscle mass' },
+    { value: 'LOSE_WEIGHT', label: '🔥 Lose Weight', desc: 'Reduce body fat' },
+    { value: 'MAINTAIN', label: '⚖️ Maintain', desc: 'Maintain current weight' },
   ];
 
   const handleChange = (e) => {
