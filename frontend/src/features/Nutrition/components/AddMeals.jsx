@@ -65,7 +65,7 @@ const loadAllData = async () => {
     const filtered = planDetails?.objective
       ? meals.filter(m => m.goal === planDetails.objective)
       : meals;
-    setAvailableMeals(filtered);
+    setAvailableMeals(meals);
 
     const weekMeals = await loadPlanMealsForWeek(userId, planId);
     setPlanMeals(weekMeals || {});
