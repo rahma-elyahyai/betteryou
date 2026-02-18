@@ -728,7 +728,6 @@ useEffect(() => {
           <AddMealToDayModal
             dayOfWeek={addingMealToDay.dayOfWeek}
             programId={selectedProgram.idNutrition}
-            objective={selectedProgram.objective}
             existingMealTypes={addingMealToDay.existingMealTypes}
             onClose={() => setAddingMealToDay(null)}
             onAdd={handleAddMeal}
