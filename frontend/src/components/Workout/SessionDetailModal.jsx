@@ -374,12 +374,16 @@ function ExerciseDetailView({
 
       {/* Video */}
       {showVideo && videoUrl && (
-        <div className="bg-gray-900 p-4 rounded-xl border border-lime-400">
-          <video controls className="w-full rounded-lg" src={videoUrl}>
-            Your browser does not support video.
-          </video>
-        </div>
-      )}
+            <div className="bg-gray-900 p-4 rounded-xl border border-lime-400">
+              <iframe
+                className="w-full h-64 rounded-lg"
+                src={videoUrl.replace("watch?v=", "embed/")}
+                title={name}
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              ></iframe>
+            </div>
+          )}
 
       {/* Stats Grid */}
       <div className="grid grid-cols-2 gap-4">
