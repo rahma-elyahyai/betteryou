@@ -31,13 +31,25 @@ const CreateNutritionPlanForm = () => {
     { value: 'MAINTAIN', label: '⚖️ Maintain', desc: 'Maintain current weight' },
   ];
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
+ const handleChange = (e) => {
+  const { name, value } = e.target;
+  
+  if (name === 'startDate' && value) {
+    // Forcer au lundi de la semaine sélectionnée
+    const date = new Date(value);
+    const day = date.getDay(); // 0=Sun, 1=Mon, ..., 6=Sat
+    const diff = day === 0 ? -6 : 1 - day; // calcul du lundi
+    date.setDate(date.getDate() + diff);
+    const monday = date.toISOString().split('T')[0];
+    setFormData(prev => ({ ...prev, startDate: monday }));
+  } else {
     setFormData(prev => ({ ...prev, [name]: value }));
-    if (errors[name]) {
-      setErrors(prev => ({ ...prev, [name]: '' }));
-    }
-  };
+  }
+  
+  if (errors[name]) {
+    setErrors(prev => ({ ...prev, [name]: '' }));
+  }
+};
 
   const handleObjectiveSelect = (value) => {
     setFormData(prev => ({ ...prev, objective: value }));
@@ -291,6 +303,11 @@ const handleSubmit = async (e) => {
                 {errors.startDate && (
                   <p className="text-red-400 text-sm mt-1">{errors.startDate}</p>
                 )}
+               {formData.startDate && (
+  <p className="text-lime-400 text-xs mt-1">
+    📅 Plan will start on Monday: {formData.startDate}
+  </p>
+)}
               </div>
 
               <div>
