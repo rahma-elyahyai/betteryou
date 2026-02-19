@@ -1,14 +1,29 @@
-import React, { Suspense } from "react";
+import React, { useEffect, useState, Suspense } from "react";
 import NutritionCatalog from "./../features/Nutrition/components/NutritionCatalog";
-import { useAuth } from "../features/Nutrition/store/AuthContext.jsx";
+//import { useAuth } from "../features/Nutrition/store/AuthContext.jsx";
+import { getCurrentUserId } from "@/utils/authUtils.js";
+//const userId = await getCurrentUserId(); 
 
 export default function NutritionPage() {
-  const { user, loadingUser } = useAuth();
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  console.log("NutritionPage render:", { user, loadingUser }); //  Debug
+  useEffect(() => {
+    async function fetchUser() {
+      try {
+        const userId = await getCurrentUserId();
+        setUser(userId);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchUser();
+  }, []);
 
   // 🔥 CORRECTION ESSENTIELLE : Vérifier user ET loadingUser
-  if (loadingUser || !user) {
+  if (loading || !user) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-[#0B0B12] via-[#1a1625] to-[#0f0f1a] flex items-center justify-center">
         <div className="flex flex-col items-center">
@@ -20,7 +35,7 @@ export default function NutritionPage() {
   }
 
   // 🔥 Vérification supplémentaire de idUser
-  if (!user.idUser) {
+  if (!user) {
     console.error("User object exists but idUser is missing:", user); //  Debug
     return (
       <div className="min-h-screen bg-gradient-to-br from-[#0B0B12] via-[#1a1625] to-[#0f0f1a] flex items-center justify-center">
@@ -38,7 +53,7 @@ export default function NutritionPage() {
     );
   }
 
-  console.log("Rendering NutritionCatalog with userId:", user.idUser); // Debug
+  console.log("Rendering NutritionCatalog with userId:", user); // Debug
 
   return (
     <Suspense fallback={
@@ -49,7 +64,7 @@ export default function NutritionPage() {
         </div>
       </div>
     }>
-      <NutritionCatalog userId={user.idUser} limit={4} />
+      <NutritionCatalog userId={user} limit={4} />
     </Suspense>
   );
 }
